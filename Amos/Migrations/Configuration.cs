@@ -13,7 +13,6 @@ namespace Amos.Migrations
         public Configuration()
         {
             AutomaticMigrationsEnabled = true;
-            AutomaticMigrationDataLossAllowed = true;
         }
 
         protected override void Seed(Amos.Models.ApplicationDbContext context)
