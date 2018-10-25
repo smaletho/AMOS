@@ -1,0 +1,60 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles{
+<style>
+    title-1 {
+        display: block;
+        font-weight: 100;
+        font-size: 120px;
+        text-align: center;
+        color: #666;
+    }
+
+    title-2 {
+        display: block;
+        font-weight: 600;
+        font-size: 24px;
+        text-align: center;
+        color: #666;
+        margin-bottom: 48px;
+    }
+
+        title-2 b {
+            font-weight: 800;
+            color: #ddd;
+            font-size: 30px;
+        }
+
+    .jumbotron {
+        background-color: #96b0c9;
+    }
+    .jumbotron img {display:table;margin:0 auto;width:30%;}
+    </style>    
+}
+
+<div class="jumbotron">
+    <img src="~/Content/images/amos_logo.png" />
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>Present Books</h2>
+        <p>View and read all published AMOS books.</p>
+        <p><a class="btn btn-primary btn-lg" href="@Url.Action("ViewBooks")">View Books &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>Configure Books</h2>
+        <p>Edit, modify, delete, and create new books.</p>
+        <p><a class="btn btn-primary btn-lg" href="@Url.Action("ListBooks", "Build")">Configure Books &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>Subjects</h2>
+        <p>
+            View data from all subjects.
+        </p>
+        <p><a class="btn btn-primary btn-lg" href="@Url.Action("Index", "Subject")">View Subjects &raquo;</a></p>
+    </div>
+</div>

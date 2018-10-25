@@ -1,0 +1,224 @@
+﻿@model Amos.Models.ManagePagesModel
+
+@{
+    ViewBag.Title = "Manage";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles{
+    <style>
+        .scrollable-menu {
+            height: auto;
+            max-height: 500px;
+            overflow-x: hidden;
+        }
+    </style>
+}
+@{
+    string name = Model.PageListModel.GetBook.Name ?? "New Book";
+    string version = Model.PageListModel.GetBook.Version ?? "1";
+}
+<div class="input-group mb-3 input-group-lg mx-auto w-100">
+    <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon1">Book Name</span>
+    </div>
+    <input type="text" class="form-control bookName" placeholder="Book Name" aria-label="Book Name" aria-describedby="basic-addon1" value="@name" @shouldDisable() />
+</div>
+<div class="input-group mb-3 mx-auto w-100">
+    <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon2">Version</span>
+    </div>
+    <input type="text" class="form-control bookVersion" placeholder="Version" aria-label="Version" aria-describedby="basic-addon12" value="@version" @shouldDisable() />
+</div>
+
+@if (Model.PageListModel.GetBook.Published)
+{
+    <div class="alert alert-secondary btn" data-toggle="modal" data-target="#lockedBookModal">
+        <i class="fa fa-lock"></i>
+        This book is published, and cannot be edited. Click for more information.
+    </div>
+    <div class="modal fade" id="lockedBookModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Unpublish Book?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Un-publishing the book for editing will make the book inaccessible to users while being edited.</p>
+                    <p>To edit this book, click the "continue" button below.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="enableDisable(false);">continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-primary btn" data-toggle="modal" data-target="#unlockedBookModal">
+        <i class="fa fa-unlock"></i>
+        This book is <b>NOT</b> published, and <b>CAN</b> be edited. Click to publish.
+    </div>
+    <div class="modal fade" id="unlockedBookModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Unpublish Book?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Publishing this book will allow it to be viewed by all users.</p>
+                    <p>To publish this book, click continue to validate it.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="enableDisable(true);">continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+    
+
+    <p>
+        <a class="btn btn-outline-primary" href="@Url.Action("Edit", new { id=Model.PageListModel.GetBook.BookId })">
+            Click here
+        </a>
+        to edit and organize this book. Here, pages can be added, rearranged, removed, or renamed.
+    </p>
+    <hr />
+    <p>
+        Below, you will find a list of links and buttons used within this book. Use this interface to 
+        connect each button to the corresponding page that you would like it to navigate to.
+    </p>
+    
+    <table class="table">
+        <tr>
+            <th>Page Id</th>
+            <th>Page Name</th>
+            <th>Type</th>
+            <th>Text</th>
+            <th>Navigate Page Id</th>
+            <th>Navigate Page Name</th>
+        </tr>
+
+        @foreach (var item in Model.pageButtons)
+        {
+            string title = "";
+            try
+            {
+                title = item.getNavPage.Title;
+            }
+            catch
+            {
+                title = "n/a";
+            }
+            <tr>
+                <td>@item.PageId</td>
+                <td>@item.getPage.Title</td>
+                @if (item.isButton)
+                {
+                    <td>
+                        <button class="btn btn-primary">button</button>
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        <a href="javascript:void(0)">link</a>
+                    </td>
+                }
+                <td>@item.ButtonText</td>
+                <td>@item.NavPageId</td>
+
+                <td>
+                    <div class="dropdown">
+                        <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @title
+                        </a>
+
+                        <div class="dropdown-menu  scrollable-menu" aria-labelledby="dropdownMenuLink">
+                            <ul class="list-group">
+                                @foreach (var mod in Model.PageListModel.Modules.OrderBy(x => x.SortOrder))
+                                {
+                                    <li class="list-group-item">
+                                        @mod.Name
+                                        <ul class="list-group">
+                                            @foreach (var sec in Model.PageListModel.Sections.Where(x => x.ModuleId == mod.ModuleId).OrderBy(x => x.SortOrder))
+                                            {
+                                                <li class="list-group-item">
+                                                    @sec.Name
+                                                    <ul class="list-group">
+                                                        @foreach (var cha in Model.PageListModel.Chapters.Where(x => x.SectionId == sec.SectionId).OrderBy(x => x.SortOrder))
+                                                        {
+                                                            <li class="list-group-item">
+                                                                @cha.Name
+                                                                <ul class="list-group">
+                                                                    @foreach (var page in Model.PageListModel.PageList.Where(x => x.ChapterId == cha.ChapterId).OrderBy(x => x.SortOrder))
+                                                                    {
+                                                                        <li class="list-group-item">
+                                                                            <a class="dropdown-item @if(page.PageId == item.NavPageId) { WriteLiteral(" active"); } " href="#">@page.PageId - @page.Title</a>
+                                                                        </li>
+                                                                    }
+                                                                </ul>
+                                                            </li>
+                                                        }
+                                                    </ul>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </li>
+                                }
+
+                            </ul>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        }
+
+    </table>
+}
+
+
+
+
+
+
+@functions{
+    string shouldDisable()
+    {
+        if (Model.PageListModel.GetBook.Published) return " disabled";
+        else return "";
+    }
+}
+
+@section scripts{
+    <script src="~/Content/js/shared.js"></script>
+    <script>
+        function enableDisable_success(data) {
+            if (data == "success")
+                window.location.reload();
+            else {
+                alert(data);
+            }
+        }
+        function enableDisable_fail(data) {
+            alert("Error");
+            console.log("error", data);
+        }
+        function enableDisable(isPublish) {
+            transmitAction('@Url.Action("ChangePublishStatus")', enableDisable_success, enableDisable_fail, "", { BookId: @Model.PageListModel.GetBook.BookId, IsPublish: isPublish }, true);
+        }
+    </script>
+
+
+}

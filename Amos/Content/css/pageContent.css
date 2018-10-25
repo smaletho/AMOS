@@ -1,0 +1,60 @@
+﻿#page-content {
+    padding: 30px 50px;
+    margin-top: 135px;
+    height: 638px;
+    position: relative;
+    font-size: 14pt;
+}
+
+    #page-content .item {
+        position: absolute;
+    }
+
+    #page-content .inner-text {
+        /*position:relative;*/
+    }
+
+    #page-content .header {
+        font-size: 18pt;
+        font-weight: bold;
+    }
+
+    #page-content button {
+        outline: none;
+        cursor: pointer;
+        padding: 10px 30px;
+        color: white;
+        background-color: black;
+        border: 4px outset gray;
+        border-radius: 10px;
+        font-family:Fira Mono;
+        font-size:12pt;
+    }
+
+        #page-content button:active {
+            border: 4px inset black;
+            color: black;
+            background-color: gray;
+        }
+
+    #page-content textarea {
+        font-family: Fira Mono;
+        font-size:12pt;
+        width:500px;
+        height:75px;
+        border:1px solid black;
+        margin-top:10px;
+    }
+
+    #page-content .post-quiz {
+        border:4px solid black;
+        padding:20px;
+    }
+
+        #page-content .post-quiz.correct {
+            border-color:green;
+        }
+
+        #page-content .post-quiz.incorrect {
+            border-color:red;
+        }

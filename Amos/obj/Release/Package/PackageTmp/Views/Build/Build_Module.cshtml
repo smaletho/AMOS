@@ -1,0 +1,35 @@
+﻿@model Amos.Models.Module
+
+@if (Model.SortOrder == 0)
+{
+    <li class="module theme_1" data-id="@Model.ModuleId">
+        @getGuts()
+    </li>
+}
+else
+{
+    @getGuts()
+}
+
+
+
+@helper getGuts()
+    {
+
+            <div class="info-controls">
+                <i class="fa fa-sort-up"></i>
+                <i class="fa fa-sort-down"></i>
+                <i class="fa fa-minus"></i>
+            </div>
+            <div class="info-content">
+                <div class="info-name">
+                    <div class="info-name-label" data-id="@Model.ModuleId">Module 1</div>
+                    <input type="text" value="@Model.Name" class="partName" />
+                </div>
+                <div class="action-menu">
+                    <a href="javascript:void(0)" onclick="performActionMenu(this)">delete</a>
+                    <a href="javascript:void(0)" onclick="performActionMenu(this)">change theme</a>
+                </div>
+            </div>
+            
+}

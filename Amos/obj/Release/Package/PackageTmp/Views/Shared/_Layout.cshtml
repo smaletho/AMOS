@@ -1,0 +1,69 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - AMOS</title>
+    <link href="~/Content/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    @Scripts.Render("~/bundles/modernizr")
+    <link href="~/fonts/FiraSans/Fonts.css" rel="stylesheet" />
+    <link href="~/Content/Site.css" rel="stylesheet" />
+    @RenderSection("styles", required: false)
+</head>
+<body>
+    <div class="container container-fluid bg-dark mw-100">
+        <div class="container container-fluid">
+            <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+                <a class="navbar-brand" href="@Url.Action("Index", "Home")">
+                    <img src="~/Content/images/amos_logo.png" width="30" height="30" class="d-inline-block align-top" alt="" />
+                </a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item">
+                            <a class="nav-link @Html.Raw(isActiveController("Home"))" href="@Url.Action("Index", "Home")">Home</a>
+                        </li>
+                        <li class="nav-item @Html.Raw(isActiveController("Present"))">
+                            <a class="nav-link" href="@Url.Action("ViewBooks", "Present")">Present</a>
+                        </li>
+                        <li class="nav-item @Html.Raw(isActiveController("Build"))">
+                            <a class="nav-link" href="@Url.Action("ListBooks", "Build")">Configure</a>
+                        </li>
+                        <li class="nav-item @Html.Raw(isActiveController("Subject"))">
+                            <a class="nav-link " href="@Url.Action("Index", "Subject")">Subjects</a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_LoginPartial")
+                </div>
+            </nav>
+        </div>
+
+    </div>
+
+    <div class="container container-fluid pt-5">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - AMOS</p>
+        </footer>
+    </div>
+    @RenderSection("footer", required: false)
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>
+
+@functions{
+    string isActiveController(string controller)
+    {
+        if (controller == this.ViewContext.RouteData.Values["controller"].ToString()) return " active";
+        else return "";
+    }
+
+
+}

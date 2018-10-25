@@ -1,0 +1,31 @@
+﻿@model Amos.Models.Section
+
+@if (Model.SortOrder == 0)
+{
+    <li class="section" data-id="@Model.SectionId">
+        @getGuts()
+    </li>
+}
+else
+{
+    @getGuts()
+}
+
+@helper getGuts()
+    {
+            <div class="info-controls">
+                <i class="fa fa-sort-up"></i>
+                <i class="fa fa-sort-down"></i>
+                <i class="fa fa-minus"></i>
+            </div>
+            <div class="info-content">
+                <div class="info-name">
+                    <div class="info-name-label" data-id="@Model.SectionId">Section 1</div>
+                    <input type="text" value="@Model.Name" class="partName" />
+                </div>
+                <div class="action-menu">
+                    <a href="javascript:void(0)" onclick="performActionMenu(this)">delete</a>
+                </div>
+            </div>
+}
+

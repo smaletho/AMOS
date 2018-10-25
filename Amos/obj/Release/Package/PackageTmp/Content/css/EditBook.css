@@ -1,0 +1,296 @@
+﻿body {
+    background-color: white;
+    overflow: auto;
+    font-family: Fira Sans;
+}
+
+input {
+    font-family: Fira Sans;
+}
+
+.module-container, .section-container, .chapter-container, .page-container {
+    display: table;
+    margin: 0 auto 20px;
+    overflow: auto;
+}
+
+
+.info-controls {
+    float: left;
+    background-color: gray;
+    height: 100%;
+}
+
+.info-content {
+    float: left;
+    padding: 10px;
+}
+
+.section-container, .chapter-container, .page-container {
+    margin-left: 45px;
+    display: block;
+    margin-top: 70px;
+}
+
+.info-controls .fa {
+    font-size: 20pt;
+    display: block;
+    padding: 5px;
+    color: white;
+}
+
+.fa-sort-up, .fa-sort-down {
+    height: 20px;
+    margin-left: 3px
+}
+
+.fa-plus, .fa-minus {
+    margin-top: 10px
+}
+
+.info-name-label {
+    font-size: 10pt;
+    font-style: italic;
+}
+
+.info-name, .action-menu {
+    float: left;
+}
+
+.action-menu a {
+    display:table;
+    font-size:10pt;
+}
+
+.background-container {
+    border: 1px solid black;
+    border-right: none;
+}
+
+.module-container {
+    border-right: 1px solid black;
+}
+
+
+
+.disabled {
+    visibility: hidden;
+}
+
+
+.action-bar {
+    position: fixed;
+    top: 50px;
+    display: table;
+    margin: 0 auto;
+    background-color: gray;
+    width: 800px;
+    z-index: 100;
+}
+
+    .action-bar .block {
+        float: left;
+        width: 33%;
+        text-align: center;
+        padding: 10px;
+        color: white;
+        font-weight: bold;
+        font-family: 'Fira Mono'
+    }
+
+        .action-bar .block .saved {
+            background-color: green;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .action-bar .block .valid {
+            background-color: green;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .action-bar .block .not-saved {
+            background-color: red;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .action-bar .block .in-valid {
+            background-color: red;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .action-bar .block .bookValid {
+            cursor: pointer;
+        }
+
+.error-list {
+    z-index: 101;
+    position: fixed;
+    top: 85px;
+    width: 800px;
+    display: none;
+    margin: 0 auto;
+}
+
+    .error-list .errors {
+        z-index: 102;
+        display: table;
+        margin: 0 auto;
+        background-color: white;
+        padding: 20px;
+        border: 2px solid black;
+        width: 325px;
+    }
+
+.scrollTo {
+    float: right;
+}
+
+
+
+
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: gray;
+    opacity: 0.7;
+    width: 100%;
+    height: 100%;
+}
+
+
+.themeSelector {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 800px;
+    height: 500px;
+    background-color: silver;
+    overflow: auto;
+    margin-top: -250px;
+    margin-left: -400px;
+    padding: 20px;
+    border: 20px solid white
+}
+
+    .themeSelector img {
+        width: 100%;
+    }
+
+    .themeSelector .themeBlock {
+        background-color: white;
+        cursor: pointer;
+        display: table;
+        padding: 20px;
+        margin-bottom: 10px;
+        border: 2px solid black;
+        border-radius: 5px;
+    }
+
+        .themeSelector .themeBlock:hover {
+            background-color: #ebebeb;
+        }
+
+        .themeSelector .themeBlock.selected {
+            background-color: #96b0c9
+        }
+
+.pageSelector {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 1138px;
+    height: 445px;
+    padding: 10px;
+    margin-top: -335px;
+    margin-left: -565px;
+    background-color: white;
+    border: 4px outset #96b0c9;
+}
+
+    .pageSelector .topbar {
+        margin-bottom: 5px;
+    }
+
+        .pageSelector .topbar .infoPages {
+            float: left;
+            width: 310px;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        .pageSelector .topbar .infoPreview {
+            float: left;
+            width: 800px;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+.topbar, .middlebar, .bottombar {
+    display: block;
+    overflow: auto;
+}
+
+.pageSelector .middlebar .pageList {
+    float: left;
+    width: 300px;
+    height: 320px;
+    margin-right: 10px;
+    border: 1px solid black;
+    overflow-y: scroll;
+}
+
+.pageSelector .middlebar .pagePreview {
+    float: left;
+    width: 800px;
+    transform: scale(0.5);
+    transform-origin: top left;
+}
+
+.pageSelector .middlebar .pageList .unusedPage {
+    display: block;
+    padding: 5px;
+    border-bottom: 1px solid black;
+    cursor: pointer;
+}
+
+    .pageSelector .middlebar .pageList .unusedPage:hover {
+        background-color: #ebebeb;
+    }
+
+    .pageSelector .middlebar .pageList .unusedPage .name {
+        font-weight: bold;
+    }
+
+    .pageSelector .middlebar .pageList .unusedPage .user {
+        font-style: italic;
+        font-size: 6pt;
+    }
+
+#importPage {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+#closeImport {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+}
+
+.selected {
+    background-color: #96b0c9;
+}
+
+
+.alert {
+    margin-bottom: 0;
+}

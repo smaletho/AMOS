@@ -1,0 +1,94 @@
+﻿@model Amos.Models.AssetModel
+@{
+    ViewBag.Title = "Assets";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Assets for PageId: @Model.PageId</h2>
+
+<table style="margin: 30px auto">
+    <tr>
+        <th>Id</th>
+        <th></th>
+        <th>Name</th>
+        <th>Size</th>
+        <th></th>
+    </tr>
+    @foreach (var file in Model.FileList)
+    {
+        decimal d_fSize = ((decimal)file.Content.Length / (decimal)1000000);
+        string id = "";
+        string fileSize = "";
+        if (file.FileType == FileType.Photo)
+        {
+            id = "i_" + file.FileId;
+        }
+        else if (file.FileType == FileType.Video)
+        {
+            id = "v_" + file.FileId;
+        }
+        if (file.Content != null)
+        {
+            fileSize = d_fSize.ToString("0.##") + " MB";
+        }
+        else
+        {
+            fileSize = "n/a";
+        }
+
+        <tr>
+            <td>@id</td>
+            <td>
+                <a target="_blank" href="../../ImageManager.ashx?id=@id">
+                    @if (file.FileType == FileType.Photo)
+                    {
+                        <img src="../../ImageManager.ashx?id=@id" height="40" width="40" />
+                    }
+                </a>
+                <div class="dimensions"></div>
+            </td>
+            <td>
+                <a target="_blank" href="../../ImageManager.ashx?id=@id">
+                    @file.FileName
+                </a>
+            </td>
+            <td>@fileSize</td>
+            <td>
+                @Html.ActionLink("delete", "DeleteFile", new { id = file.FileId })
+            </td>
+        </tr>
+
+    }
+</table>
+
+
+<div style="margin:0 auto;display:table">
+    @using (Html.BeginForm("UploadAsset", "Build", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.HiddenFor(x => x.PageId)
+        @Html.TextBoxFor(m => m.UploadedFile, new { type = "file" })
+        @Html.ValidationMessageFor(m => m.UploadedFile)
+        <button type="submit">upload</button>
+    }
+</div>
+
+
+
+
+@section scripts{
+    <script>
+        $(function () {
+            $("img").each(function () {
+                var ogImage = this;
+                var tmpImg = new Image();
+                tmpImg.src = $(this).prop('src');
+                $(tmpImg).on('load', function () {
+                    var orgWidth = tmpImg.width;
+                    var orgHeight = tmpImg.height;
+
+                    $(ogImage).closest("td").find(".dimensions").first().text(orgWidth + " x " + orgHeight);
+                });
+            });
+        });
+    </script>
+}

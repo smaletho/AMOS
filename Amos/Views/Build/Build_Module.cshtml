@@ -1,0 +1,39 @@
+﻿@model Amos.Models.Module
+
+@if (Model.SortOrder == 0)
+{
+    <li class="module theme_1" data-id="@Model.ModuleId">
+        @getGuts()
+        <ul class="sections">
+            <li class="new">
+                <a class="newItem" data-type="section" href="javascript:void(0)">new section</a>
+            </li>
+        </ul>
+    </li>
+}
+else
+{
+    @getGuts()
+}
+
+
+
+@helper getGuts()
+    {
+        <div class="info-block">
+            <div class="arrow-block">
+                <i class="fa fa-sort-up"></i>
+                <i class="fa fa-sort-down"></i>
+                <i class="fa fa-minus"></i>
+            </div>
+            <div class="info-name">
+                <div class="info-name-text">Module 1</div>
+                <input type="text" value="@Model.Name" class="partName" />
+            </div>
+            
+            <div class="action-menu">
+                <a href="javascript:void(0)" onclick="performActionMenu(this)" data-type="module">delete</a>
+                <a href="javascript:void(0)" onclick="performActionMenu(this)" data-type="module">change theme</a>
+            </div>
+        </div>
+}

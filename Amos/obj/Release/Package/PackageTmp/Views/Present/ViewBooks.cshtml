@@ -1,0 +1,37 @@
+﻿@model IEnumerable<Amos.Models.Book>
+
+@{
+    ViewBag.Title = "ListBooks";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>List Books</h2>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Version)
+        </th>
+       
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model.OrderByDescending(x => x.ModifyDate))
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Version)
+            </td>
+            <td>
+                @Html.ActionLink("view", "Index", "View", new { id = item.BookId }, null)
+            </td>
+        </tr>
+    }
+
+</table>

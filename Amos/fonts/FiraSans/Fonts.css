@@ -1,0 +1,65 @@
+﻿/*
+The configuration of these fonts is matched to the family names, folder hierarchy, and file names utilized by source GitHub repository at: https://github.com/bBoxType/FiraSans . (Google Fonts uses a different naming scheme.)
+This font family includes additional weights that are not represented here, since modern CSS only supports weights in multiples of 100 (100 - 900).
+*/
+
+@font-face { font-family: 'Fira Sans'; font-style: normal; font-weight: 100; src: url(Normal/Roman/FiraSans-Thin.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans'; font-style: normal; font-weight: 200; src: url(Normal/Roman/FiraSans-UltraLight.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans'; font-style: normal; font-weight: 300; src: url(Normal/Roman/FiraSans-Light.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans'; font-style: normal; font-weight: 400; src: url(Normal/Roman/FiraSans-Regular.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans'; font-style: normal; font-weight: 500; src: url(Normal/Roman/FiraSans-Medium.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans'; font-style: normal; font-weight: 600; src: url(Normal/Roman/FiraSans-SemiBold.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans'; font-style: normal; font-weight: 700; src: url(Normal/Roman/FiraSans-Bold.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans'; font-style: normal; font-weight: 800; src: url(Normal/Roman/FiraSans-ExtraBold.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans'; font-style: normal; font-weight: 900; src: url(Normal/Roman/FiraSans-Heavy.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans'; font-style: italic; font-weight: 100; src: url(Normal/Italic/FiraSans-ThinItalic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans'; font-style: italic; font-weight: 200; src: url(Normal/Italic/FiraSans-UltraLightItalic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans'; font-style: italic; font-weight: 300; src: url(Normal/Italic/FiraSans-LightItalic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans'; font-style: italic; font-weight: 400; src: url(Normal/Italic/FiraSans-Italic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans'; font-style: italic; font-weight: 500; src: url(Normal/Italic/FiraSans-MediumItalic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans'; font-style: italic; font-weight: 600; src: url(Normal/Italic/FiraSans-SemiBoldItalic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans'; font-style: italic; font-weight: 700; src: url(Normal/Italic/FiraSans-BoldItalic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans'; font-style: italic; font-weight: 800; src: url(Normal/Italic/FiraSans-ExtraBoldItalic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans'; font-style: italic; font-weight: 900; src: url(Normal/Italic/FiraSans-HeavyItalic.woff) format('woff'); }
+
+@font-face { font-family: 'Fira Sans Condensed'; font-style: normal; font-weight: 100; src: url(Condensed/Roman/FiraSansCondensed-Thin.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Condensed'; font-style: normal; font-weight: 200; src: url(Condensed/Roman/FiraSansCondensed-UltraLight.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Condensed'; font-style: normal; font-weight: 300; src: url(Condensed/Roman/FiraSansCondensed-Light.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Condensed'; font-style: normal; font-weight: 400; src: url(Condensed/Roman/FiraSansCondensed-Regular.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Condensed'; font-style: normal; font-weight: 500; src: url(Condensed/Roman/FiraSansCondensed-Medium.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Condensed'; font-style: normal; font-weight: 600; src: url(Condensed/Roman/FiraSansCondensed-SemiBold.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Condensed'; font-style: normal; font-weight: 700; src: url(Condensed/Roman/FiraSansCondensed-Bold.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Condensed'; font-style: normal; font-weight: 800; src: url(Condensed/Roman/FiraSansCondensed-ExtraBold.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Condensed'; font-style: normal; font-weight: 900; src: url(Condensed/Roman/FiraSansCondensed-Heavy.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Condensed'; font-style: italic; font-weight: 100; src: url(Condensed/Italic/FiraSansCondensed-ThinItalic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Condensed'; font-style: italic; font-weight: 200; src: url(Condensed/Italic/FiraSansCondensed-UltraLightItalic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Condensed'; font-style: italic; font-weight: 300; src: url(Condensed/Italic/FiraSansCondensed-LightItalic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Condensed'; font-style: italic; font-weight: 400; src: url(Condensed/Italic/FiraSansCondensed-Italic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Condensed'; font-style: italic; font-weight: 500; src: url(Condensed/Italic/FiraSansCondensed-MediumItalic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Condensed'; font-style: italic; font-weight: 600; src: url(Condensed/Italic/FiraSansCondensed-SemiBoldItalic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Condensed'; font-style: italic; font-weight: 700; src: url(Condensed/Italic/FiraSansCondensed-BoldItalic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Condensed'; font-style: italic; font-weight: 800; src: url(Condensed/Italic/FiraSansCondensed-ExtraBoldItalic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Condensed'; font-style: italic; font-weight: 900; src: url(Condensed/Italic/FiraSansCondensed-HeavyItalic.woff) format('woff'); }
+
+@font-face { font-family: 'Fira Sans Compressed'; font-style: normal; font-weight: 100; src: url(Compressed/Roman/FiraSansCompressed-Thin.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Compressed'; font-style: normal; font-weight: 200; src: url(Compressed/Roman/FiraSansCompressed-UltraLight.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Compressed'; font-style: normal; font-weight: 300; src: url(Compressed/Roman/FiraSansCompressed-Light.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Compressed'; font-style: normal; font-weight: 400; src: url(Compressed/Roman/FiraSansCompressed-Regular.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Compressed'; font-style: normal; font-weight: 500; src: url(Compressed/Roman/FiraSansCompressed-Medium.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Compressed'; font-style: normal; font-weight: 600; src: url(Compressed/Roman/FiraSansCompressed-SemiBold.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Compressed'; font-style: normal; font-weight: 700; src: url(Compressed/Roman/FiraSansCompressed-Bold.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Compressed'; font-style: normal; font-weight: 800; src: url(Compressed/Roman/FiraSansCompressed-ExtraBold.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Compressed'; font-style: normal; font-weight: 900; src: url(Compressed/Roman/FiraSansCompressed-Heavy.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Compressed'; font-style: italic; font-weight: 100; src: url(Compressed/Italic/FiraSansCompressed-ThinItalic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Compressed'; font-style: italic; font-weight: 200; src: url(Compressed/Italic/FiraSansCompressed-UltraLightItalic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Compressed'; font-style: italic; font-weight: 300; src: url(Compressed/Italic/FiraSansCompressed-LightItalic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Compressed'; font-style: italic; font-weight: 400; src: url(Compressed/Italic/FiraSansCompressed-Italic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Compressed'; font-style: italic; font-weight: 500; src: url(Compressed/Italic/FiraSansCompressed-MediumItalic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Compressed'; font-style: italic; font-weight: 600; src: url(Compressed/Italic/FiraSansCompressed-SemiBoldItalic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Compressed'; font-style: italic; font-weight: 700; src: url(Compressed/Italic/FiraSansCompressed-BoldItalic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Compressed'; font-style: italic; font-weight: 800; src: url(Compressed/Italic/FiraSansCompressed-ExtraBoldItalic.woff) format('woff'); }
+@font-face { font-family: 'Fira Sans Compressed'; font-style: italic; font-weight: 900; src: url(Compressed/Italic/FiraSansCompressed-HeavyItalic.woff) format('woff'); }
+
+@font-face { font-family: 'Fira Mono'; font-style: normal; font-weight: 400; src: url(Mono/FiraMono-Regular.woff) format('woff'); }
+@font-face { font-family: 'Fira Mono'; font-style: normal; font-weight: 500; src: url(Mono/FiraMono-Medium.woff) format('woff'); }
+@font-face { font-family: 'Fira Mono'; font-style: normal; font-weight: 700; src: url(Mono/FiraMono-Bold.woff) format('woff'); }

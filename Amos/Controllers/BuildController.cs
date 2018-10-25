@@ -1,0 +1,1459 @@
+﻿using Amos.Models;
+using Ionic.Zip;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Text;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Script.Serialization;
+using System.Xml;
+
+namespace Amos.Controllers
+{
+    [Authorize]
+    public class BuildController : Controller
+    {
+        // GET: Build
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+        public ActionResult ListBooks()
+        {
+            ApplicationDbContext adb = new ApplicationDbContext();
+            return View(adb.Books.ToList());
+        }
+
+
+        public ActionResult Create()
+        {
+            var model = new PageListModel();
+            model.GetBook.Create(User.Identity.Name);
+            model.PageList.FirstOrDefault().Create(User.Identity.Name);
+
+            return View("Edit", model);
+        }
+
+
+        public ActionResult ImportBook()
+        {
+            return View(new ImportBookModel());
+        }
+
+        public ActionResult DoImportBook(ImportBookModel model)
+        {
+            StringBuilder sb = new StringBuilder();
+            ApplicationDbContext cdb = new ApplicationDbContext();
+
+            try
+            {
+                HttpPostedFileBase file = Request.Files[0];
+                using (ZipArchive zipArchive = new ZipArchive(file.InputStream))
+                {
+
+                    Dictionary<string, string> oldToNewPageNumbers = new Dictionary<string, string>();
+
+                    // TODO timer
+
+                    var config = zipArchive.Entries.Where(x => x.Name == "config.xml").FirstOrDefault();
+                    if (config == null)
+                    {
+                        sb.AppendLine("Could not find config.xml. Aborting.");
+                        return Content(sb.ToString());
+                    }
+                    else
+                    {
+                        sb.AppendLine("Found config.xml. Parsing in to book...");
+                        using (var stream = config.Open())
+                        {
+                            using (var reader = new StreamReader(stream))
+                            {
+                                try
+                                {
+                                    // turn it in to an XML Doc
+                                    XmlDocument xmlDoc = new XmlDocument();
+                                    xmlDoc.LoadXml(reader.ReadToEnd());
+
+                                    // loop through the xml doc to build book
+                                    foreach (XmlElement bookNode in xmlDoc.ChildNodes)
+                                    {
+                                        // this is the book object
+                                        Book book = new Book();
+                                        book.CreatedBy = bookNode.Attributes["author"].Value;
+                                        book.ModifiedBy = bookNode.Attributes["author"].Value;
+
+                                        try { book.CreateDate = Convert.ToDateTime(bookNode.Attributes["createdate"].Value); }
+                                        catch { book.CreateDate = DateTime.Now; }
+                                        try { book.ModifyDate = Convert.ToDateTime(bookNode.Attributes["modifydate"].Value); }
+                                        catch { book.ModifyDate = DateTime.Now; }
+
+                                        book.Published = true;
+                                        book.Version = bookNode.Attributes["version"].Value;
+                                        book.Name = bookNode.Attributes["name"].Value;
+
+                                        cdb.Books.Add(book);
+                                        cdb.SaveChanges();
+                                        sb.AppendLine(string.Format("Added book. Name: {0} Id: {1}", book.Name, book.BookId));
+
+                                        int moduleSort = 10;
+
+                                        foreach (XmlElement moduleNode in bookNode.ChildNodes)
+                                        {
+                                            // these are modules
+                                            Module module = new Module();
+                                            module.BookId = book.BookId;
+                                            module.Name = moduleNode.Attributes["name"].Value;
+
+                                            module.SortOrder = moduleSort;
+                                            moduleSort += 10;
+
+                                            module.Theme = moduleNode.Attributes["theme"].Value;
+                                            cdb.Modules.Add(module);
+                                            cdb.SaveChanges();
+
+                                            int sectionSort = 10;
+
+                                            foreach (XmlElement sectionNode in moduleNode.ChildNodes)
+                                            {
+                                                // these are sections
+                                                Section section = new Section();
+                                                section.ModuleId = module.ModuleId;
+                                                section.Name = sectionNode.Attributes["name"].Value;
+
+                                                section.SortOrder = sectionSort;
+                                                sectionSort += 10;
+
+                                                cdb.Sections.Add(section);
+                                                cdb.SaveChanges();
+
+                                                int chapterSort = 10;
+
+                                                foreach (XmlElement chapterNode in sectionNode.ChildNodes)
+                                                {
+                                                    // these are chapters
+                                                    Chapter chapter = new Chapter();
+                                                    chapter.Name = chapterNode.Attributes["name"].Value;
+
+                                                    chapter.SortOrder = chapterSort;
+                                                    chapterSort += 10;
+
+                                                    chapter.SectionId = section.SectionId;
+                                                    cdb.Chapters.Add(chapter);
+                                                    cdb.SaveChanges();
+
+                                                    int pageSort = 10;
+
+                                                    foreach (XmlElement pageNode in chapterNode.ChildNodes)
+                                                    {
+                                                        // these are pages
+                                                        Page page = new Page();
+                                                        page.BookId = book.BookId;
+                                                        page.ChapterId = chapter.ChapterId;
+
+                                                        page.SortOrder = pageSort;
+                                                        pageSort += 10;
+
+                                                        page.Type = pageNode.Attributes["type"].Value;
+
+                                                        page.Create("import");
+                                                        try
+                                                        {
+                                                            page.Title = pageNode.Attributes["title"].Value;
+                                                        }
+                                                        catch (NullReferenceException)
+                                                        {
+                                                            page.Title = "New Page";
+                                                        }
+
+                                                        page.PageContent = "";
+
+                                                        cdb.Pages.Add(page);
+                                                        cdb.SaveChanges();
+
+                                                        oldToNewPageNumbers.Add(pageNode.Attributes["id"].Value, "p_" + page.PageId);
+                                                        pageNode.SetAttribute("id", "p_" + page.PageId);
+
+                                                        foreach (XmlElement contentNode in pageNode.ChildNodes)
+                                                        {
+                                                            if (contentNode.Name.ToLower() == "image" || contentNode.Name.ToLower() == "video")
+                                                            {
+                                                                // find the image in the archive
+                                                                string id = contentNode.Attributes["source"].Value;
+
+                                                                string type = "";
+                                                                string matchFileName = "";
+                                                                try
+                                                                {
+                                                                    type = contentNode.Attributes["type"].Value;
+                                                                    matchFileName = id + "." + type;
+                                                                }
+                                                                catch (NullReferenceException)
+                                                                {
+                                                                    type = "jpg";
+                                                                    matchFileName = id + ".jpg";
+                                                                }
+
+
+                                                                var innerFile = zipArchive.Entries.Where(x => x.Name == matchFileName).FirstOrDefault();
+                                                                if (innerFile != null)
+                                                                {
+                                                                    using (var innerStream = innerFile.Open())
+                                                                    {
+                                                                        using (var innerReader = new StreamReader(innerStream))
+                                                                        {
+                                                                            AmosFile f = new AmosFile();
+
+                                                                            MemoryStream target = new MemoryStream();
+                                                                            innerReader.BaseStream.CopyTo(target);
+                                                                            f.Content = target.ToArray();
+
+
+                                                                            f.FileName = matchFileName;
+                                                                            switch (type)
+                                                                            {
+                                                                                case "jpg":
+                                                                                case "png":
+                                                                                    f.ContentType = "image/" + type;
+                                                                                    f.FileType = FileType.Photo;
+                                                                                    break;
+                                                                                case "mp4":
+                                                                                    f.ContentType = "video/" + type;
+                                                                                    f.FileType = FileType.Video;
+                                                                                    break;
+                                                                            }
+
+                                                                            f.PageId = page.PageId;
+                                                                            cdb.AmosFiles.Add(f);
+                                                                            cdb.SaveChanges();
+
+                                                                            // update ID in contentNode
+                                                                            switch (f.FileType)
+                                                                            {
+                                                                                case FileType.Photo:
+                                                                                    contentNode.SetAttribute("source", "i_" + f.FileId);
+                                                                                    break;
+                                                                                case FileType.Video:
+                                                                                    contentNode.SetAttribute("source", "v_" + f.FileId);
+                                                                                    break;
+                                                                            }
+
+                                                                        }
+                                                                    }
+                                                                }
+                                                                else
+                                                                {
+                                                                    sb.AppendLine(string.Format("File not found. Page: {0} FileId: {1}", pageNode.Attributes["id"].Value, matchFileName));
+                                                                }
+                                                            }
+                                                        }
+
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                    }
+
+                                    // go back through all the page nodes, and update the other IDs (buttons, links, etc)
+                                    ///book/module/section/chapter/
+                                    foreach (XmlElement p in xmlDoc.SelectNodes("//page"))
+                                    {
+                                        // update the buttons
+                                        foreach (XmlElement button in p.SelectNodes("./button"))
+                                        {
+                                            try
+                                            {
+                                                // change the id from the old one to the matching new one
+                                                button.SetAttribute("id", oldToNewPageNumbers[button.Attributes["id"].Value]);
+                                            }
+                                            catch (NullReferenceException) { }
+                                        }
+
+                                        // update the anchors
+                                        foreach (XmlElement a in p.SelectNodes("./text//a"))
+                                        {
+
+                                            try
+                                            {
+                                                if (a.Attributes["class"].Value == "navigateTo")
+                                                {
+                                                    // change the id from the old one to the matching new one
+                                                    a.SetAttribute("data-id", oldToNewPageNumbers[a.Attributes["data-id"].Value]);
+                                                }
+                                            }
+                                            catch (NullReferenceException)
+                                            {
+
+                                            }
+
+                                        }
+
+                                        // get the pageId from the node
+                                        string pageId = p.Attributes["id"].Value;
+                                        int newPageId = Convert.ToInt32(pageId.Split('_')[1]);
+
+                                        var pageLookup = cdb.Pages.Where(x => x.PageId == newPageId).FirstOrDefault();
+                                        if (pageLookup != null)
+                                        {
+                                            pageLookup.PageContent = p.OuterXml;
+                                        }
+                                    }
+
+                                    cdb.SaveChanges();
+
+                                }
+                                catch (XmlException e)
+                                {
+                                    sb.AppendLine("Bad xml in config.xml. Aborting. Exception: " + e.Message);
+                                }
+                                catch (ArgumentException e)
+                                {
+                                    sb.AppendLine("Attribute exception. Message: " + e.Message);
+                                }
+                            }
+                        }
+                    }
+
+
+
+                }
+            }
+            catch (NotImplementedException e)
+            {
+                sb.AppendLine("Couldn't open file. Exception: " + e.Message);
+            }
+
+
+
+            return Content(sb.ToString());
+        }
+
+        public ActionResult Delete(int id)
+        {
+            ApplicationDbContext adb = new ApplicationDbContext();
+
+            var book = adb.Books.Where(x => x.BookId == id).FirstOrDefault();
+
+            ResetBook(book.BookId);
+
+            adb.Books.Remove(book);
+            adb.SaveChanges();
+
+            return RedirectToAction("ListBooks");
+        }
+
+        public ActionResult Export(int id)
+        {
+
+            CreateFolderIfNotThere();
+
+
+            ApplicationDbContext cdb = new ApplicationDbContext();
+            BookModel bookModel = new BookModel(id);
+
+            var pages = cdb.Pages.Where(x => x.BookId == id).ToList();
+
+            var theBook = cdb.Books.Where(x => x.BookId == id).FirstOrDefault();
+
+            string bookName = theBook.Name;
+            foreach (var c in Path.GetInvalidFileNameChars())
+            {
+                bookName = bookName.Replace(c, '-');
+            }
+
+            string dt = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
+            string fullFileName = Server.MapPath("~/ZipDump/export_" + bookName + "_" + dt + ".zip");
+            string fileName = "export_" + bookName + "_" + dt + ".zip";
+
+            // write each of these to a file
+            using (ZipFile zip = new ZipFile())
+            {
+                foreach (var p in pages)
+                {
+                    // find all associated files with that page
+                    var files = cdb.AmosFiles.Where(x => x.PageId == p.PageId).ToList();
+                    int count = 1;
+                    foreach (var f in files)
+                    {
+                        if (f.Content != null)
+                        {
+                            string fName = Server.MapPath("~/ZipDump/f_" + f.FileId.ToString() + "_" + dt);
+                            string newFileName = "/Content/";
+                            switch (f.FileType)
+                            {
+                                case FileType.Photo:
+                                    switch (f.ContentType)
+                                    {
+                                        case "image/jpg":
+                                        case "jpg":
+                                        case "jpeg":
+                                        case "image/jpeg":
+                                            fName += ".jpg";
+                                            newFileName += "i_" + f.FileId.ToString() + ".jpg";
+                                            break;
+                                        case "image/png":
+                                            fName += ".png";
+                                            newFileName += "i_" + f.FileId.ToString() + ".png";
+                                            break;
+                                    }
+                                    break;
+                                case FileType.Video:
+                                    switch (f.ContentType)
+                                    {
+                                        case "mp4":
+                                        case "video/mp4":
+                                            fName += ".mp4";
+                                            newFileName += "v_" + f.FileId.ToString() + ".mp4";
+                                            break;
+                                    }
+                                    break;
+                            }
+
+                            // write the file to the stream
+                            using (var tw = new StreamWriter(fName, true))
+                            {
+                                tw.BaseStream.Write(f.Content, 0, f.Content.Length);
+
+                                zip.AddFile(fName).FileName = newFileName;
+                            }
+                            count++;
+                        }
+                    }
+                }
+
+                // write the XML to a file too
+                string configFileName = Server.MapPath("~/ZipDump/config.xml");
+                using (var tw = new StreamWriter(configFileName, true))
+                {
+                    tw.Write(bookModel.ConfigXml.OuterXml);
+                    zip.AddFile(configFileName).FileName = "config.xml";
+                }
+
+                zip.Save(fullFileName);
+
+                return File(fullFileName, "application/zip", fileName);
+            }
+        }
+
+        public void CreateFolderIfNotThere()
+        {
+            if (!Directory.Exists(Server.MapPath("~/ZipDump")))
+                Directory.CreateDirectory(Server.MapPath("~/ZipDump"));
+        }
+
+
+
+        public ActionResult Download(int id)
+        {
+            CreateFolderIfNotThere();
+            // delete all the old stuff
+            DeleteOldFiles();
+
+
+
+            // grab all the stuff
+            ApplicationDbContext cdb = new ApplicationDbContext();
+            BookModel model = new BookModel(id);
+            var theBook = cdb.Books.Where(x => x.BookId == id).FirstOrDefault();
+
+
+            // loop through model.PageContent, and separate out all the XML pieces
+            List<string> contentLs = new List<string>();
+            foreach (var item in model.PageContent)
+            {
+                contentLs.Add(item.content);
+                item.content = "";
+            }
+
+
+            // change the offline load to read two different files
+            string dt = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
+
+            // make the name of the book safe for filenames
+            string bookName = theBook.Name;
+            foreach (var c in Path.GetInvalidFileNameChars())
+            {
+                bookName = bookName.Replace(c, '-');
+            }
+
+
+            string fullFileName = Server.MapPath("~/ZipDump/" + bookName + "_" + dt + ".zip");
+            string fileName = bookName + "_" + dt + ".zip";
+
+            string configFile1 = Server.MapPath("~/ZipDump/1config_" + dt + ".js");
+            string configFile2 = Server.MapPath("~/ZipDump/2config_" + dt + ".js");
+            string homeFile = Server.MapPath("~/ZipDump/index.html");
+
+            using (ZipFile zip = new ZipFile())
+            {
+                zip.AddDirectory(Server.MapPath("~/Content/"), "/Content/");
+                zip.AddDirectory(Server.MapPath("~/fonts/"), "/fonts/");
+
+                // Add Index.html
+                //  I need to strip down this file, and include the variables "config1.js" and config2.js"
+
+                using (var tw = new StreamWriter(homeFile, true))
+                {
+                    string text = System.IO.File.ReadAllText(Server.MapPath("~/Views/View/Index.cshtml"));
+
+                    text = text.Replace("~/", "./");
+
+                    string scriptText = "<script src=\"./Content/js/offline.js\"></script>";
+                    scriptText += "<script src=\"./Content/js/config1.js\"></script>";
+                    scriptText += "<script src=\"./Content/js/config2.js\"></script>";
+                    text = text.Replace("<script src=\"./Content/js/offline.js\"></script>", scriptText);
+
+                    tw.Write(text);
+                    zip.AddFile(homeFile).FileName = "index.html";
+
+                }
+
+                using (var tw = new StreamWriter(configFile1, true))
+                {
+                    // create the config file
+                    tw.Write("var offline_ConfigXml = $.parseXML(`");
+                    tw.Write(model.ConfigXml.OuterXml);
+                    tw.Write("`);");
+
+                    zip.AddFile(configFile1).FileName = "/Content/js/config1.js";
+                }
+
+                using (var tw = new StreamWriter(configFile2, true))
+                {
+                    // create the config file
+                    tw.Write("var offline_PageContents = `");
+
+                    var jsonSerialiser = new JavaScriptSerializer();
+                    var json = jsonSerialiser.Serialize(model.PageContent);
+
+                    tw.Write(json);
+                    tw.Write("`;");
+
+                    tw.WriteLine(Environment.NewLine);
+                    tw.WriteLine("var offline_PageGuts = [];");
+
+                    tw.WriteLine(Environment.NewLine);
+                    tw.WriteLine(Environment.NewLine);
+                    tw.WriteLine("function loadGuts() {");
+
+                    foreach (var page in contentLs)
+                    {
+                        tw.WriteLine("offline_PageGuts.push(`" + page + "`);");
+                    }
+
+                    tw.WriteLine("}");
+
+                    zip.AddFile(configFile2).FileName = "/Content/js/config2.js";
+                }
+
+                // map the images too
+
+                // first get all the pages in the book
+                //var bookPages = cdb.BookPages.Where(x => x.BookId == theBook.BookId).Select(x => x.PageId).ToList();
+                var pages = cdb.Pages.Where(x => x.BookId == theBook.BookId).ToList();
+                foreach (var p in pages)
+                {
+                    // find all associated files with that page
+                    var files = cdb.AmosFiles.Where(x => x.PageId == p.PageId).ToList();
+                    int count = 1;
+                    foreach (var f in files)
+                    {
+                        if (f.Content != null)
+                        {
+                            string fName = Server.MapPath("~/ZipDump/f_" + f.FileId.ToString() + "_" + dt);
+                            string newFileName = "/Content/";
+                            switch (f.FileType)
+                            {
+                                case FileType.Photo:
+                                    switch (f.ContentType)
+                                    {
+                                        case "image/jpg":
+                                        case "image/jpeg":
+                                            fName += ".jpg";
+                                            newFileName += "images/i_" + f.FileId.ToString() + ".jpg";
+                                            break;
+                                        case "image/png":
+                                            fName += ".png";
+                                            newFileName += "images/i_" + f.FileId.ToString() + ".png";
+                                            break;
+                                    }
+                                    break;
+                                case FileType.Video:
+                                    switch (f.ContentType)
+                                    {
+                                        case "video/mp4":
+                                            fName += ".mp4";
+                                            newFileName += "images/v_" + f.FileId.ToString() + ".mp4";
+                                            break;
+                                    }
+                                    break;
+                            }
+
+                            // write the file to the stream
+                            using (var tw = new StreamWriter(fName, true))
+                            {
+                                tw.BaseStream.Write(f.Content, 0, f.Content.Length);
+
+                                zip.AddFile(fName).FileName = newFileName;
+                            }
+                            count++;
+                        }
+                    }
+                }
+
+
+
+                zip.Save(fullFileName);
+
+                return File(fullFileName, "application/zip", fileName);
+            }
+        }
+        public void DeleteOldFiles()
+        {
+            string sourceDir = Server.MapPath("~/ZipDump/");
+
+            try
+            {
+                string[] mp4List = Directory.GetFiles(sourceDir, "*.mp4");
+                string[] pngList = Directory.GetFiles(sourceDir, "*.png");
+                string[] jpgList = Directory.GetFiles(sourceDir, "*.jpg");
+                string[] zipList = Directory.GetFiles(sourceDir, "*.zip");
+                string[] jsList = Directory.GetFiles(sourceDir, "*.js");
+                string[] htmlList = Directory.GetFiles(sourceDir, "*.html");
+
+                // Delete source files
+                foreach (string f in zipList)
+                {
+                    System.IO.File.Delete(f);
+                }
+                foreach (string f in jsList)
+                {
+                    System.IO.File.Delete(f);
+                }
+                foreach (string f in htmlList)
+                {
+                    System.IO.File.Delete(f);
+                }
+                foreach (string f in jpgList)
+                {
+                    System.IO.File.Delete(f);
+                }
+                foreach (string f in pngList)
+                {
+                    System.IO.File.Delete(f);
+                }
+                foreach (string f in mp4List)
+                {
+                    System.IO.File.Delete(f);
+                }
+            }
+            catch (DirectoryNotFoundException dirNotFound)
+            {
+                Console.WriteLine(dirNotFound.Message);
+            }
+        }
+
+
+
+
+
+        public ActionResult Edit(int id)
+        {
+            return View(new PageListModel(id));
+        }
+
+        public ActionResult ViewPage(int id)
+        {
+            PageViewModel model = new PageViewModel();
+            ApplicationDbContext cdb = new ApplicationDbContext();
+            if (id == 0)
+            {
+                model.PageId = 0;
+                model.PageName = "New Page";
+                model.XmlContent = "<page type=\"content\"></page>";
+            }
+            else
+            {
+                var page = cdb.Pages.Where(x => x.PageId == id).FirstOrDefault();
+
+                model.PageId = id;
+                model.XmlContent = page.PageContent;
+                model.PageName = page.Title;
+            }
+
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult GetPage(int id)
+        {
+            // Get page content by ID
+            ApplicationDbContext cdb = new ApplicationDbContext();
+            return Content(cdb.Pages.Where(x => x.PageId == id).Select(x => x.PageContent).FirstOrDefault());
+        }
+
+        [HttpPost]
+        public ActionResult UploadAsset(AssetModel model)
+        {
+            ApplicationDbContext cdb = new ApplicationDbContext();
+            // if file is there...
+            AmosFile f = new AmosFile();
+
+            // Convert the httppostedfilebase to a byte[]
+            MemoryStream target = new MemoryStream();
+            model.UploadedFile.InputStream.CopyTo(target);
+            f.Content = target.ToArray();
+
+            f.ContentType = model.UploadedFile.ContentType;
+            f.FileName = model.UploadedFile.FileName;
+
+            // check if comatable/etc
+            //  use ContentType ("image/jpeg" etc)
+            if (f.ContentType.Contains("image"))
+                f.FileType = FileType.Photo;
+            else if (f.ContentType.Contains("video"))
+                f.FileType = FileType.Video;
+
+            f.PageId = model.PageId;
+
+            cdb.AmosFiles.Add(f);
+            cdb.SaveChanges();
+            return RedirectToAction("ViewAssets", new { id = model.PageId });
+        }
+
+        public ActionResult ViewEditor(int id)
+        {
+            ApplicationDbContext cdb = new ApplicationDbContext();
+
+            PageViewModel model = new PageViewModel
+            {
+                PageId = id,
+            };
+
+            var page = cdb.Pages.Where(x => x.PageId == id).FirstOrDefault();
+            if (page != null)
+            {
+                model.PageName = page.Title;
+                model.PageType = page.Type;
+                string oldContent = page.PageContent;
+                model.XmlContent = oldContent.Replace("href=\"javascript:void(0)\"", "href=\"#\"");
+            }
+            else
+            {
+                model.PageName = "New Page";
+                model.XmlContent = "<page type=\"content\"></page>";
+            }
+            return View(model);
+        }
+
+        public ActionResult ViewAssets(int id)
+        {
+            return View("ViewAssets", new AssetModel(id));
+        }
+
+        [HttpPost]
+        public ActionResult SavePage(string xml,
+            List<string> images,
+            int pageId,
+            string name,
+            string type)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("Beginning analysis of page...");
+            bool foundErrors = false;
+
+            ApplicationDbContext cdb = new ApplicationDbContext();
+
+            XmlDocument doc = new XmlDocument();
+            try
+            {
+                doc.LoadXml(xml);
+            }
+            catch (XmlException e)
+            {
+                sb.AppendLine("ERROR: Unable to parse the XML. Aborting. Exception: " + e.Message);
+                return Content(sb.ToString());
+            }
+
+            var page = cdb.Pages.Where(x => x.PageId == pageId).FirstOrDefault();
+            if (page == null)
+            {
+                sb.AppendLine("This looks like a new page. Creating one...");
+                page = new Page(User.Identity.Name);
+                cdb.Pages.Add(page);
+            }
+            else
+            {
+                sb.AppendLine("Found an existing page...");
+                page.Modify(User.Identity.Name);
+            }
+
+            page.Title = name;
+
+            page.Type = type;
+
+
+            if (page.Type == "quiz")
+            {
+                sb.AppendLine("This appears to be a QUIZ page. Checking for proper quiz elements...");
+
+                // check for answer to question
+                string givenAnswer = "";
+                var questionNode = doc.SelectSingleNode("//text[@class='quiz-question']");
+                if (questionNode == null)
+                {
+                    sb.AppendLine("ERROR: Found quiz page, did not find required \"quiz-question\" element.");
+                    foundErrors = true;
+                }
+                else
+                {
+                    sb.AppendLine("Found question node, now checking for a valid answer...");
+                    try
+                    {
+                        givenAnswer = questionNode.Attributes["answer"].Value;
+                        sb.AppendLine("Quiz question appears to have an answer. Validating...");
+                    }
+                    catch (ArgumentException)
+                    {
+                        sb.AppendLine("ERROR: Found quiz page, found \"quiz-question\" element, but did not find \"answer\" attribute on \"quiz-question\" element.");
+                        foundErrors = true;
+                    }
+
+                    // now find all the question inputs
+                    var inputNodes = doc.SelectNodes("//input[@name='quiz']");
+                    if (inputNodes == null)
+                    {
+                        sb.AppendLine("ERROR: Found quiz page, didn't find any input[name=quiz] elements.");
+                        foundErrors = true;
+                    }
+                    else
+                    {
+                        sb.AppendLine("Found quiz input nodes. Checking to see if the answers are valid...");
+                        // make sure there are at least 2 options, and that 1 is the correct answer
+                        if (inputNodes.Count <= 1)
+                        {
+                            sb.AppendLine("ERROR: Found quiz page, but there was only one answer found.");
+                            foundErrors = true;
+                        }
+                        else
+                        {
+                            sb.AppendLine("Found more than one quiz input, searching for matching answer...");
+                            bool foundCorrectAnswer = false;
+                            foreach (XmlElement element in inputNodes)
+                            {
+                                // does it have a value?
+                                try
+                                {
+                                    var foundAnswer = element.Attributes["value"].Value;
+                                    if (foundAnswer == givenAnswer)
+                                    {
+                                        foundCorrectAnswer = true;
+                                        sb.AppendLine("Found an answer matching the given question!");
+                                    }
+                                }
+                                catch (ArgumentException)
+                                {
+                                    sb.AppendLine("ERROR: Found a quiz input, but couldn't find the value.\n\n" + element.OuterXml);
+                                    foundErrors = true;
+                                }
+                            }
+
+                            if (!foundCorrectAnswer)
+                            {
+                                sb.AppendLine("ERROR: Processing quiz page, but did not find an input matching the correct answer: " + givenAnswer);
+                                foundErrors = true;
+                            }
+                        }
+                    }
+                }
+                // does it have .post-quiz element?
+                var postQuizNode = doc.SelectSingleNode("//text[@class='post-quiz']");
+                if (postQuizNode == null)
+                {
+                    sb.AppendLine("ERROR: Coun't find a \"post-quiz\" element on the quiz page.");
+                    foundErrors = true;
+                }
+                else
+                {
+                    sb.AppendLine("Found \"post-quiz\" elements to pop up after the quiz.");
+                }
+            }
+            if (page.Type == "survey")
+            {
+                sb.AppendLine("This appears to be a SURVEY page. Checking for proper survey elements...");
+
+                // check for .survey-question and 8 inputs (name=survey)
+                var surveyQuestionNode = doc.SelectNodes("//input[@class='survey-question']");
+                if (surveyQuestionNode == null)
+                {
+                    sb.AppendLine("ERROR: Found survey page, couldn't find a .survey-question object.");
+                    foundErrors = true;
+                }
+                else
+                {
+                    sb.AppendLine("Found survey page, and found .survey-question object.");
+                    // check for 8 inputs
+                    var inputNodes = doc.SelectNodes("//input[@name='survey']");
+                    if (inputNodes == null)
+                    {
+                        sb.AppendLine("ERROR: Found survey page, didn't find any radio button inputs.");
+                        foundErrors = true;
+                    }
+                    else
+                    {
+                        sb.AppendLine("Found radio button inputs, counting them...");
+                        if (inputNodes.Count != 8)
+                        {
+                            sb.AppendFormat("ERROR: Found {0} survey response elements, when there should be 8.", inputNodes.Count.ToString());
+                            foundErrors = true;
+                        }
+                        else
+                        {
+                            sb.AppendLine("Found 8 radio button inputs.");
+                            // check for comments box
+                            var commentsBox = doc.SelectNodes("//textarea[@id='survey-comment']");
+                            if (commentsBox == null)
+                            {
+                                sb.AppendLine("ERROR: Found survey page, but found no comments box.");
+                                foundErrors = true;
+                            }
+                            else if (commentsBox.Count > 1)
+                            {
+                                sb.AppendLine("ERROR: Found more than one comments box on the page.");
+                                foundErrors = true;
+                            }
+                            else sb.AppendLine("Found a survey comments box.");
+                        }
+                    }
+                }
+            }
+            if (page.Title == "content")
+            {
+                // make sure it has no survey or quiz elements
+                if (doc.SelectNodes("//input[@name='quiz']").Count > 0)
+                {
+                    sb.AppendLine("This page is tagged as \"content\", but a quiz input element was discovered.");
+                    foundErrors = true;
+                }
+                if (doc.SelectNodes("//text[@class='quiz-question']").Count > 0)
+                {
+                    sb.AppendLine("This page is tagged as \"content\", but a quiz question element was discovered.");
+                    foundErrors = true;
+                }
+                if (doc.SelectNodes("//text[@class='post-quiz']").Count > 0)
+                {
+                    sb.AppendLine("This page is tagged as \"content\", but a post-quiz element was discovered.");
+                    foundErrors = true;
+                }
+                if (doc.SelectNodes("//input[@class='survey-question']").Count > 0)
+                {
+                    sb.AppendLine("This page is tagged as \"content\", but a survey-question element was discovered.");
+                    foundErrors = true;
+                }
+                if (doc.SelectNodes("//input[@name='survey']").Count > 0)
+                {
+                    sb.AppendLine("This page is tagged as \"content\", but a survey input element was discovered.");
+                    foundErrors = true;
+                }
+                if (doc.SelectNodes("///textarea[@id='survey-comment']").Count > 0)
+                {
+                    sb.AppendLine("This page is tagged as \"content\", but a survey-comment element was discovered.");
+                    foundErrors = true;
+                }
+
+            }
+
+            // TODO finish implementing validation for other inputs
+            if (!foundErrors)
+            {
+                // everything is good so far, do some updating
+                page.PageContent = "";
+                cdb.SaveChanges();
+
+                // now we'll iterate through the other nodes to update them.
+                // these are page elements
+                foreach (XmlElement node in doc.ChildNodes)
+                {
+                    // replace page id
+                    string newPageId = "p_" + page.PageId.ToString();
+                    node.SetAttribute("id", newPageId);
+
+                    // process the image nodes further
+                    //  update the page ids so they're all associated with that page
+                    foreach (XmlElement child in node.ChildNodes)
+                    {
+                        if (child.Name.ToLower() == "text")
+                        {
+                            // needs more checking for inner content
+                            foreach (var el in child.ChildNodes)
+                            {
+                                try
+                                {
+                                    XmlElement e = (XmlElement)el;
+                                    if (e.Name.ToLower() == "a")
+                                    {
+                                        e.SetAttribute("href", "javascript:void(0)");
+                                    }
+                                }
+                                catch { }
+                            }
+                        }
+                        if (child.Name.ToLower() == "image")
+                        {
+                            // check for image source
+                            // check for "type"
+
+                            string fileId = child.Attributes["source"].Value;
+                            try
+                            {
+                                int id = Convert.ToInt32(fileId.Split('_')[1]);
+                                var dbImage = cdb.AmosFiles.Where(x => x.FileId == id).FirstOrDefault();
+                                if (dbImage != null)
+                                {
+                                    dbImage.PageId = page.PageId;
+                                }
+                            }
+                            catch
+                            {
+
+                            }
+                        }
+
+                        if (child.Name.ToLower() == "video")
+                        {
+
+                            // check for image source
+                            // check for "type"
+                        }
+
+                        if (child.Name.ToLower() == "button")
+                        {
+                            // check if it has a class of "quiz-submit" or "survey-submit"
+                            try
+                            {
+                                var classList = child.Attributes["class"].Value;
+                                if (classList.Contains("quiz-submit"))
+                                {
+
+                                }
+                                if (classList.Contains("survey-submit"))
+                                {
+
+                                }
+                            }
+                            catch (NullReferenceException)
+                            {
+
+                            }
+                        }
+                    }
+                }
+
+                page.PageContent = doc.OuterXml;
+                cdb.SaveChanges();
+            }
+
+            return Content(sb.ToString());
+        }
+
+
+        public ActionResult Duplicate(int id)
+        {
+            ApplicationDbContext cdb = new ApplicationDbContext();
+            var book = cdb.Books.Where(x => x.BookId == id).FirstOrDefault();
+
+            var modules = cdb.Modules.Where(x => x.BookId == id).ToList();
+            var moduleIds = modules.Select(x => x.ModuleId).ToList();
+
+            var sections = cdb.Sections.Where(x => moduleIds.Contains(x.ModuleId)).ToList();
+            var sectionIds = sections.Select(x => x.SectionId).ToList();
+
+            var chapters = cdb.Chapters.Where(x => sectionIds.Contains(x.SectionId)).ToList();
+            //var chapterIds = chapters.Select(x => x.ChapterId).ToList();
+
+            var pages = cdb.Pages.Where(x => x.BookId == id).ToList();
+            var pageIds = pages.Select(x => x.PageId).ToList();
+
+            var files = cdb.AmosFiles.Where(x => pageIds.Contains(x.PageId)).ToList();
+
+
+            // copy these elements
+            Book newBook = new Book();
+            newBook.Create(User.Identity.Name);
+            newBook.Name = book.Name + " (copy)";
+            newBook.Published = book.Published;
+            newBook.Version = book.Version;
+
+            cdb.Books.Add(newBook);
+            cdb.SaveChanges();
+
+            foreach (var mod in modules)
+            {
+                Module newModule = new Module
+                {
+                    BookId = newBook.BookId,
+                    Name = mod.Name,
+                    SortOrder = mod.SortOrder,
+                    Theme = mod.Theme
+                };
+
+                cdb.Modules.Add(newModule);
+                cdb.SaveChanges();
+
+                foreach (var sec in sections.Where(x => x.ModuleId == mod.ModuleId).ToList())
+                {
+                    Section newSection = new Section
+                    {
+                        ModuleId = newModule.ModuleId,
+                        Name = sec.Name,
+                        SortOrder = sec.SortOrder,
+                    };
+                    cdb.Sections.Add(newSection);
+                    cdb.SaveChanges();
+
+                    foreach (var cha in chapters.Where(x => x.SectionId == sec.SectionId).ToList())
+                    {
+                        Chapter newChapter = new Chapter
+                        {
+                            SectionId = newSection.SectionId,
+                            Name = cha.Name,
+                            SortOrder = cha.SortOrder
+                        };
+                        cdb.Chapters.Add(newChapter);
+                        cdb.SaveChanges();
+
+                        foreach (var pag in pages.Where(x => x.ChapterId == cha.ChapterId).ToList())
+                        {
+                            Page newPage = new Page
+                            {
+                                BookId = newBook.BookId,
+                                ChapterId = newChapter.ChapterId,
+                                PageContent = pag.PageContent,
+                                SortOrder = pag.SortOrder,
+                                Title = pag.Title,
+                                Type = pag.Type
+                            };
+                            newPage.Create("TODO fix");
+                            cdb.Pages.Add(newPage);
+                            cdb.SaveChanges();
+
+                            foreach (var file in files.Where(x => x.PageId == pag.PageId).ToList())
+                            {
+                                AmosFile newFile = new AmosFile
+                                {
+                                    Content = file.Content,
+                                    ContentType = file.ContentType,
+                                    FileName = file.FileName,
+                                    FileType = file.FileType,
+                                    PageId = newPage.PageId
+                                };
+                                cdb.AmosFiles.Add(newFile);
+                                cdb.SaveChanges();
+                            }
+                        }
+                    }
+                }
+            }
+
+
+
+            return RedirectToAction("ListBooks");
+        }
+
+
+
+        [HttpPost]
+        public ActionResult SaveBook(SaveBookModel model)
+        {
+            ApplicationDbContext adb = new ApplicationDbContext();
+            Book newOrMatchedBook = new Book();
+            newOrMatchedBook = adb.Books.Where(x => x.BookId == model.S_Book.BookId).FirstOrDefault();
+            if (newOrMatchedBook == null)
+            {
+                // creating a new book
+                newOrMatchedBook = new Book();
+                newOrMatchedBook.Create(User.Identity.Name);
+                newOrMatchedBook.Published = false;
+                newOrMatchedBook.Name = model.S_Book.Name;
+                newOrMatchedBook.Version = model.S_Book.Version;
+
+                adb.Books.Add(newOrMatchedBook);
+            }
+            else
+            {
+                // we're updating a book.
+                //  delete all modules, sections, chapters
+                //  set all pageIds and fileIds == 0
+                ResetBook(model.S_Book.BookId);
+
+                newOrMatchedBook.Modify(User.Identity.Name);
+                newOrMatchedBook.Name = model.S_Book.Name;
+                newOrMatchedBook.Version = model.S_Book.Version;
+            }
+
+            adb.SaveChanges();
+
+            // go through the modules
+
+            // keep track of old and temp ids
+            //  <TempId, ActualNewId>
+            Dictionary<int, int> ModuleTempIdPairs = new Dictionary<int, int>();
+            foreach (var module in model.s_Modules)
+            {
+                Module newOrMatchedModule = new Module();
+                newOrMatchedModule = adb.Modules.Where(x => x.ModuleId == module.ModuleId).FirstOrDefault();
+                bool addModuleFlag = false;
+                if (newOrMatchedModule == null)
+                {
+                    newOrMatchedModule = new Module();
+                    addModuleFlag = true;
+                }
+
+                newOrMatchedModule.Name = module.Name;
+                newOrMatchedModule.BookId = newOrMatchedBook.BookId;
+                newOrMatchedModule.SortOrder = module.SortOrder;
+                newOrMatchedModule.Theme = module.Theme;
+
+                if (addModuleFlag) adb.Modules.Add(newOrMatchedModule);
+
+                adb.SaveChanges();
+                ModuleTempIdPairs.Add(module.ModuleTempId, newOrMatchedModule.ModuleId);
+
+            }
+
+
+            // go through sections
+
+            // keep track of old and temp ids
+            Dictionary<int, int> SectionTempIdPairs = new Dictionary<int, int>();
+            foreach (var section in model.s_Sections)
+            {
+                Section newOrMatchedSection = new Section();
+                newOrMatchedSection = adb.Sections.Where(x => x.SectionId == section.SectionId).FirstOrDefault();
+                bool addSectionFlag = false;
+                if (newOrMatchedSection == null)
+                {
+                    newOrMatchedSection = new Section();
+                    addSectionFlag = true;
+                }
+
+                newOrMatchedSection.Name = section.Name;
+                newOrMatchedSection.SortOrder = section.SortOrder;
+
+                newOrMatchedSection.ModuleId = ModuleTempIdPairs[section.ModuleTempId];
+                if (addSectionFlag) adb.Sections.Add(newOrMatchedSection);
+
+                adb.SaveChanges();
+                SectionTempIdPairs.Add(section.SectionTempId, newOrMatchedSection.SectionId);
+            }
+
+
+            // go through chapters
+
+            // keep track of old and temp ids
+            Dictionary<int, int> ChapterTempIdPairs = new Dictionary<int, int>();
+            foreach (var chapter in model.s_Chapters)
+            {
+                Chapter newOrMatchedChapter = new Chapter();
+                newOrMatchedChapter = adb.Chapters.Where(x => x.ChapterId == chapter.ChapterId).FirstOrDefault();
+                bool addChapterFlag = false;
+                if (newOrMatchedChapter == null)
+                {
+                    newOrMatchedChapter = new Chapter();
+                    addChapterFlag = true;
+                }
+
+                newOrMatchedChapter.Name = chapter.Name;
+                newOrMatchedChapter.SortOrder = chapter.SortOrder;
+
+                newOrMatchedChapter.SectionId = SectionTempIdPairs[chapter.SectionTempId];
+                if (addChapterFlag) adb.Chapters.Add(newOrMatchedChapter);
+
+                adb.SaveChanges();
+                ChapterTempIdPairs.Add(chapter.ChapterTempId, newOrMatchedChapter.ChapterId);
+            }
+
+
+            // go through pages
+
+            // keep track of old and temp ids
+            foreach (var page in model.s_Pages)
+            {
+                Page newOrMatchedPage = new Page();
+                newOrMatchedPage = adb.Pages.Where(x => x.PageId == page.PageId).FirstOrDefault();
+                bool addPageFlag = false;
+                if (newOrMatchedPage == null)
+                {
+                    newOrMatchedPage = new Page();
+                    newOrMatchedPage.PageContent = "<page id=\"{id}\" type=\"content\"></page>";
+                    newOrMatchedPage.Type = "content";
+                    addPageFlag = true;
+                }
+
+                newOrMatchedPage.Title = page.Name;
+                newOrMatchedPage.SortOrder = page.SortOrder;
+                newOrMatchedPage.BookId = newOrMatchedBook.BookId;
+
+                newOrMatchedPage.ChapterId = ChapterTempIdPairs[page.ChapterTempId];
+                if (addPageFlag)
+                {
+                    newOrMatchedPage.Create(User.Identity.Name);
+                    adb.Pages.Add(newOrMatchedPage);
+                    adb.SaveChanges();
+                    newOrMatchedPage.PageContent = newOrMatchedPage.PageContent.Replace("{id}", "p_" + newOrMatchedPage.PageId);
+                    adb.SaveChanges();
+                    newOrMatchedBook.Published = false;
+                }
+                else
+                {
+                    newOrMatchedPage.Modify(User.Identity.Name);
+                }
+
+            }
+
+
+
+            adb.SaveChanges();
+
+            return Content("success");
+        }
+
+
+        public void ResetBook(int bookId)
+        {
+            ApplicationDbContext db = new ApplicationDbContext();
+            var modules = db.Modules.Where(x => x.BookId == bookId).ToList();
+            var moduleIds = modules.Select(x => x.ModuleId).ToList();
+            var sections = db.Sections.Where(x => moduleIds.Contains(x.ModuleId)).ToList();
+            var sectionIds = sections.Select(x => x.SectionId).ToList();
+            var chapters = db.Chapters.Where(x => sectionIds.Contains(x.SectionId)).ToList();
+
+            db.Chapters.RemoveRange(chapters);
+            db.Sections.RemoveRange(sections);
+            db.Modules.RemoveRange(modules);
+
+            var pages = db.Pages.Where(x => x.BookId == bookId).ToList();
+            var pageIds = pages.Select(x => x.PageId).ToList();
+
+            var files = db.AmosFiles.Where(x => pageIds.Contains(x.PageId)).ToList();
+            foreach (var file in files)
+            {
+                file.PageId = 0;
+            }
+
+            foreach (var page in pages)
+            {
+                page.Modify(User.Identity.Name);
+                page.BookId = 0;
+                page.ChapterId = 0;
+                page.SortOrder = 0;
+            }
+
+            db.SaveChanges();
+        }
+
+
+
+        [HttpPost]
+        public JsonResult GetAvailablePages()
+        {
+            ApplicationDbContext db = new ApplicationDbContext();
+            var unusedPages = db.Pages.Where(x => x.BookId == 0).ToList();
+
+            return Json(unusedPages);
+        }
+
+
+        [HttpPost]
+        public ActionResult ChangePublishStatus(int BookId, bool IsPublish)
+        {
+            ApplicationDbContext db = new ApplicationDbContext();
+            if (!IsPublish)
+                db.Books.Where(x => x.BookId == BookId).FirstOrDefault().Published = false;
+            else
+            {
+                // validate
+            }
+            db.SaveChanges();
+            return Content("success");
+        }
+
+
+        public ActionResult Manage(int id)
+        {
+            return View(new ManagePagesModel(id));
+        }
+
+
+        public ActionResult BuildList(PageListModel model)
+        {
+            return View(model);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public ActionResult New_Module()
+        {
+            return View("Build_Module", new Module {
+                Name = "New Module",
+                Theme = "1"
+            });
+        }
+        public ActionResult Build_Module(Module item)
+        {
+            return View("Build_Module", item);
+        }
+
+        public ActionResult New_Section()
+        {
+            return View("Build_Section", new Section {
+                Name = "New Section"
+            });
+        }
+        public ActionResult Build_Section(Section item)
+        {
+            return View("Build_Section", item);
+        }
+
+        public ActionResult New_Chapter()
+        {
+            return View("Build_Chapter", new Chapter {
+                Name = "New Chapter"
+            });
+        }
+        public ActionResult Build_Chapter(Chapter item)
+        {
+            return View("Build_Chapter", item);
+        }
+
+        public ActionResult New_Page(int m, int s, int c, int p)
+        {
+            return View("Build_Page", new Build_PageModel(m, s, c, p));
+        }
+        public ActionResult Build_Page(Page item, int m, int s, int c, int p)
+        {
+            // this one needs a model
+            return View("Build_Page", new Build_PageModel(item, m, s, c, p));
+        }
+    }
+
+    
+}

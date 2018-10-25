@@ -1,0 +1,374 @@
+﻿@model Amos.Models.PageListModel
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    int moduleCount = 1;
+    int sectionCount = 1;
+    int chapterCount = 1;
+    int pageCount = 1;
+}
+
+@section styles{
+    <link href="~/Content/themes/base/all.css" rel="stylesheet" />
+    <link href="~/fonts/FiraSans/Fonts.css" rel="stylesheet" />
+    <link href="~/Content/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/Content/css/base.css" rel="stylesheet" />
+    <link href="~/Content/css/themes.css" rel="stylesheet" />
+    <link href="~/Content/css/EditBook.css" rel="stylesheet" />
+
+    <style>
+        .theme_1 {
+            background-color: #f7e5a8;
+        }
+
+            .theme_1 > .info-block {
+                background-color: #efc94c;
+            }
+
+        li.module.theme_2 {
+            background-color: #a8acb2;
+        }
+
+            li.module.theme_2 > .info-block .info-controls {
+                background-color: #505967;
+            }
+
+        li.module.theme_3 {
+            background-color: #96b0c9;
+        }
+
+            li.module.theme_3 > .info-block .info-controls {
+                background-color: #2c6192;
+            }
+
+        li.module.theme_4 {
+            background-color: #a2a4b9;
+        }
+
+            li.module.theme_4 > .info-block .info-controls {
+                background-color: #444872;
+            }
+
+        li.module.theme_5 {
+            background-color: #a2d9c3;
+        }
+
+            li.module.theme_5 > .info-block .info-controls {
+                background-color: #45b29d;
+            }
+
+        li.module.theme_6 {
+            background-color: #f2c58d;
+        }
+
+            li.module.theme_6 > .info-block .info-controls {
+                background-color: #e58800;
+            }
+
+        li.module.theme_7 {
+            background-color: #c3a3b6;
+        }
+
+            li.module.theme_7 > .info-block .info-controls {
+                background-color: #85496f;
+            }
+
+        li.module.theme_8 {
+            background-color: #f2c58d;
+        }
+
+            li.module.theme_8 > .info-block .info-controls {
+                background-color: #df5a49;
+            }
+
+        li.module.theme_9 {
+            background-color: #a6b4d6;
+        }
+
+            li.module.theme_9 > .info-block .info-controls {
+                background-color: #4e69ac;
+            }
+    </style>
+
+    <style>
+        .pagePreview {
+            padding: 30px 50px;
+            height: 638px;
+            position: relative;
+            font-size: 14pt;
+        }
+
+            .pagePreview .item {
+                position: absolute;
+            }
+
+            .pagePreview .inner-text {
+                /*position:relative;*/
+            }
+
+            .pagePreview .header {
+                font-size: 18pt;
+                font-weight: bold;
+            }
+
+            .pagePreview button {
+                outline: none;
+                cursor: pointer;
+                padding: 10px 30px;
+                color: white;
+                background-color: black;
+                border: 4px outset gray;
+                border-radius: 10px;
+                font-family: Fira Mono;
+                font-size: 12pt;
+            }
+
+                .pagePreview button:active {
+                    border: 4px inset black;
+                    color: black;
+                    background-color: gray;
+                }
+
+            .pagePreview textarea {
+                font-family: Fira Mono;
+                font-size: 12pt;
+                width: 500px;
+                height: 75px;
+                border: 1px solid black;
+                margin-top: 10px;
+            }
+
+            .pagePreview .post-quiz {
+                border: 4px solid black;
+                padding: 20px;
+            }
+
+                .pagePreview .post-quiz.correct {
+                    border-color: green;
+                }
+
+                .pagePreview .post-quiz.incorrect {
+                    border-color: red;
+                }
+    </style>
+}
+
+
+
+
+@{
+    string name = Model.GetBook.Name ?? "New Book";
+    string version = Model.GetBook.Version ?? "1";
+}
+
+
+<div class="input-group mb-3 input-group-lg mx-auto w-50">
+    <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon1">Book Name</span>
+    </div>
+    <input type="text" class="form-control bookName" placeholder="Book Name" aria-label="Book Name" aria-describedby="basic-addon1" value="@name" />
+</div>
+<div class="input-group mb-3 mx-auto w-50">
+    <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon2">Version</span>
+    </div>
+    <input type="text" class="form-control bookVersion" placeholder="Version" aria-label="Version" aria-describedby="basic-addon12" value="@version" />
+</div>
+
+
+
+@*<div class="container">
+    @foreach (var mod in Model.Modules.OrderBy(x => x.SortOrder).ToList())
+    {
+        string theme = "theme_" + mod.Theme;
+        <div class="background-container module-container @theme">
+            @Html.Action("Build_Module", new { item = mod })
+            <div class="background-container section-container">
+                @foreach (var sec in Model.Sections.Where(x => x.ModuleId == mod.ModuleId).OrderBy(x => x.SortOrder).ToList())
+                {
+                    @Html.Action("Build_Section", new { item = sec })
+                    <div class="background-container chapter-container">
+                        @foreach (var cha in Model.Chapters.Where(x => x.SectionId == sec.SectionId).OrderBy(x => x.SortOrder).ToList())
+                        {
+                            @Html.Action("Build_Chapter", new { item = cha, m = moduleCount, s = sectionCount, c = chapterCount, p = pageCount })
+                            <div class="background-container page-container">
+                                @foreach (var pa in Model.PageList.Where(x => x.ChapterId == cha.ChapterId).OrderBy(x => x.SortOrder).ToList())
+                                {
+                                    @Html.Action("Build_Page", new { item = pa, m = moduleCount, s = sectionCount, c = chapterCount, p = pageCount })
+                                    pageCount++;
+                                }
+                            </div>
+                            chapterCount++;
+                        }
+                    </div>
+                    sectionCount++;
+                }
+            </div>
+        </div>
+        moduleCount++;
+    }
+</div>*@
+
+
+
+
+<ul class="modules mx-auto">
+        @foreach (var mod in Model.Modules.OrderBy(x => x.SortOrder).ToList())
+        {
+            string theme = "theme_" + mod.Theme;
+            <li class="module @theme" data-id="@mod.ModuleId">
+                @Html.Action("Build_Module", new { item = mod })
+
+                <ul class="sections">
+                    @foreach (var sec in Model.Sections.Where(x => x.ModuleId == mod.ModuleId).OrderBy(x => x.SortOrder).ToList())
+                    {
+                        <li class="section" data-id="@sec.SectionId">
+                            @Html.Action("Build_Section", new { item = sec })
+                            <ul class="chapters">
+                                @foreach (var cha in Model.Chapters.Where(x => x.SectionId == sec.SectionId).OrderBy(x => x.SortOrder).ToList())
+                                {
+                                    <li class="chapter" data-id="@cha.ChapterId">
+                                        @Html.Action("Build_Chapter", new { item = cha, m=moduleCount, s=sectionCount, c=chapterCount, p=pageCount })
+                                        <ul class="pages">
+                                            @foreach (var pa in Model.PageList.Where(x => x.ChapterId == cha.ChapterId).OrderBy(x => x.SortOrder).ToList())
+                                            {
+                                                <li class="page" data-id="@pa.PageId">
+                                                    @Html.Action("Build_Page", new { item = pa, m=moduleCount, s=sectionCount, c=chapterCount, p=pageCount })
+                                                </li>
+                                                pageCount++;
+                                            }
+                                            <li class="new">
+                                                <a class="newItem" data-type="page" href="javascript:void(0)">new page</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    chapterCount++;
+                                }
+                                <li class="new">
+                                    <a class="newItem" data-type="chapter" href="javascript:void(0)">new chapter</a>
+                                </li>
+                            </ul>
+                        </li>
+                        sectionCount++;
+                    }
+                    <li class="new">
+                        <a class="newItem" data-type="section" href="javascript:void(0)">new section</a>
+                    </li>
+                </ul>
+            </li>
+            moduleCount++;
+        }
+
+        <li class="new">
+            <a class="newItem" data-type="module" href="javascript:void(0)">new module</a>
+        </li>
+    </ul>
+
+
+
+
+
+
+
+<div class="overlay"></div>
+<div class="pageSelector">
+    <div class="topbar">
+        <div class="infoPages">
+            Select page to import:
+        </div>
+        <div class="infoPreview">
+            Page Preview
+        </div>
+    </div>
+    <div class="middlebar">
+        <div class="pageList"></div>
+        <div class="pagePreview"></div>
+    </div>
+
+    <input id="closeImport" type="button" value="cancel" onclick="closePageImport();" />
+    <input id="importPage" type="button" value="import page" onclick="importPage();" />
+</div>
+
+<div class="themeSelector">
+    <div class="themeBlock">
+        <img class="themeImg" src="~/Content/images/themes/1.png" data-id="1" />
+    </div>
+    <div class="themeBlock">
+        <img class="themeImg" src="~/Content/images/themes/2.png" data-id="2" />
+    </div>
+    <div class="themeBlock">
+        <img class="themeImg" src="~/Content/images/themes/3.png" data-id="3" />
+    </div>
+    <div class="themeBlock">
+        <img class="themeImg" src="~/Content/images/themes/4.png" data-id="4" />
+    </div>
+    <div class="themeBlock">
+        <img class="themeImg" src="~/Content/images/themes/5.png" data-id="5" />
+    </div>
+    <div class="themeBlock">
+        <img class="themeImg" src="~/Content/images/themes/6.png" data-id="6" />
+    </div>
+    <div class="themeBlock">
+        <img class="themeImg" src="~/Content/images/themes/7.png" data-id="7" />
+    </div>
+    <div class="themeBlock">
+        <img class="themeImg" src="~/Content/images/themes/8.png" data-id="8" />
+    </div>
+    <div class="themeBlock">
+        <img class="themeImg" src="~/Content/images/themes/9.png" data-id="9" />
+    </div>
+</div>
+
+@Html.HiddenFor(x => x.GetBook.BookId)
+
+@section footer{
+    <div class="container container-fluid bg-light mw-100 fixed-bottom border-top border-primary">
+        <div class="container container-fluid mx-auto row text-center">
+            <div class="col-md-5 p-2">
+                <div class="btn-group dropup">
+                    <button id="configurationButton" type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Valid Configuration
+                    </button>
+                    <div id="errors" class="dropdown-menu" style="width:350px;">
+                        <div class="dropdown-item">no errors</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2"></div>
+            <div class="col-md-5 p-2">
+                <button class="btn btn-success" id="saveButton">saved</button>
+            </div>
+        </div>
+
+    </div>
+}
+
+@helper getInfoControls()
+    {
+        <div class="col-md-2 info-controls">
+            <i class="fa fa-sort-up"></i>
+            <i class="fa fa-sort-down"></i>
+            <i class="fa fa-minus"></i>
+        </div>
+}
+
+@section scripts{
+    <script src="~/Content/js/jquery-ui-1.12.1.min.js"></script>
+    <script src="~/Content/js/render.js"></script>
+    <script src="~/Content/js/shared.js"></script>
+    <script>
+        var URL_Content = '@Url.Content("~/")';
+        var URL_EditPage = '@Url.Action("ViewEditor", new { id=99999 })';
+        var URL_ViewPage = '@Url.Action("ViewPage", new { id = 99999 })';
+        var URL_GetAvailablePages = '@Url.Action("GetAvailablePages")';
+        var URL_SaveBook = '@Url.Action("SaveBook")';
+
+        var URL_New_Module = '@Url.Action("New_Module")';
+        var URL_New_Section = '@Url.Action("New_Section")';
+        var URL_New_Chapter = '@Url.Action("New_Chapter")';
+        var URL_New_Page = '@Url.Action("New_Page")';
+    </script>
+    <script src="~/Content/js/EditBook.js"></script>
+}
