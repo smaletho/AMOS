@@ -81,8 +81,8 @@
             var arr;
             try {
                 arr = $.parseXML(content);
-            } catch {
-                alert("XML couldn't be parsed. Check if it's valid.");
+            } catch (e) {
+                alert("XML couldn't be parsed. Check if it's valid. " + e.Message);
                 return false;
             }
 

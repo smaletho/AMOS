@@ -29,25 +29,71 @@ namespace Amos.Controllers
             return View(adb.Books.ToList());
         }
 
+        public ActionResult ListPages()
+        {
+            return View(new ApplicationDbContext().Pages.Where(x => x.BookId == 0).ToList());
+        }
 
         public ActionResult Create()
         {
-            var model = new PageListModel();
-            model.GetBook.Create(User.Identity.Name);
-            model.PageList.FirstOrDefault().Create(User.Identity.Name);
+            ApplicationDbContext db = new ApplicationDbContext();
+            Book book = new Book();
+            book.Create(User.Identity.Name);
+            book.Name = "New Book";
+            book.Published = false;
+            book.Version = "1";
 
-            return View("Edit", model);
+            db.Books.Add(book);
+            db.SaveChanges();
+
+            Module module = new Module();
+            module.BookId = book.BookId;
+            module.Name = "New Module";
+            module.SortOrder = 10;
+            module.Theme = "1";
+
+            db.Modules.Add(module);
+            db.SaveChanges();
+
+            Section section = new Section();
+            section.ModuleId = module.ModuleId;
+            section.Name = "New Section";
+            section.SortOrder = 10;
+
+            db.Sections.Add(section);
+            db.SaveChanges();
+
+            Chapter chapter = new Chapter();
+            chapter.SectionId = section.SectionId;
+            chapter.Name = "New Chapter";
+            chapter.SortOrder = 10;
+
+            db.Chapters.Add(chapter);
+            db.SaveChanges();
+
+            Page page = new Page();
+            page.ChapterId = chapter.ChapterId;
+            page.BookId = book.BookId;
+            page.Create(User.Identity.Name);
+            page.SortOrder = 10;
+            page.Title = "New Page";
+            page.Type = "content";
+
+            db.Pages.Add(page);
+            db.SaveChanges();
+
+            return RedirectToAction("Edit", new { id = book.BookId });
         }
 
 
-        public ActionResult ImportBook()
+        public ActionResult ImportBook(ImportBookModel model)
         {
             return View(new ImportBookModel());
         }
 
         public ActionResult DoImportBook(ImportBookModel model)
         {
-            StringBuilder sb = new StringBuilder();
+            model.ResponseList = new List<string>();
             ApplicationDbContext cdb = new ApplicationDbContext();
 
             try
@@ -63,12 +109,12 @@ namespace Amos.Controllers
                     var config = zipArchive.Entries.Where(x => x.Name == "config.xml").FirstOrDefault();
                     if (config == null)
                     {
-                        sb.AppendLine("Could not find config.xml. Aborting.");
-                        return Content(sb.ToString());
+                        model.ResponseList.Add("Could not find config.xml. Aborting.");
+                        return RedirectToAction("ImportBook", model);
                     }
                     else
                     {
-                        sb.AppendLine("Found config.xml. Parsing in to book...");
+                        model.ResponseList.Add("Found config.xml. Parsing in to book...");
                         using (var stream = config.Open())
                         {
                             using (var reader = new StreamReader(stream))
@@ -98,7 +144,7 @@ namespace Amos.Controllers
 
                                         cdb.Books.Add(book);
                                         cdb.SaveChanges();
-                                        sb.AppendLine(string.Format("Added book. Name: {0} Id: {1}", book.Name, book.BookId));
+                                        model.ResponseList.Add(string.Format("Added book. Name: {0} Id: {1}", book.Name, book.BookId));
 
                                         int moduleSort = 10;
 
@@ -247,7 +293,7 @@ namespace Amos.Controllers
                                                                 }
                                                                 else
                                                                 {
-                                                                    sb.AppendLine(string.Format("File not found. Page: {0} FileId: {1}", pageNode.Attributes["id"].Value, matchFileName));
+                                                                    model.ResponseList.Add(string.Format("File not found. Page: {0} FileId: {1}", pageNode.Attributes["id"].Value, matchFileName));
                                                                 }
                                                             }
                                                         }
@@ -309,11 +355,11 @@ namespace Amos.Controllers
                                 }
                                 catch (XmlException e)
                                 {
-                                    sb.AppendLine("Bad xml in config.xml. Aborting. Exception: " + e.Message);
+                                    model.ResponseList.Add("Bad xml in config.xml. Aborting. Exception: " + e.Message);
                                 }
                                 catch (ArgumentException e)
                                 {
-                                    sb.AppendLine("Attribute exception. Message: " + e.Message);
+                                    model.ResponseList.Add("Attribute exception. Message: " + e.Message);
                                 }
                             }
                         }
@@ -325,12 +371,12 @@ namespace Amos.Controllers
             }
             catch (NotImplementedException e)
             {
-                sb.AppendLine("Couldn't open file. Exception: " + e.Message);
+                model.ResponseList.Add("Couldn't open file. Exception: " + e.Message);
             }
 
 
 
-            return Content(sb.ToString());
+            return View("ImportBook", model);
         }
 
         public ActionResult Delete(int id)
@@ -1168,163 +1214,193 @@ namespace Amos.Controllers
 
 
 
-        [HttpPost]
-        public ActionResult SaveBook(SaveBookModel model)
-        {
-            ApplicationDbContext adb = new ApplicationDbContext();
-            Book newOrMatchedBook = new Book();
-            newOrMatchedBook = adb.Books.Where(x => x.BookId == model.S_Book.BookId).FirstOrDefault();
-            if (newOrMatchedBook == null)
-            {
-                // creating a new book
-                newOrMatchedBook = new Book();
-                newOrMatchedBook.Create(User.Identity.Name);
-                newOrMatchedBook.Published = false;
-                newOrMatchedBook.Name = model.S_Book.Name;
-                newOrMatchedBook.Version = model.S_Book.Version;
+        //[HttpPost]
+        //public SaveBookModel SaveBook(SaveBookModel model)
+        //{
+        //    ApplicationDbContext adb = new ApplicationDbContext();
+        //    Book newOrMatchedBook = new Book();
+        //    newOrMatchedBook = adb.Books.Where(x => x.BookId == model.S_Book.BookId).FirstOrDefault();
+        //    if (newOrMatchedBook == null)
+        //    {
+        //        // creating a new book
+        //        newOrMatchedBook = new Book();
+        //        newOrMatchedBook.Create(User.Identity.Name);
+        //        newOrMatchedBook.Published = false;
+        //        newOrMatchedBook.Name = model.S_Book.Name;
+        //        newOrMatchedBook.Version = model.S_Book.Version;
 
-                adb.Books.Add(newOrMatchedBook);
-            }
-            else
-            {
-                // we're updating a book.
-                //  delete all modules, sections, chapters
-                //  set all pageIds and fileIds == 0
-                ResetBook(model.S_Book.BookId);
+        //        adb.Books.Add(newOrMatchedBook);
+        //    }
+        //    else
+        //    {
+        //        // we're updating a book.
+        //        //  delete all modules, sections, chapters
+        //        //  set all pageIds and fileIds == 0
+        //        ResetBook(model.S_Book.BookId);
 
-                newOrMatchedBook.Modify(User.Identity.Name);
-                newOrMatchedBook.Name = model.S_Book.Name;
-                newOrMatchedBook.Version = model.S_Book.Version;
-            }
+        //        newOrMatchedBook.Modify(User.Identity.Name);
+        //        newOrMatchedBook.Name = model.S_Book.Name;
+        //        newOrMatchedBook.Version = model.S_Book.Version;
+        //    }
 
-            adb.SaveChanges();
-
-            // go through the modules
-
-            // keep track of old and temp ids
-            //  <TempId, ActualNewId>
-            Dictionary<int, int> ModuleTempIdPairs = new Dictionary<int, int>();
-            foreach (var module in model.s_Modules)
-            {
-                Module newOrMatchedModule = new Module();
-                newOrMatchedModule = adb.Modules.Where(x => x.ModuleId == module.ModuleId).FirstOrDefault();
-                bool addModuleFlag = false;
-                if (newOrMatchedModule == null)
-                {
-                    newOrMatchedModule = new Module();
-                    addModuleFlag = true;
-                }
-
-                newOrMatchedModule.Name = module.Name;
-                newOrMatchedModule.BookId = newOrMatchedBook.BookId;
-                newOrMatchedModule.SortOrder = module.SortOrder;
-                newOrMatchedModule.Theme = module.Theme;
-
-                if (addModuleFlag) adb.Modules.Add(newOrMatchedModule);
-
-                adb.SaveChanges();
-                ModuleTempIdPairs.Add(module.ModuleTempId, newOrMatchedModule.ModuleId);
-
-            }
-
-
-            // go through sections
-
-            // keep track of old and temp ids
-            Dictionary<int, int> SectionTempIdPairs = new Dictionary<int, int>();
-            foreach (var section in model.s_Sections)
-            {
-                Section newOrMatchedSection = new Section();
-                newOrMatchedSection = adb.Sections.Where(x => x.SectionId == section.SectionId).FirstOrDefault();
-                bool addSectionFlag = false;
-                if (newOrMatchedSection == null)
-                {
-                    newOrMatchedSection = new Section();
-                    addSectionFlag = true;
-                }
-
-                newOrMatchedSection.Name = section.Name;
-                newOrMatchedSection.SortOrder = section.SortOrder;
-
-                newOrMatchedSection.ModuleId = ModuleTempIdPairs[section.ModuleTempId];
-                if (addSectionFlag) adb.Sections.Add(newOrMatchedSection);
-
-                adb.SaveChanges();
-                SectionTempIdPairs.Add(section.SectionTempId, newOrMatchedSection.SectionId);
-            }
-
-
-            // go through chapters
-
-            // keep track of old and temp ids
-            Dictionary<int, int> ChapterTempIdPairs = new Dictionary<int, int>();
-            foreach (var chapter in model.s_Chapters)
-            {
-                Chapter newOrMatchedChapter = new Chapter();
-                newOrMatchedChapter = adb.Chapters.Where(x => x.ChapterId == chapter.ChapterId).FirstOrDefault();
-                bool addChapterFlag = false;
-                if (newOrMatchedChapter == null)
-                {
-                    newOrMatchedChapter = new Chapter();
-                    addChapterFlag = true;
-                }
-
-                newOrMatchedChapter.Name = chapter.Name;
-                newOrMatchedChapter.SortOrder = chapter.SortOrder;
-
-                newOrMatchedChapter.SectionId = SectionTempIdPairs[chapter.SectionTempId];
-                if (addChapterFlag) adb.Chapters.Add(newOrMatchedChapter);
-
-                adb.SaveChanges();
-                ChapterTempIdPairs.Add(chapter.ChapterTempId, newOrMatchedChapter.ChapterId);
-            }
-
-
-            // go through pages
-
-            // keep track of old and temp ids
-            foreach (var page in model.s_Pages)
-            {
-                Page newOrMatchedPage = new Page();
-                newOrMatchedPage = adb.Pages.Where(x => x.PageId == page.PageId).FirstOrDefault();
-                bool addPageFlag = false;
-                if (newOrMatchedPage == null)
-                {
-                    newOrMatchedPage = new Page();
-                    newOrMatchedPage.PageContent = "<page id=\"{id}\" type=\"content\"></page>";
-                    newOrMatchedPage.Type = "content";
-                    addPageFlag = true;
-                }
-
-                newOrMatchedPage.Title = page.Name;
-                newOrMatchedPage.SortOrder = page.SortOrder;
-                newOrMatchedPage.BookId = newOrMatchedBook.BookId;
-
-                newOrMatchedPage.ChapterId = ChapterTempIdPairs[page.ChapterTempId];
-                if (addPageFlag)
-                {
-                    newOrMatchedPage.Create(User.Identity.Name);
-                    adb.Pages.Add(newOrMatchedPage);
-                    adb.SaveChanges();
-                    newOrMatchedPage.PageContent = newOrMatchedPage.PageContent.Replace("{id}", "p_" + newOrMatchedPage.PageId);
-                    adb.SaveChanges();
-                    newOrMatchedBook.Published = false;
-                }
-                else
-                {
-                    newOrMatchedPage.Modify(User.Identity.Name);
-                }
-
-            }
+        //    adb.SaveChanges();
 
 
 
-            adb.SaveChanges();
+        //    // go through the modules
 
-            return Content("success");
-        }
+        //    // keep track of old and temp ids
+        //    //  <TempId, ActualNewId>
+        //    Dictionary<int, int> ModuleTempIdPairs = new Dictionary<int, int>();
+        //    int moduleSortCount = 10;
+        //    foreach (var module in model.s_Modules)
+        //    {
+        //        Module newOrMatchedModule = new Module();
+        //        newOrMatchedModule = adb.Modules.Where(x => x.ModuleId == module.ModuleId).FirstOrDefault();
+        //        bool addModuleFlag = false;
+        //        if (newOrMatchedModule == null)
+        //        {
+        //            newOrMatchedModule = new Module();
+        //            addModuleFlag = true;
+        //        }
+
+        //        newOrMatchedModule.Name = module.Name;
+        //        newOrMatchedModule.BookId = newOrMatchedBook.BookId;
+        //        newOrMatchedModule.SortOrder = moduleSortCount;
+        //        moduleSortCount += 10;
+        //        newOrMatchedModule.Theme = module.Theme;
+
+        //        if (addModuleFlag) adb.Modules.Add(newOrMatchedModule);
+
+        //        adb.SaveChanges();
+        //        ModuleTempIdPairs.Add(module.ModuleTempId, newOrMatchedModule.ModuleId);
+
+        //    }
 
 
+        //    // go through sections
+
+        //    // keep track of old and temp ids
+        //    Dictionary<int, int> SectionTempIdPairs = new Dictionary<int, int>();
+        //    int sectionSortCount = 10;
+        //    int previousSectionId = 0;
+        //    foreach (var section in model.s_Sections)
+        //    {
+        //        if (previousSectionId != section.SectionId)
+        //        {
+        //            moduleSortCount = 10;
+        //            previousModuleId = section.SectionId;
+        //        }
+        //        else
+        //        {
+        //            sectionSortCount += 10;
+        //            previousModuleId = section.SectionId;
+        //        }
+        //        Section newOrMatchedSection = new Section();
+        //        newOrMatchedSection = adb.Sections.Where(x => x.SectionId == section.SectionId).FirstOrDefault();
+        //        bool addSectionFlag = false;
+        //        if (newOrMatchedSection == null)
+        //        {
+        //            newOrMatchedSection = new Section();
+        //            addSectionFlag = true;
+        //        }
+
+        //        newOrMatchedSection.Name = section.Name;
+        //        newOrMatchedSection.SortOrder = section.SortOrder;
+
+        //        newOrMatchedSection.ModuleId = ModuleTempIdPairs[section.ModuleTempId];
+        //        if (addSectionFlag) adb.Sections.Add(newOrMatchedSection);
+
+        //        adb.SaveChanges();
+        //        SectionTempIdPairs.Add(section.SectionTempId, newOrMatchedSection.SectionId);
+        //    }
+
+
+        //    // go through chapters
+
+        //    // keep track of old and temp ids
+        //    Dictionary<int, int> ChapterTempIdPairs = new Dictionary<int, int>();
+        //    int chapterSortCount = 10;
+        //    int previousChapterId = 0;
+        //    foreach (var chapter in model.s_Chapters)
+        //    {
+        //        if (previousChapterId != chapter.ChapterId)
+        //        {
+        //            chapterSortCount = 10;
+        //            previousChapterId = chapter.se;
+        //        }
+        //        else
+        //        {
+        //            chapterSortCount += 10;
+        //            previousChapterId = chapter.SectionId;
+        //        }
+        //        Chapter newOrMatchedChapter = new Chapter();
+        //        newOrMatchedChapter = adb.Chapters.Where(x => x.ChapterId == chapter.ChapterId).FirstOrDefault();
+        //        bool addChapterFlag = false;
+        //        if (newOrMatchedChapter == null)
+        //        {
+        //            newOrMatchedChapter = new Chapter();
+        //            addChapterFlag = true;
+        //        }
+
+        //        newOrMatchedChapter.Name = chapter.Name;
+        //        newOrMatchedChapter.SortOrder = chapterSortCount;
+
+        //        newOrMatchedChapter.SectionId = SectionTempIdPairs[chapter.SectionTempId];
+        //        if (addChapterFlag) adb.Chapters.Add(newOrMatchedChapter);
+
+        //        adb.SaveChanges();
+        //        ChapterTempIdPairs.Add(chapter.ChapterTempId, newOrMatchedChapter.ChapterId);
+        //    }
+
+
+        //    // go through pages
+
+        //    // keep track of old and temp ids
+        //    foreach (var page in model.s_Pages)
+        //    {
+        //        Page newOrMatchedPage = new Page();
+        //        newOrMatchedPage = adb.Pages.Where(x => x.PageId == page.PageId).FirstOrDefault();
+        //        bool addPageFlag = false;
+        //        if (newOrMatchedPage == null)
+        //        {
+        //            newOrMatchedPage = new Page();
+        //            newOrMatchedPage.PageContent = "<page id=\"{id}\" type=\"content\"></page>";
+        //            newOrMatchedPage.Type = "content";
+        //            addPageFlag = true;
+        //        }
+
+        //        newOrMatchedPage.Title = page.Name;
+        //        newOrMatchedPage.SortOrder = page.SortOrder;
+        //        newOrMatchedPage.BookId = newOrMatchedBook.BookId;
+
+        //        newOrMatchedPage.ChapterId = ChapterTempIdPairs[page.ChapterTempId];
+        //        if (addPageFlag)
+        //        {
+        //            newOrMatchedPage.Create(User.Identity.Name);
+        //            adb.Pages.Add(newOrMatchedPage);
+        //            adb.SaveChanges();
+        //            newOrMatchedPage.PageContent = newOrMatchedPage.PageContent.Replace("{id}", "p_" + newOrMatchedPage.PageId);
+        //            adb.SaveChanges();
+        //            newOrMatchedBook.Published = false;
+        //        }
+        //        else
+        //        {
+        //            newOrMatchedPage.Modify(User.Identity.Name);
+        //        }
+
+        //    }
+
+
+
+        //    adb.SaveChanges();
+
+
+        //    // You're right here. Everything is fine, except your sort orders are whacky.
+        //    //  I think I can go through each object now and check if it has a different parent.
+
+        //    return new SaveBookModel(new PageListModel(newOrMatchedBook.BookId));
+        //}
         public void ResetBook(int bookId)
         {
             ApplicationDbContext db = new ApplicationDbContext();
@@ -1361,6 +1437,261 @@ namespace Amos.Controllers
 
 
         [HttpPost]
+        public ActionResult SaveBook(SaveBookModel model)
+        {
+            // This book is coming in properly ordered and numbered. 
+            //  The looping doesn't have to count the sort order
+
+
+            ApplicationDbContext db = new ApplicationDbContext();
+
+            var book = db.Books.Where(x => x.BookId == model.S_Book.BookId).FirstOrDefault();
+            bool addBook = false;
+            if (book == null)
+            {
+                book = new Book();
+                book.Create(User.Identity.Name);
+                addBook = true;
+            }
+            else
+            {
+                book.Modify(User.Identity.Name);
+                
+            }
+            try { book.Name = model.S_Book.Name; }
+            catch { book.Name = "New Book"; }
+
+            book.Published = false;
+
+            try { book.Version = model.S_Book.Version; }
+            catch { book.Version = "1"; }
+
+            if (addBook) db.Books.Add(book);
+            db.SaveChanges();
+
+            // update the model as well
+            model.S_Book.BookId = book.BookId;
+            model.S_Book.Name = book.Name;
+            model.S_Book.Version = book.Version;
+
+            // MODULES
+            foreach (var mod in model.s_Modules)
+            {
+                var module = db.Modules.Where(x => x.ModuleId == mod.ModuleId).FirstOrDefault();
+                bool addModule = false;
+                if (module == null)
+                {
+                    module = new Module();
+                    addModule = true;
+                }
+
+                module.BookId = book.BookId;
+
+                try { module.Name = mod.Name; }
+                catch { module.Name = "New Module"; }
+
+                try { module.Theme = mod.Theme; }
+                catch { module.Theme = "1"; }
+
+                module.SortOrder = mod.SortOrder;
+
+                if (addModule) db.Modules.Add(module);
+
+                db.SaveChanges();
+
+                // update the model
+                mod.ModuleId = module.ModuleId;
+                mod.Name = module.Name;
+                mod.ParentId = book.BookId;
+                mod.SortOrder = module.SortOrder;
+                mod.Theme = module.Theme;
+            }
+
+            // SECTIONS
+            foreach (var sec in model.s_Sections)
+            {
+                var section = db.Sections.Where(x => x.SectionId == sec.SectionId).FirstOrDefault();
+                bool addSection = false;
+                if (section == null)
+                {
+                    section = new Section();
+                    addSection = true;
+                }
+
+                section.ModuleId = sec.ParentId;
+
+                try { section.Name = sec.Name; }
+                catch { section.Name = "New Section"; }
+
+                section.SortOrder = sec.SortOrder;
+
+                if (addSection) db.Sections.Add(section);
+
+                db.SaveChanges();
+
+                // update the model
+                sec.Name = section.Name;
+                sec.ParentId = section.ModuleId;
+                sec.SectionId = section.SectionId;
+                sec.SortOrder = section.SortOrder;
+            }
+
+            // CHAPTERS
+            foreach (var cha in model.s_Chapters)
+            {
+                var chapter = db.Chapters.Where(x => x.ChapterId == cha.ChapterId).FirstOrDefault();
+                bool addChapter = false;
+                if (chapter == null)
+                {
+                    chapter = new Chapter();
+                    addChapter = true;
+                }
+
+                chapter.SectionId = cha.ParentId;
+
+                try { chapter.Name = cha.Name; }
+                catch { chapter.Name = "New Chapter"; }
+
+                chapter.SortOrder = cha.SortOrder;
+
+                if (addChapter) db.Chapters.Add(chapter);
+
+                db.SaveChanges();
+
+                // update the model
+                cha.ChapterId = chapter.ChapterId;
+                cha.Name = chapter.Name;
+                cha.ParentId = chapter.SectionId;
+                cha.SortOrder = chapter.SortOrder;
+            }
+
+            // PAGES
+            foreach (var pa in model.s_Pages)
+            {
+                var page = db.Pages.Where(x => x.PageId == pa.PageId).FirstOrDefault();
+                bool addPage = false;
+                if (page == null)
+                {
+                    page = new Page();
+                    addPage = true;
+                    page.Create(User.Identity.Name);
+                    page.PageContent = "<page id=\"{id}\" type=\"content\"></page>";
+                }
+                else page.Modify(User.Identity.Name);
+
+                page.BookId = book.BookId;
+                page.Type = "content";
+
+
+                page.ChapterId = pa.ParentId;
+
+                try { page.Title = pa.Name; }
+                catch { page.Title = "New Page"; }
+
+                page.SortOrder = pa.SortOrder;
+            
+                if (addPage)
+                {
+                    db.Pages.Add(page);
+                    db.SaveChanges();
+                    page.PageContent = page.PageContent.Replace("{id}", "p_" + page.PageId);
+                }
+
+                db.SaveChanges();
+
+                // update the model
+                pa.Name = page.Title;
+                pa.PageId = page.PageId;
+                pa.ParentId = page.ChapterId;
+                pa.SortOrder = page.SortOrder;
+            }
+
+            db.SaveChanges();
+
+            return View("BuildList", model);
+        }
+        
+        [HttpPost]
+        public ActionResult BuildList(SaveBookModel model)
+        {
+            return View(model);
+        }
+        [HttpPost]
+        public ActionResult DeleteItem(int id, string type)
+        {
+            ApplicationDbContext db = new ApplicationDbContext();
+            if (type == "module")
+            {
+                var mod = db.Modules.Where(x => x.ModuleId == id).FirstOrDefault();
+
+                var sections = db.Sections.Where(x => x.ModuleId == id);
+                var sectionIds = sections.Select(x => x.SectionId).ToList();
+
+                var chapters = db.Chapters.Where(x => sectionIds.Contains(x.SectionId));
+                var chapterIds = chapters.Select(x => x.ChapterId).ToList();
+                
+                foreach (var page in db.Pages.Where(x => chapterIds.Contains(x.ChapterId)).ToList())
+                {
+                    page.BookId = 0;
+                    page.ChapterId = 0;
+                    page.Modify(User.Identity.Name);
+                    page.SortOrder = 0;
+                }
+
+                db.Chapters.RemoveRange(chapters);
+                db.Sections.RemoveRange(sections);
+                db.Modules.Remove(mod);
+            }
+
+            if (type == "section")
+            {
+                var section = db.Sections.Where(x => x.SectionId == id).FirstOrDefault();
+
+                var chapters = db.Chapters.Where(x => x.SectionId == id);
+                var chapterIds = chapters.Select(x => x.ChapterId).ToList();
+
+                foreach (var page in db.Pages.Where(x => chapterIds.Contains(x.ChapterId)).ToList())
+                {
+                    page.BookId = 0;
+                    page.ChapterId = 0;
+                    page.Modify(User.Identity.Name);
+                    page.SortOrder = 0;
+                }
+
+                db.Sections.Remove(section);
+                db.Chapters.RemoveRange(chapters);
+            }
+
+            if (type == "chapter")
+            {
+                var chapter = db.Chapters.Where(x => x.ChapterId == id).FirstOrDefault();
+
+                foreach (var page in db.Pages.Where(x => x.ChapterId == id).ToList())
+                {
+                    page.BookId = 0;
+                    page.ChapterId = 0;
+                    page.Modify(User.Identity.Name);
+                    page.SortOrder = 0;
+                }
+
+                db.Chapters.Remove(chapter);
+            }
+
+            if (type == "page")
+            {
+                var page = db.Pages.Where(x => x.PageId == id).FirstOrDefault();
+                page.BookId = 0;
+                page.ChapterId = 0;
+                page.Modify(User.Identity.Name);
+                page.SortOrder = 0;
+            }
+
+            
+            db.SaveChanges();
+            return Content("success");
+        }
+
+        [HttpPost]
         public JsonResult GetAvailablePages()
         {
             ApplicationDbContext db = new ApplicationDbContext();
@@ -1391,64 +1722,39 @@ namespace Amos.Controllers
         }
 
 
-        public ActionResult BuildList(PageListModel model)
+
+
+
+
+
+
+
+
+
+
+
+
+
+        [HttpPost]
+        public ActionResult Build_Module(S_Module item, int m)
         {
-            return View(model);
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        public ActionResult New_Module()
-        {
-            return View("Build_Module", new Module {
-                Name = "New Module",
-                Theme = "1"
-            });
-        }
-        public ActionResult Build_Module(Module item)
-        {
+            ViewBag.Count = m;
             return View("Build_Module", item);
         }
-
-        public ActionResult New_Section()
+        [HttpPost]
+        public ActionResult Build_Section(S_Section item, int s)
         {
-            return View("Build_Section", new Section {
-                Name = "New Section"
-            });
-        }
-        public ActionResult Build_Section(Section item)
-        {
+            ViewBag.Count = s;
             return View("Build_Section", item);
         }
-
-        public ActionResult New_Chapter()
+        [HttpPost]
+        public ActionResult Build_Chapter(S_Chapter item, int c)
         {
-            return View("Build_Chapter", new Chapter {
-                Name = "New Chapter"
-            });
-        }
-        public ActionResult Build_Chapter(Chapter item)
-        {
+            ViewBag.Count = c;
             return View("Build_Chapter", item);
         }
-
-        public ActionResult New_Page(int m, int s, int c, int p)
-        {
-            return View("Build_Page", new Build_PageModel(m, s, c, p));
-        }
-        public ActionResult Build_Page(Page item, int m, int s, int c, int p)
+        [HttpPost]
+        public ActionResult Build_Page(S_Page item, int m, int s, int c, int p)
         {
             // this one needs a model
             return View("Build_Page", new Build_PageModel(item, m, s, c, p));

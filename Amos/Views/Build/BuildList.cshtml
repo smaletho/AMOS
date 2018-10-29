@@ -1,0 +1,34 @@
+﻿@model Amos.Models.SaveBookModel
+
+@{ 
+    int moduleCount = 1;
+    int sectionCount = 1;
+    int chapterCount = 1;
+    int pageCount = 1;
+}
+
+
+<div style="display:table;margin:0 auto;text-align:center">
+    <a href="javascript:void(0)" onclick="addNewItem('module', this);">add module</a>
+</div>
+@foreach (var mod in Model.s_Modules.OrderBy(x => x.SortOrder).ToList())
+{
+    @Html.Action("Build_Module", "Build", new { item = mod, m = moduleCount })
+    foreach (var sec in Model.s_Sections.Where(x => x.ParentId == mod.ModuleId).OrderBy(x => x.SortOrder).ToList())
+    {
+        @Html.Action("Build_Section", new { item = sec, S = sectionCount })
+        foreach (var cha in Model.s_Chapters.Where(x => x.ParentId == sec.SectionId).OrderBy(x => x.SortOrder).ToList())
+        {
+            @Html.Action("Build_Chapter", new { item = cha, c = chapterCount })
+            foreach (var pa in Model.s_Pages.Where(x => x.ParentId == cha.ChapterId).OrderBy(x => x.SortOrder).ToList())
+            {
+                @Html.Action("Build_Page", new { item = pa, m = moduleCount, s = sectionCount, c = chapterCount, p = pageCount })
+                pageCount++;
+            }
+            chapterCount++;
+        }
+        sectionCount++;
+    }
+    moduleCount++;
+}
+

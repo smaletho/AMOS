@@ -18,40 +18,45 @@
     string name = Model.PageListModel.GetBook.Name ?? "New Book";
     string version = Model.PageListModel.GetBook.Version ?? "1";
 }
-<div class="input-group mb-3 input-group-lg mx-auto w-100">
-    <div class="input-group-prepend">
-        <span class="input-group-text" id="basic-addon1">Book Name</span>
+<div class="container" style="width:50%;">
+    <div class="input-group input-group-lg" style="margin-bottom:10px;">
+        <span class="input-group-addon" id="basic-addon1">Book Name</span>
+        <input type="text" class="form-control bookName" placeholder="Book Name" aria-label="Book Name" aria-describedby="basic-addon1" value="@name" />
     </div>
-    <input type="text" class="form-control bookName" placeholder="Book Name" aria-label="Book Name" aria-describedby="basic-addon1" value="@name" @shouldDisable() />
-</div>
-<div class="input-group mb-3 mx-auto w-100">
-    <div class="input-group-prepend">
-        <span class="input-group-text" id="basic-addon2">Version</span>
+    <div class="input-group">
+        <span class="input-group-addon" id="basic-addon2">Version</span>
+        <input type="text" class="form-control bookVersion" placeholder="Version" aria-label="Version" aria-describedby="basic-addon2" value="@version" />
     </div>
-    <input type="text" class="form-control bookVersion" placeholder="Version" aria-label="Version" aria-describedby="basic-addon12" value="@version" @shouldDisable() />
+
 </div>
+
+
+<hr />
 
 @if (Model.PageListModel.GetBook.Published)
 {
-    <div class="alert alert-secondary btn" data-toggle="modal" data-target="#lockedBookModal">
-        <i class="fa fa-lock"></i>
-        This book is published, and cannot be edited. Click for more information.
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3 alert alert-warning btn" role="alert">
+            <a href="#" class="alert-link" data-toggle="modal" data-target="#lockedBookModal">
+                <i class="fa fa-lock"></i>
+                This book is published, and cannot be edited. Click for more information.
+            </a>
+        </div>
+        <div class="col-md-3"></div>
     </div>
-    <div class="modal fade" id="lockedBookModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="lockedBookModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Unpublish Book?</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Unlock book?</h4>
                 </div>
                 <div class="modal-body">
                     <p>Un-publishing the book for editing will make the book inaccessible to users while being edited.</p>
                     <p>To edit this book, click the "continue" button below.</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">cancel</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">cancel</button>
                     <button type="button" class="btn btn-primary" onclick="enableDisable(false);">continue</button>
                 </div>
             </div>
@@ -60,18 +65,22 @@
 }
 else
 {
-    <div class="alert alert-primary btn" data-toggle="modal" data-target="#unlockedBookModal">
-        <i class="fa fa-unlock"></i>
-        This book is <b>NOT</b> published, and <b>CAN</b> be edited. Click to publish.
+
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3 alert alert-info btn" role="alert">
+            <a class="alert-link" data-toggle="modal" data-target="#unlockedBookModal">
+                <i class="fa fa-lock"></i>
+                This book is NOT published, and can be edited. Click to publish.
+            </a>
+        </div>
+        <div class="col-md-3"></div>
     </div>
-    <div class="modal fade" id="unlockedBookModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="unlockedBookModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Unpublish Book?</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Unlock book?</h4>
                 </div>
                 <div class="modal-body">
                     <p>Publishing this book will allow it to be viewed by all users.</p>
@@ -85,21 +94,23 @@ else
         </div>
     </div>
 
-    <hr />
-    
 
-    <p>
-        <a class="btn btn-outline-primary" href="@Url.Action("Edit", new { id=Model.PageListModel.GetBook.BookId })">
+
+    <div class="col-md-8 col-md-offset-2">
+        <a class="btn btn-default" href="@Url.Action("Edit", new { id=Model.PageListModel.GetBook.BookId })">
             Click here
         </a>
         to edit and organize this book. Here, pages can be added, rearranged, removed, or renamed.
-    </p>
+    </div>
+    <div class="col-md-2"></div>
+
     <hr />
-    <p>
-        Below, you will find a list of links and buttons used within this book. Use this interface to 
+
+    <div class="container col-md-12" style="margin-top:20px;">
+        Below, you will find a list of links and buttons used within this book. Use this interface to
         connect each button to the corresponding page that you would like it to navigate to.
-    </p>
-    
+    </div>
+
     <table class="table">
         <tr>
             <th>Page Id</th>

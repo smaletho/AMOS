@@ -1,51 +1,50 @@
 ﻿@model Amos.Models.Build_PageModel
 
+@{string pageIdentifier = "M" + Model.ModuleCount + ".S" + Model.SectionCount + ".C" + Model.ChapterCount + ".P" + Model.PageCount; }
+<div class="page row" data-myid="@Model.Page.PageId" data-parentid="@Model.Page.ParentId">
+    <div class="col-md-1 upper-highlight-module">
+        <i class="fa fa-level-up fa-flip-horizontal"></i>
+    </div>
+    <div class="col-md-1 upper-highlight-section">
+        <i class="fa fa-level-up fa-flip-horizontal"></i>
+    </div>
+    <div class="col-md-1 upper-highlight-chapter">
+        <i class="fa fa-level-up fa-flip-horizontal"></i>
+    </div>
+    <div class="col-md-1 sortControls">
+        <i class="fa fa-caret-up"></i>
+        <i class="fa fa-caret-down"></i>
+    </div>
+    <div class="col-md-6 lower-highlight">
+        <div class="input-group input-group-sm">
+            <span class="input-group-addon" id="pageAddon_@ViewBag.Count">@pageIdentifier</span>
+            <input value="@Model.Page.Name" type="text" class="itemTitle form-control mw-100" placeholder="New Page" aria-label="Page" aria-describedby="pageAddon_@ViewBag.Count">
+            <div class="input-group-btn">
+                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    action <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    @if (Model.Page.SortOrder == 0)
+                    {
+                        <li>
+                            <a data-id="@Model.Page.PageId" data-type="page" onclick="performActionMenu(this)">import</a>
+                        </li>
+                        <li>
+                            <a data-id="@Model.Page.PageId" data-type="page" onclick="performActionMenu(this)">delete</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li><a data-id="@Model.Page.PageId" data-type="page" onclick="performActionMenu(this)">preview</a></li>
+                        <li><a data-id="@Model.Page.PageId" data-type="page" onclick="performActionMenu(this)">delete</a></li>
+                        <li><a data-id="@Model.Page.PageId" data-type="page" onclick="performActionMenu(this)">edit</a></li>
+                    }
 
-@if (Model.GetPage.SortOrder == 0)
-{
-    <li class="page" data-id="@Model.GetPage.PageId">
-        @getGuts(true)
-    </li>
-}
-else
-{
-    @getGuts(false);
-}
-
-@helper getGuts(bool isNew)
-    {
-        string pageIdentifier = Model.ModuleCount + "_" + Model.SectionCount + "_" + Model.ChapterCount + "_" + Model.PageCount;
-            <div class="info-controls">
-                <i class="fa fa-sort-up"></i>
-                <i class="fa fa-sort-down"></i>
-                <i class="fa fa-minus"></i>
+                </ul>
             </div>
-            <div class="info-content">
-                <div class="info-name">
-                    <div class="info-name-label" data-id="@Model.GetPage.PageId">Page 1</div>
-                    <input type="text" value="@Model.GetPage.Title" class="partName" />
-                </div>
+        </div>
+    </div>
+    <div class="col-md-2 lower-highlight dropright">
 
-                <div class="action-menu">
-                    <div class="dropdown">
-                        <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            action
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" data-id="@Model.GetPage.PageId">
-                            @if (isNew)
-                            {
-                                <button class="dropdown-item" data-type="page" onclick="performActionMenu(this)">import</button>
-                                <button class="dropdown-item" data-type="page" onclick="performActionMenu(this)">delete</button>
-                            }
-                            else
-                            {
-                                <button data-id="@Model.GetPage.PageId" class="dropdown-item" data-type="page" onclick="performActionMenu(this)">preview</button>
-                                <button data-id="@Model.GetPage.PageId" class="dropdown-item" data-type="page" onclick="performActionMenu(this)">delete</button>
-                                <button data-id="@Model.GetPage.PageId" class="dropdown-item" data-type="page" onclick="performActionMenu(this)">edit</button>
-                            }
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-}
+    </div>
+</div>

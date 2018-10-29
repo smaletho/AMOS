@@ -29,9 +29,14 @@ namespace Amos.Models
 
     public class ImportBookModel
     {
+        public ImportBookModel()
+        {
+            this.ResponseList = new List<string>();
+        }
         [Required, FileExtensions(Extensions = "zip",
              ErrorMessage = "Specify a ZIP file.")]
         public HttpPostedFileBase File { get; set; }
+        public List<string> ResponseList { get; set; }
     }
 
     public class PageViewModel
@@ -130,7 +135,81 @@ namespace Amos.Models
         public List<Chapter> Chapters { get; set; }
     }
 
+    //public class MiniBookModel
+    //{
+    //    public MiniBookModel() { }
+    //    public MiniBookModel(PageListModel model)
+    //    {
+    //        this.Modules = new List<MiniBookItem>();
+    //        this.Sections = new List<MiniBookItem>();
+    //        this.Chapters = new List<MiniBookItem>();
+    //        this.Pages = new List<MiniBookItem>();
 
+    //        foreach (Module mod in model.Modules)
+    //        {
+    //            this.Modules.Add(new MiniBookItem(mod));
+    //        }
+    //        foreach (Section sec in model.Sections)
+    //        {
+    //            this.Sections.Add(new MiniBookItem(sec));
+    //        }
+    //        foreach (Chapter cha in model.Chapters)
+    //        {
+    //            this.Chapters.Add(new MiniBookItem(cha));
+    //        }
+    //        foreach (Page pa in model.PageList)
+    //        {
+    //            this.Pages.Add(new MiniBookItem(pa));
+    //        }
+    //    }
+    //    public List<MiniBookItem> Modules { get; set; }
+    //    public List<MiniBookItem> Sections { get; set; }
+    //    public List<MiniBookItem> Chapters { get; set; }
+    //    public List<MiniBookItem> Pages { get; set; }
+    //}
+
+    //public class MiniBookItem
+    //{
+    //    public MiniBookItem() { }
+    //    public MiniBookItem(Module module)
+    //    {
+    //        this.Id = module.ModuleId.ToString();
+    //        this.Name = module.Name;
+    //        this.ParentId = module.BookId.ToString();
+    //        this.SortOrder = module.SortOrder;
+    //        this.Type = "module";
+    //    }
+    //    public MiniBookItem(Section section)
+    //    {
+    //        this.Id = section.SectionId.ToString();
+    //        this.Name = section.Name;
+    //        this.ParentId = section.ModuleId.ToString();
+    //        this.SortOrder = section.SortOrder;
+    //        this.Type = "section";
+    //    }
+    //    public MiniBookItem(Chapter chapter)
+    //    {
+    //        this.Id = chapter.ChapterId.ToString();
+    //        this.Name = chapter.Name;
+    //        this.ParentId = chapter.SectionId.ToString();
+    //        this.SortOrder = chapter.SortOrder;
+    //        this.Type = "chapter";
+    //    }
+    //    public MiniBookItem(Page page)
+    //    {
+    //        this.Id = page.PageId.ToString();
+    //        this.Name = page.Title;
+    //        this.ParentId = page.ChapterId.ToString();
+    //        this.SortOrder = page.SortOrder;
+    //        this.Type = "page";
+    //    }
+
+    //    public string Id { get; set; }
+    //    public string Type { get; set; }
+    //    public int SortOrder { get; set; }
+    //    public string ParentId { get; set; }
+    //    public string Name { get; set; }
+    //}
 
     public class ManagePagesModel
     {
@@ -144,39 +223,47 @@ namespace Amos.Models
             {
                 // get the content, and turn into XML
                 XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.LoadXml(page.PageContent);
-
-                foreach (XmlElement contentNode in xmlDoc.ChildNodes[0].ChildNodes)
+                try
                 {
-                    if (contentNode.LocalName == "button")
+                    xmlDoc.LoadXml(page.PageContent);
+                    foreach (XmlElement contentNode in xmlDoc.ChildNodes[0].ChildNodes)
                     {
-                        try
-                        {
-                            string classList = contentNode.Attributes["class"].Value;
-                            if (!classList.Contains("quiz-submit") && !classList.Contains("survey-submit"))
-                                this.pageButtons.Add(new PageButton(contentNode, this.PageListModel.PageList, page.PageId, true));
-                        }
-                        catch {
-                            // This is here on purpose. Buttons don't always have an attribute "class" so failing is good, because it
-                            //  means it's not a quiz or survey button
-                            this.pageButtons.Add(new PageButton(contentNode, this.PageListModel.PageList, page.PageId, true));
-                        }
-                    }
-                    else if (contentNode.LocalName == "text")
-                    {
-                        foreach (XmlNode textChild in contentNode.ChildNodes)
+                        if (contentNode.LocalName == "button")
                         {
                             try
                             {
-                                if (textChild.LocalName == "a" && textChild.Attributes["class"].Value.Contains("navigateTo"))
-                                    this.pageButtons.Add(new PageButton(textChild, this.PageListModel.PageList, page.PageId, false));
+                                string classList = contentNode.Attributes["class"].Value;
+                                if (!classList.Contains("quiz-submit") && !classList.Contains("survey-submit"))
+                                    this.pageButtons.Add(new PageButton(contentNode, this.PageListModel.PageList, page.PageId, true));
                             }
-                            catch { }
+                            catch
+                            {
+                                // This is here on purpose. Buttons don't always have an attribute "class" so failing is good, because it
+                                //  means it's not a quiz or survey button
+                                this.pageButtons.Add(new PageButton(contentNode, this.PageListModel.PageList, page.PageId, true));
+                            }
+                        }
+                        else if (contentNode.LocalName == "text")
+                        {
+                            foreach (XmlNode textChild in contentNode.ChildNodes)
+                            {
+                                try
+                                {
+                                    if (textChild.LocalName == "a" && textChild.Attributes["class"].Value.Contains("navigateTo"))
+                                        this.pageButtons.Add(new PageButton(textChild, this.PageListModel.PageList, page.PageId, false));
+                                }
+                                catch { }
+
+                            }
 
                         }
-
                     }
                 }
+                catch (ArgumentNullException) { }
+                catch (XmlException) { }
+                
+
+                
             }
         }
         public PageListModel PageListModel { get; set; }
@@ -233,26 +320,15 @@ namespace Amos.Models
     public class Build_PageModel
     {
         public Build_PageModel() { }
-        public Build_PageModel(Page item, int m, int s, int c, int p)
+        public Build_PageModel(S_Page item, int m, int s, int c, int p)
         {
-            this.GetPage = item;
+            this.Page = item;
             this.ModuleCount = m;
             this.SectionCount = s;
             this.ChapterCount = c;
             this.PageCount = p;
         }
-        public Build_PageModel(int m, int s, int c, int p)
-        {
-            this.GetPage = new Page
-            {
-                Title = "New Page",
-            };
-            this.ModuleCount = m;
-            this.SectionCount = s;
-            this.ChapterCount = c;
-            this.PageCount = p;
-        }
-        public Page GetPage { get; set; }
+        public S_Page Page { get; set; }
         public int ModuleCount { get; set; }
         public int SectionCount { get; set; }
         public int ChapterCount { get; set; }

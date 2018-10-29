@@ -362,8 +362,10 @@ function textNode(element) {
 function textStyleMap(element, styles) {
     var styleArr = styles.split(';');
     for (var i = 0; i < styleArr.length; i++) {
-        var block = styleArr[i].split(':');
-        $(element).css($.trim(block[0]), $.trim(block[1]));
+        if ($.trim(styleArr[i]) != "") {
+            var block = styleArr[i].split(':');
+            $(element).css($.trim(block[0]), $.trim(block[1]));
+        }
     }
     return element;
 }

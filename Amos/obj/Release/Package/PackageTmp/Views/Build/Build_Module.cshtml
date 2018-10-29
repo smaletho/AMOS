@@ -1,35 +1,26 @@
-﻿@model Amos.Models.Module
+﻿@model Amos.Models.S_Module
 
-@if (Model.SortOrder == 0)
-{
-    <li class="module theme_1" data-id="@Model.ModuleId">
-        @getGuts()
-    </li>
-}
-else
-{
-    @getGuts()
-}
-
-
-
-@helper getGuts()
-    {
-
-            <div class="info-controls">
-                <i class="fa fa-sort-up"></i>
-                <i class="fa fa-sort-down"></i>
-                <i class="fa fa-minus"></i>
+<div class="module row theme_@Model.Theme" data-myid="@Model.ModuleId" data-parentid="@Model.ParentId">
+    <div class="col-md-1 sortControls">
+        <i class="fa fa-caret-up"></i>
+        <i class="fa fa-caret-down"></i>
+    </div>
+    <div class="col-md-9 lower-highlight">
+        <div class="input-group input-group-sm">
+            <span class="input-group-addon mod-theme" id="moduleAddon_@ViewBag.Count">M @ViewBag.Count</span>
+            <input value="@Model.Name" type="text" class="itemTitle form-control mw-100" placeholder="New Module" aria-label="Module" aria-describedby="moduleAddon_@ViewBag.Count">
+            <div class="input-group-btn">
+                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    action <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li><a onclick="performActionMenu(this)" data-type="module">delete</a></li>
+                    <li><a onclick="performActionMenu(this)" data-type="module">change theme</a></li>
+                </ul>
             </div>
-            <div class="info-content">
-                <div class="info-name">
-                    <div class="info-name-label" data-id="@Model.ModuleId">Module 1</div>
-                    <input type="text" value="@Model.Name" class="partName" />
-                </div>
-                <div class="action-menu">
-                    <a href="javascript:void(0)" onclick="performActionMenu(this)">delete</a>
-                    <a href="javascript:void(0)" onclick="performActionMenu(this)">change theme</a>
-                </div>
-            </div>
-            
-}
+        </div>
+    </div>
+    <div class="col-md-2 lower-highlight">
+        <a href="javascript:void(0)" onclick="addNewItem('section', this);">add section</a>
+    </div>
+</div>

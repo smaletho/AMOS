@@ -13,19 +13,25 @@
     @RenderSection("styles", required: false)
 </head>
 <body>
-    <div class="container container-fluid bg-dark mw-100">
-        <div class="container container-fluid">
-            <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-                <a class="navbar-brand" href="@Url.Action("Index", "Home")">
-                    <img src="~/Content/images/amos_logo.png" width="30" height="30" class="d-inline-block align-top" alt="" />
-                </a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav mr-auto">
-                        <li class="nav-item">
-                            <a class="nav-link @Html.Raw(isActiveController("Home"))" href="@Url.Action("Index", "Home")">Home</a>
+    <div class="container container-fluid">
+        <nav class="navbar navbar-expand-md navbar-inverse">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="@Url.Action("Index", "Home")">
+                        <img src="~/Content/images/amos_logo.png" width="30" height="30" class="d-inline-block align-top" alt="" style="margin-top:-5px" />
+                    </a>
+                </div>
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li class="nav-item @Html.Raw(isActiveController("Home"))">
+                            <a class="nav-link" href="@Url.Action("Index", "Home")">Home</a>
                         </li>
                         <li class="nav-item @Html.Raw(isActiveController("Present"))">
                             <a class="nav-link" href="@Url.Action("ViewBooks", "Present")">Present</a>
@@ -39,10 +45,16 @@
                     </ul>
                     @Html.Partial("_LoginPartial")
                 </div>
-            </nav>
-        </div>
-
+            </div>
+        </nav>
     </div>
+
+
+
+    @*<div class="container container-fluid bg-dark mw-100">
+
+
+    </div>*@
 
     <div class="container container-fluid pt-5">
         @RenderBody()

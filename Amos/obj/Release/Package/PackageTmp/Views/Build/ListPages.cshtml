@@ -1,0 +1,56 @@
+﻿@model IEnumerable<Amos.Models.Page>
+
+@{
+    ViewBag.Title = "ListPages";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>ListPages</h2>
+
+<p>
+    @Html.ActionLink("Create New Page", "ViewEditor", new { id = 0 })
+</p>
+<table class="table">
+    <tr>
+        <th>Page Name</th>
+        <th>Page Type</th>
+        <th>Modified</th>
+        <th>Created</th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model.OrderByDescending(x => x.ModifyDate)) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Title)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Type)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ModifyDate)<br />
+            @Html.DisplayFor(modelItem => item.ModifiedBy)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.CreateDate)<br />
+            @Html.DisplayFor(modelItem => item.CreatedBy)
+        </td>
+        <td>
+            <div class="dropdown">
+                <button class="btn btn-default dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Page Actions <span class="caret"></span>
+                </button>
+
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                    <li><a href="@Url.Action("ViewEditor", new { id = item.PageId })">edit</a></li>
+                    <li><a href="@Url.Action("ViewPage", new { id = item.PageId })">preview</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="javascript:void(0)" onclick="confirmDelete(@item.PageId)">delete</a></li>
+                    <li><a href="@Url.Action("Duplicate", new { id = item.PageId })">duplicate</a></li>
+                </ul>
+            </div>
+        </td>
+    </tr>
+}
+
+</table>

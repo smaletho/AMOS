@@ -1,36 +1,27 @@
-﻿@model Amos.Models.Chapter
-
-@if (Model.SortOrder == 0)
-{
-<li class="chapter" data-id="@Model.ChapterId">
-    @getGuts()
-    <ul class="pages">
-        <li class="new">
-            <a class="newItem" data-type="page" href="javascript:void(0)">new page</a>
-        </li>
-    </ul>
-</li>
-}
-else
-{
-    @getGuts();
-}
+﻿@model Amos.Models.S_Chapter
 
 
-@helper getGuts()
-    {
-        <div class="info-block">
-            <div class="arrow-block">
-                <i class="fa fa-sort-up"></i>
-                <i class="fa fa-sort-down"></i>
-                <i class="fa fa-minus"></i>
-            </div>
-            <div class="info-name">
-                <div class="info-name-text">Chapter 1</div>
-                <input type="text" value="@Model.Name" class="partName" />
-            </div>
-            <div class="action-menu">
-                <a href="javascript:void(0)" onclick="performActionMenu(this)" data-type="chapter">delete</a>
+<div class="chapter row" data-myid="@Model.ChapterId" data-parentid="@Model.ParentId">
+    <div class="col-md-1 upper-highlight-module">
+        <i class="fa fa-level-up fa-flip-horizontal"></i>
+    </div>
+    <div class="col-md-1 upper-highlight-section">
+        <i class="fa fa-level-up fa-flip-horizontal"></i>
+    </div>
+    <div class="col-md-1 sortControls">
+        <i class="fa fa-caret-up"></i>
+        <i class="fa fa-caret-down"></i>
+    </div>
+    <div class="col-md-7 lower-highlight">
+        <div class="input-group input-group-sm">
+            <span class="input-group-addon" id="chapterAddon_@ViewBag.Count">C @ViewBag.Count</span>
+            <input value="@Model.Name" type="text" class="itemTitle form-control mw-100" placeholder="New Chapter" aria-label="Chapter" aria-describedby="chapterAddon_@ViewBag.Count">
+            <div class="input-group-btn">
+                <button class="btn btn-default" type="button" data-type="chapter" onclick="performActionMenu(this)">delete</button>
             </div>
         </div>
-}
+    </div>
+    <div class="col-md-2 lower-highlight">
+        <a href="javascript:void(0)" onclick="addNewItem('page', this);">add page</a>
+    </div>
+</div>

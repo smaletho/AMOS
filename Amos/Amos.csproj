@@ -222,14 +222,13 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\bootstrap-grid.css" />
-    <Content Include="Content\bootstrap-grid.min.css" />
-    <Content Include="Content\bootstrap-reboot.css" />
-    <Content Include="Content\bootstrap-reboot.min.css" />
+    <Content Include="Content\bootstrap-theme.css" />
+    <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\css\base.css" />
     <Content Include="Content\css\bootstrap-tour-standalone.min.css" />
+    <Content Include="Content\css\EditBook - Copy.css" />
     <Content Include="Content\css\EditBook.css" />
     <Content Include="Content\css\pageContent.css" />
     <Content Include="Content\css\themes.css" />
@@ -255,6 +254,7 @@
     <Content Include="Content\images\themes\9.png" />
     <Content Include="Content\js\base.js" />
     <Content Include="Content\js\bootstrap-tour-standalone.min.js" />
+    <Content Include="Content\js\EditBook - Copy.js" />
     <Content Include="Content\js\EditBook.js" />
     <Content Include="Content\js\jquery-3.3.1.min.js" />
     <Content Include="Content\js\jquery-ui-1.12.1.min.js" />
@@ -309,6 +309,7 @@
     <Content Include="favicon.ico" />
     <Content Include="fonts\FiraSans\Fonts.css" />
     <Content Include="fonts\fontawesome-webfont.svg" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="ApplicationInsights.config">
@@ -377,21 +378,17 @@
     <Content Include="fonts\fontawesome-webfont.woff" />
     <Content Include="fonts\fontawesome-webfont.woff2" />
     <Content Include="fonts\FontAwesome.otf" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\bootstrap.min.css.map" />
     <Content Include="Content\bootstrap.css.map" />
-    <Content Include="Content\bootstrap-reboot.min.css.map" />
-    <Content Include="Content\bootstrap-reboot.css.map" />
-    <Content Include="Content\bootstrap-grid.min.css.map" />
-    <Content Include="Content\bootstrap-grid.css.map" />
+    <Content Include="Content\bootstrap-theme.min.css.map" />
+    <Content Include="Content\bootstrap-theme.css.map" />
     <None Include="Properties\PublishProfiles\COMfORT2vm - Web Deploy.pubxml" />
-    <Content Include="Scripts\bootstrap.bundle.js" />
-    <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <Content Include="Scripts\bootstrap.min.js.map" />
-    <Content Include="Scripts\bootstrap.js.map" />
-    <Content Include="Scripts\bootstrap.bundle.min.js.map" />
-    <Content Include="Scripts\bootstrap.bundle.js.map" />
     <Content Include="Scripts\esm\popper-utils.js" />
     <Content Include="Scripts\esm\popper-utils.min.js" />
     <Content Include="Scripts\esm\popper.js" />
@@ -476,11 +473,13 @@
     <Content Include="Scripts\jquery-3.3.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.3.1.min.map" />
     <Content Include="Views\Build\Manage.cshtml" />
-    <Content Include="Views\Build\Build_Module.cshtml" />
-    <Content Include="Views\Build\Build_Section.cshtml" />
-    <Content Include="Views\Build\Build_Page.cshtml" />
-    <Content Include="Views\Build\Build_Chapter.cshtml" />
     <Content Include="Views\Build\Edit.cshtml" />
+    <Content Include="Views\Build\Build_Chapter.cshtml" />
+    <Content Include="Views\Build\Build_Module.cshtml" />
+    <Content Include="Views\Build\Build_Page.cshtml" />
+    <Content Include="Views\Build\Build_Section.cshtml" />
+    <Content Include="Views\Build\BuildList.cshtml" />
+    <Content Include="Views\Build\ListPages.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -1,31 +1,23 @@
-﻿@model Amos.Models.Section
+﻿@model Amos.Models.S_Section
 
-@if (Model.SortOrder == 0)
-{
-    <li class="section" data-id="@Model.SectionId">
-        @getGuts()
-    </li>
-}
-else
-{
-    @getGuts()
-}
-
-@helper getGuts()
-    {
-            <div class="info-controls">
-                <i class="fa fa-sort-up"></i>
-                <i class="fa fa-sort-down"></i>
-                <i class="fa fa-minus"></i>
+<div class="section row" data-myid="@Model.SectionId" data-parentid="@Model.ParentId">
+    <div class="col-md-1 upper-highlight-module">
+        <i class="fa fa-level-up fa-flip-horizontal"></i>
+    </div>
+    <div class="col-md-1 sortControls">
+        <i class="fa fa-caret-up"></i>
+        <i class="fa fa-caret-down"></i>
+    </div>
+    <div class="col-md-8 lower-highlight">
+        <div class="input-group input-group-sm">
+            <span class="input-group-addon" id="sectionAddon_@ViewBag.Count">S @ViewBag.Count</span>
+            <input value="@Model.Name" type="text" class="itemTitle form-control mw-100" placeholder="New Section" aria-label="Section" aria-describedby="sectionAddon_@ViewBag.Count">
+            <div class="input-group-btn">
+                <button class="btn btn-default" type="button" data-type="section" onclick="performActionMenu(this)">delete</button>
             </div>
-            <div class="info-content">
-                <div class="info-name">
-                    <div class="info-name-label" data-id="@Model.SectionId">Section 1</div>
-                    <input type="text" value="@Model.Name" class="partName" />
-                </div>
-                <div class="action-menu">
-                    <a href="javascript:void(0)" onclick="performActionMenu(this)">delete</a>
-                </div>
-            </div>
-}
-
+        </div>
+    </div>
+    <div class="col-md-2 lower-highlight">
+        <a href="javascript:void(0)" onclick="addNewItem('chapter', this);">add chapter</a>
+    </div>
+</div>
