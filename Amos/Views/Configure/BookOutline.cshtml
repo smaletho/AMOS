@@ -1,2 +1,60 @@
 ﻿@model Amos.Controllers.Configuration.BookOutlineModel
-<div>@DateTime.Now</div>
+@{ 
+    int moduleCall = 0;
+    int sectionCall = 0;
+    int chapterCall = 0;
+    int pageCall = 0;
+}
+@*<div>@DateTime.Now</div>*@
+<div class="book item" data-type="book" data-id="@Model.OutlineBook.BookId">
+        <div class="name">@Model.OutlineBook.Name</div>
+        <div class="version">version: <b>@Model.OutlineBook.Version</b></div>
+</div>
+
+@foreach (var currentModule in Model.OutlineModules)
+{
+    moduleCall++;
+    sectionCall = 0;
+    chapterCall = 0;
+    pageCall = 0;
+<div class="module item" data-type="module" data-id="@currentModule.ModuleId">
+    <div class="call">@moduleCall</div>
+    <div class="description"><div class="name">@currentModule.Name</div></div>
+</div>
+
+    var sections = from s in Model.OutlineSections where s.ModuleId == currentModule.ModuleId select s;
+    foreach (var currentSection in sections)
+    {
+        sectionCall++;
+        chapterCall = 0;
+        
+<div class="section item" data-type="section" data-id="@currentSection.SectionId">
+    <div class="call">@moduleCall.@sectionCall</div>
+    <div class="description"><div class="name">@currentSection.Name</div></div>
+</div>
+
+        var chapters = from s in Model.OutlineChapters where s.SectionId == currentSection.SectionId select s;
+        foreach (var currentChapter in chapters)
+        {
+            chapterCall++;
+<div class="chapter item" data-type="chapter" data-id="@currentChapter.ChapterId">
+    <div class="call">@moduleCall.@sectionCall.@chapterCall</div>
+    <div class="description"><div class="name">@currentChapter.Name</div></div>
+</div>
+
+            var pages = from s in Model.OutlinePages where s.ChapterId == currentChapter.ChapterId select s;
+            foreach (var currentPage in pages)
+            {
+                pageCall++;
+<div class="page item" data-type="page" data-id="@currentPage.PageId">
+    <div class="call">@moduleCall.@sectionCall.@chapterCall.@pageCall</div>
+    <div class="description"><div class="name">@currentPage.Title</div></div>
+</div>
+
+
+            }
+
+        }
+
+    }
+}

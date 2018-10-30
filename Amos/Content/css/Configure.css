@@ -1,5 +1,40 @@
 ﻿#Main{}
 
-#BookOutline{width:700px;padding-right:16px;}
+#BookOutline{width:700px;border-right:1px solid #ddd;}
 
-#ItemActions{width:440px;border-left:1px solid #ddd;padding-left:32px;}
+#ItemActions{width:440px;/*border-left:1px solid #ddd;*/padding-left:32px;}
+
+#BookOutline .item:hover{background-color:#eee;cursor:pointer;}
+#BookOutline .selectedItem{background-color:#9966ff !important;color:#eee !important;}
+
+#BookOutline .book{}
+#BookOutline .book .name{font-size:32px;color:#4800ff;}
+#BookOutline .book .version{font-size:14px;}
+
+#BookOutline .module{font-size:24px;padding-top:40px;}
+#BookOutline .module .call{display:table-cell;width:80px;}
+#BookOutline .module .description{display:table-cell;width:500px;font-weight:bold;}
+
+#BookOutline .section{font-size:18px;padding-top:20px;}
+#BookOutline .section .call{display:table-cell;width:80px;}
+#BookOutline .section .description{display:table-cell;width:500px;padding-left:24px;}
+
+#BookOutline .chapter{font-size:14px;padding-top:10px;}
+#BookOutline .chapter .call{display:table-cell;width:80px;}
+#BookOutline .chapter .description{display:table-cell;width:500px;padding-left:48px;font-weight:bold;}
+
+#BookOutline .page{font-size:14px;}
+#BookOutline .page .call{display:table-cell;width:80px;}
+#BookOutline .page .description{display:table-cell;width:500px;padding-left:72px;}
+
+
+#ItemActions .actions-header{font-size:18px;margin-bottom:48px;color:#808080;}
+#ItemActions .actions-set{display:none;}
+
+#ItemActions #DefaultActions{display:block;padding-top:100px;font-size:18px;}
+#ItemActions #DefaultActions i{position:relative;top:5px;color:#ccc;padding-right:10px;}
+
+#ItemActions .input-item{}
+#ItemActions .input-item .input-label{}
+#ItemActions .input-item .input-value input{width:400px;font-size:18px;font-weight:bold;}
+#ItemActions .input-item .input-action{text-align:right;padding-right:8px;}
