@@ -27,6 +27,8 @@
 #BookOutline .page{font-size:14px;}
 #BookOutline .page .call{display:table-cell;width:80px;}
 #BookOutline .page .description{display:table-cell;width:500px;padding-left:72px;}
+#BookOutline .page .description .quiz{background-color:#fbb;padding:0px 4px;color:#fff;border-radius:4px;}
+#BookOutline .page .description .survey{background-color:#abf;padding:0px 4px;color:#fff;border-radius:4px;}
 
 #BookOutline #MoveSelectInputs{display:none;}
 

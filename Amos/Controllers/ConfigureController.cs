@@ -76,7 +76,7 @@ namespace Amos.Controllers.Configuration
                                                    ChapterId = s.ChapterId,
                                                    Title = s.Title,
                                                    Type = s.Type,
-                                                   PageContent = s.PageContent
+                                                   //PageContent = s.PageContent
                                                }).ToList();
 
             return View("BookOutline",bookOutlineModel);
@@ -124,21 +124,272 @@ namespace Amos.Controllers.Configuration
         public ActionResult AddItem(RemoveItemRequest AddItemRequest)
         {
             var db = new ApplicationDbContext();
-
+            switch (AddItemRequest.Type)
+            {
+                case "book": // new modules are added at TOP
+                    var lowestExistingModuleSortOrder = (from s in db.Modules where s.BookId == AddItemRequest.Id select s.SortOrder).DefaultIfEmpty(0).Min();
+                    var newModule = new Module();
+                    newModule.SortOrder = lowestExistingModuleSortOrder - 1;
+                    newModule.Name = "Untitled Module";
+                    newModule.Theme = "1";
+                    newModule.BookId = AddItemRequest.Id;
+                    db.Modules.Add(newModule);
+                    break;
+                case "module": // new sections are added at BOTTOM
+                    var highestExistingSectionSortOrder = (from s in db.Sections where s.ModuleId == AddItemRequest.Id select s.SortOrder).DefaultIfEmpty(0).Max();
+                    var newSection = new Section();
+                    newSection.SortOrder = highestExistingSectionSortOrder + 1;
+                    newSection.Name = "Untitled Section";
+                    newSection.ModuleId = AddItemRequest.Id;
+                    db.Sections.Add(newSection);
+                    break;
+                case "section": // new chapters are added at BOTTOM
+                    var highestExistingChapterSortOrder = (from s in db.Chapters where s.SectionId == AddItemRequest.Id select s.SortOrder).DefaultIfEmpty(0).Max();
+                    var newChapter = new Chapter();
+                    newChapter.SortOrder = highestExistingChapterSortOrder + 1;
+                    newChapter.Name = "Untitled Chapter";
+                    newChapter.SectionId = AddItemRequest.Id;
+                    db.Chapters.Add(newChapter);
+                    break;
+                case "chapter": // new pages are added at BOTTOM
+                    var highestExistingPageSortOrder = (from s in db.Pages where s.ChapterId == AddItemRequest.Id select s.SortOrder).DefaultIfEmpty(0).Max();
+                    var newPage = new Page();
+                    newPage.SortOrder = highestExistingPageSortOrder + 1;
+                    newPage.Title = "Untitled Page";
+                    newPage.ChapterId = AddItemRequest.Id;
+                    newPage.BookId = AddItemRequest.PageQueryModel.BookId;
+                    newPage.PageContent = "";
+                    newPage.CreatedBy = User.Identity.Name;
+                    newPage.CreateDate = DateTime.Now;
+                    newPage.ModifiedBy = User.Identity.Name;
+                    newPage.ModifyDate = newPage.CreateDate;
+                    newPage.Type = "content";
+                    db.Pages.Add(newPage);
+                    break;
+            }
+            db.SaveChanges();
             return BookOutline(AddItemRequest.PageQueryModel);
         }
 
         public ActionResult RemoveItem(RemoveItemRequest RemoveItemRequest)
         {
             var db = new ApplicationDbContext();
-
+            switch (RemoveItemRequest.Type)
+            {
+                case "module":
+                    var module = db.Modules.Find(RemoveItemRequest.Id);
+                    db.Modules.Remove(module);
+                    var sections = (from s in db.Sections where s.ModuleId == RemoveItemRequest.Id select s);
+                    var sectionIds = from s in sections select s.SectionId;
+                    db.Sections.RemoveRange(sections);
+                    var chapters2 = (from s in db.Chapters where sectionIds.Contains(s.SectionId) select s);
+                    var chapterIds2 = from s in chapters2 select s.ChapterId;
+                    db.Chapters.RemoveRange(chapters2);
+                    var pages3 = (from s in db.Pages where chapterIds2.Contains(s.ChapterId) select s);
+                    foreach (var page3 in pages3)
+                    {
+                        page3.BookId = 0;
+                        page3.ChapterId = 0;
+                        page3.SortOrder = 0;
+                    }
+                    break;
+                case "section":
+                    var section = db.Sections.Find(RemoveItemRequest.Id);
+                    db.Sections.Remove(section);
+                    var chapters = (from s in db.Chapters where s.SectionId == RemoveItemRequest.Id select s);
+                    var chapterIds = from s in chapters select s.ChapterId;
+                    db.Chapters.RemoveRange(chapters);
+                    var pages2 = (from s in db.Pages where chapterIds.Contains(s.ChapterId) select s);
+                    foreach (var page2 in pages2)
+                    {
+                        page2.BookId = 0;
+                        page2.ChapterId = 0;
+                        page2.SortOrder = 0;
+                    }
+                    break;
+                case "chapter":
+                    var chapter = db.Chapters.Find(RemoveItemRequest.Id);
+                    db.Chapters.Remove(chapter);
+                    var pages = (from s in db.Pages where s.ChapterId == RemoveItemRequest.Id select s);
+                    foreach(var page2 in pages)
+                    {
+                        page2.BookId = 0;
+                        page2.ChapterId = 0;
+                        page2.SortOrder = 0;
+                    }
+                    break;
+                case "page":
+                    var page = db.Pages.Find(RemoveItemRequest.Id);
+                    page.BookId = 0;
+                    page.ChapterId = 0;
+                    page.SortOrder = 0;
+                    break;
+            }
+            db.SaveChanges();
             return BookOutline(RemoveItemRequest.PageQueryModel);
         }
 
-        public ActionResult ReorderItem(RemoveItemRequest ReorderItemRequest)
+        public ActionResult MoveItem(MoveItemRequest MoveItemRequest)
         {
             var db = new ApplicationDbContext();
+            switch (MoveItemRequest.Type)
+            {
+                case "section":
+                    var highestExistingSectionSortOrder = (from s in db.Sections where s.ModuleId == MoveItemRequest.TargetParentId select s.SortOrder).DefaultIfEmpty(0).Max();
+                    var section = db.Sections.Find(MoveItemRequest.Id);
+                    section.ModuleId = MoveItemRequest.TargetParentId;
+                    section.SortOrder = highestExistingSectionSortOrder + 1;
+                    break;
+                case "chapter":
+                    var highestExistingChapterSortOrder = (from s in db.Chapters where s.SectionId == MoveItemRequest.TargetParentId select s.SortOrder).DefaultIfEmpty(0).Max();
+                    var chapter = db.Chapters.Find(MoveItemRequest.Id);
+                    chapter.SectionId = MoveItemRequest.TargetParentId;
+                    chapter.SortOrder = highestExistingChapterSortOrder + 1;
+                    break;
+                case "page":
+                    var highestExistingPageSortOrder = (from s in db.Pages where s.ChapterId == MoveItemRequest.TargetParentId select s.SortOrder).DefaultIfEmpty(0).Max();
+                    var page = db.Pages.Find(MoveItemRequest.Id);
+                    page.ChapterId = MoveItemRequest.TargetParentId;
+                    page.SortOrder = highestExistingPageSortOrder + 1;
+                    break;
+            }
+            db.SaveChanges();
+            return BookOutline(MoveItemRequest.PageQueryModel);
+        }
 
+        public ActionResult ReorderItem(ReorderItemRequest ReorderItemRequest)
+        {
+            var db = new ApplicationDbContext();
+            switch (ReorderItemRequest.Type)
+            {
+                case "module":
+                    if (ReorderItemRequest.Action == "up")
+                    {
+                        var module = db.Modules.Find(ReorderItemRequest.Id);
+                        var adjacentModule = (from s in db.Modules where s.BookId == module.BookId && s.SortOrder < module.SortOrder orderby s.SortOrder descending select s).FirstOrDefault();
+                        if (adjacentModule != null) // there IS an adjacent module within this book to swap with:
+                        {
+                            int swapSortOrder = adjacentModule.SortOrder;
+                            adjacentModule.SortOrder = module.SortOrder;
+                            module.SortOrder = swapSortOrder;
+                        } 
+                    }
+                    if (ReorderItemRequest.Action == "down")
+                    {
+                        var module = db.Modules.Find(ReorderItemRequest.Id);
+                        var adjacentModule = (from s in db.Modules where s.BookId == module.BookId && s.SortOrder > module.SortOrder orderby s.SortOrder select s).FirstOrDefault();
+                        if (adjacentModule != null) // there IS an adjacent module within this book to swap with:
+                        {
+                            int swapSortOrder = adjacentModule.SortOrder;
+                            adjacentModule.SortOrder = module.SortOrder;
+                            module.SortOrder = swapSortOrder;
+                        } 
+                    }
+                    break;
+                case "section":
+
+
+
+
+                    break;
+                case "chapter":
+                    if (ReorderItemRequest.Action == "up")
+                    {
+                        var chapter = db.Chapters.Find(ReorderItemRequest.Id);
+                        var adjacentChapter = (from s in db.Chapters where s.SectionId == chapter.SectionId && s.SortOrder < chapter.SortOrder orderby s.SortOrder descending select s).FirstOrDefault();
+                        if (adjacentChapter != null) // there IS an adjacent chapter within this chapter to swap with:
+                        {
+                            int swapSortOrder = adjacentChapter.SortOrder;
+                            adjacentChapter.SortOrder = chapter.SortOrder;
+                            chapter.SortOrder = swapSortOrder;
+                        }
+                        else // there is NOT an adjacent chapter, we will need to move the chapter to the bottom of an adjacent section:
+                        {
+                            var allSections = (from s in db.Sections orderby s.Module.SortOrder,  s.SortOrder select s.SectionId).ToList();
+                            int sectionIndex = allSections.IndexOf(chapter.SectionId);
+                            if (sectionIndex > 0) // there IS an adjacent section to move this chapter to:
+                            {
+                                int targetSectionId = allSections[sectionIndex - 1];
+                                var highestChapterSortOrderInTargetSection = (from s in db.Chapters where s.SectionId == targetSectionId select s.SortOrder).DefaultIfEmpty(0).Max();
+                                chapter.SectionId = targetSectionId;
+                                chapter.SortOrder = highestChapterSortOrderInTargetSection + 1;
+                            } // otherwise, there is no adjacent chapter AND no adjacent section... the chapter can be moved no further: take no action.
+                        }
+                    }
+                    if (ReorderItemRequest.Action == "down")
+                    {
+                        var chapter = db.Chapters.Find(ReorderItemRequest.Id);
+                        var adjacentChapter = (from s in db.Chapters where s.SectionId == chapter.SectionId && s.SortOrder > chapter.SortOrder orderby s.SortOrder select s).FirstOrDefault();
+                        if (adjacentChapter != null) // there IS an adjacent chapter within this chapter to swap with:
+                        {
+                            int swapSortOrder = adjacentChapter.SortOrder;
+                            adjacentChapter.SortOrder = chapter.SortOrder;
+                            chapter.SortOrder = swapSortOrder;
+                        }
+                        else // there is NOT an adjacent chapter, we will need to move the chapter to the top of an adjacent section:
+                        {
+                            var allSections = (from s in db.Sections orderby s.Module.SortOrder descending, s.SortOrder descending select s.SectionId).ToList();
+                            int sectionIndex = allSections.IndexOf(chapter.SectionId);
+                            if (sectionIndex > 0) // there IS an adjacent section to move this chapter to:
+                            {
+                                int targetSectionId = allSections[sectionIndex - 1];
+                                var lowestChapterSortOrderInTargetSection = (from s in db.Chapters where s.SectionId == targetSectionId select s.SortOrder).DefaultIfEmpty(0).Min();
+                                chapter.SectionId = targetSectionId;
+                                chapter.SortOrder = lowestChapterSortOrderInTargetSection - 1;
+                            } // otherwise, there is no adjacent chapter AND no adjacent section... the chapter can be moved no further: take no action.
+                        }
+                    }
+                    break;
+                case "page":
+                    if (ReorderItemRequest.Action == "up")
+                    {
+                        var page = db.Pages.Find(ReorderItemRequest.Id);
+                        var adjacentPage = (from s in db.Pages where s.ChapterId == page.ChapterId && s.SortOrder < page.SortOrder orderby s.SortOrder descending select s).FirstOrDefault();
+                        if (adjacentPage != null) // there IS an adjacent page within this chapter to swap with:
+                        {
+                            int swapSortOrder = adjacentPage.SortOrder;
+                            adjacentPage.SortOrder = page.SortOrder;
+                            page.SortOrder = swapSortOrder;
+                        }
+                        else // there is NOT an adjacent page, we will need to move the page to the bottom of an adjacent chapter:
+                        {
+                            var allChapters = (from s in db.Chapters orderby s.Section.Module.SortOrder, s.Section.SortOrder, s.SortOrder select s.ChapterId).ToList();
+                            int chapterIndex = allChapters.IndexOf(page.ChapterId);
+                            if (chapterIndex > 0) // there IS an adjacent chapter to move this page to:
+                            {
+                                int targetChapterId = allChapters[chapterIndex - 1];
+                                var highestPageSortOrderInTargetChapter = (from s in db.Pages where s.ChapterId == targetChapterId select s.SortOrder).DefaultIfEmpty(0).Max();
+                                page.ChapterId = targetChapterId;
+                                page.SortOrder = highestPageSortOrderInTargetChapter + 1;
+                            } // otherwise, there is no adjacent page AND no adjacent chapter... the page can be moved no further: take no action.
+                        }
+                    }
+                    if (ReorderItemRequest.Action == "down")
+                    {
+                        var page = db.Pages.Find(ReorderItemRequest.Id);
+                        var adjacentPage = (from s in db.Pages where s.ChapterId == page.ChapterId && s.SortOrder > page.SortOrder orderby s.SortOrder select s).FirstOrDefault();
+                        if (adjacentPage != null) // there IS an adjacent page within this chapter to swap with:
+                        {
+                            int swapSortOrder = adjacentPage.SortOrder;
+                            adjacentPage.SortOrder = page.SortOrder;
+                            page.SortOrder = swapSortOrder;
+                        }
+                        else // there is NOT an adjacent page, we will need to move the page to the top of an adjacent chapter:
+                        {
+                            var allChapters = (from s in db.Chapters orderby s.Section.Module.SortOrder descending, s.Section.SortOrder descending, s.SortOrder descending select s.ChapterId).ToList();
+                            int chapterIndex = allChapters.IndexOf(page.ChapterId);
+                            if (chapterIndex > 0) // there IS an adjacent chapter to move this page to:
+                            {
+                                int targetChapterId = allChapters[chapterIndex - 1];
+                                var lowestPageSortOrderInTargetChapter = (from s in db.Pages where s.ChapterId == targetChapterId select s.SortOrder).DefaultIfEmpty(0).Min();
+                                page.ChapterId = targetChapterId;
+                                page.SortOrder = lowestPageSortOrderInTargetChapter - 1;
+                            } // otherwise, there is no adjacent page AND no adjacent chapter... the page can be moved no further: take no action.
+                        }
+                    }
+                    break;
+            }
+            db.SaveChanges();
             return BookOutline(ReorderItemRequest.PageQueryModel);
         }
     }
@@ -230,6 +481,14 @@ namespace Amos.Controllers.Configuration
         public int Id { get; set; }
         public string Type { get; set; }
         public string Action { get; set; }
+        public PageQueryModel PageQueryModel { get; set; }
+    }
+
+    public class MoveItemRequest
+    {
+        public int Id { get; set; }
+        public string Type { get; set; }
+        public int TargetParentId { get; set; }
         public PageQueryModel PageQueryModel { get; set; }
     }
 

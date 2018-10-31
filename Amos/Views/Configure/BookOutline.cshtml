@@ -48,7 +48,13 @@
                 pageCall++;
 <div class="page item" data-type="page" data-id="@currentPage.PageId" data-parent="@currentChapter.ChapterId">
     <div class="call">@moduleCall.@sectionCall.@chapterCall.@pageCall</div>
-    <div class="description"><div class="name">@currentPage.Title</div></div>
+    <div class="description">
+    @if(currentPage.Type != "content")
+    {
+        <span class="@currentPage.Type">@currentPage.Type</span>
+    }
+    <span class="name">@currentPage.Title</span>
+    </div>
 </div>
 
 

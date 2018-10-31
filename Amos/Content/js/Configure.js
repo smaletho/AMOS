@@ -60,6 +60,16 @@ function initPage() {
         return false;
     });
 
+    $('#ItemActions .move-button').click(function () {
+        var data = {};
+        data.Type = selectedType;
+        data.Id = selectedId;
+        data.TargetParentId = $('#ItemActions [data-type="' + selectedType + '"] .move-select').val();
+        data.pageQueryModel = pageQueryModel;
+        transmitAction("MoveItem", updateOutlineResponse, null, 'html', data);
+        return false;
+    });
+
 
 
 }
@@ -116,6 +126,7 @@ function hiliteSelectedItem() {
 }
 
 function showActionsForSelectedItem() {
+    //alert(selectedType + ' ' + selectedId);
     $('#ItemActions .actions-set').hide();
     $('#ItemActions [data-type="' + selectedType + '"] .name-input').val(selectedName);
     switch (selectedType) {
