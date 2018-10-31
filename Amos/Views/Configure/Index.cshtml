@@ -34,8 +34,14 @@
                 <div class="input-value"><input class="name-input" type="text" /></div>
                 <div class="input-action"><a class="name-update" href="#">update</a></div>
             </div>
-            Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
-            The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
+            <div class="input-item">
+                <div class="input-label">book version:</div>
+                <div class="input-value"><input class="version-input" type="text" /></div>
+                <div class="input-action"><a class="version-update" href="#">update</a></div>
+            </div>
+            <div class="add-item">
+                <a class="add-button" href="#">add a new module to this book</a>
+            </div>
         </div>
         <div id="ModuleActions" class="actions-set" data-type="module">
             <div class="actions-header">modify selected <b>module</b>:</div>
@@ -44,8 +50,18 @@
                 <div class="input-value"><input class="name-input" type="text" /></div>
                 <div class="input-action"><a class="name-update" href="#">update</a></div>
             </div>
-            Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
-            The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
+            <div class="add-item">
+                <a class="add-button" href="#">add a new section to this module</a>
+            </div>
+            <div class="remove-item">
+                <div class="remove-action"><a class="remove-button" href="#">remove this module</a></div>
+                <div class="remove-note">after removal, any pages within will still be available for re-use</div>
+            </div>
+            <div class="reorder-item">
+                <div class="reorder-label">reorder modules:</div>
+                <div class="reorder-action"><a class="reorder-button" data-action="up" href="#">move this module up</a></div>
+                <div class="reorder-action"><a class="reorder-button" data-action="down" href="#">move this module down</a></div>
+            </div>
         </div>
         <div id="SectionActions" class="actions-set" data-type="section">
             <div class="actions-header">modify selected <b>section</b>:</div>
@@ -54,8 +70,23 @@
                 <div class="input-value"><input class="name-input" type="text" /></div>
                 <div class="input-action"><a class="name-update" href="#">update</a></div>
             </div>
-            Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
-            The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
+            <div class="add-item">
+                <a class="add-button" href="#">add a new chapter to this section</a>
+            </div>
+            <div class="remove-item">
+                <div class="remove-action"><a class="remove-button" href="#">remove this section</a></div>
+                <div class="remove-note">after removal, any pages within will still be available for re-use</div>
+            </div>
+            <div class="reorder-item">
+                <div class="reorder-label">reorder sections:</div>
+                <div class="reorder-action"><a class="reorder-button" data-action="up" href="#">move this section up</a></div>
+                <div class="reorder-action"><a class="reorder-button" data-action="down" href="#">move this section down</a></div>
+            </div>
+            <div class="move-item">
+                <div class="move-label">move section to module:</div>
+                <div class="move-input"><select></select></div>
+                <div class="move-action"><a class="move-button" href="#">update</a></div>
+            </div>
         </div>
         <div id="ChapterActions" class="actions-set" data-type="chapter">
             <div class="actions-header">modify selected <b>chapter</b>:</div>
@@ -64,8 +95,23 @@
                 <div class="input-value"><input class="name-input" type="text" /></div>
                 <div class="input-action"><a class="name-update" href="#">update</a></div>
             </div>
-            Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
-            The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
+            <div class="add-item">
+                <a class="add-button" href="#">add a new page to this chapter</a>
+            </div>
+            <div class="remove-item">
+                <div class="remove-action"><a class="remove-button" href="#">remove this chapter</a></div>
+                <div class="remove-note">after removal, any pages within will still be available for re-use</div>
+            </div>
+            <div class="reorder-item">
+                <div class="reorder-label">reorder chapters:</div>
+                <div class="reorder-action"><a class="reorder-button" data-action="up" href="#">move this chapter up</a></div>
+                <div class="reorder-action"><a class="reorder-button" data-action="down" href="#">move this chapter down</a></div>
+            </div>
+            <div class="move-item">
+                <div class="move-label">move chapter to section:</div>
+                <div class="move-input"><select></select></div>
+                <div class="move-action"><a class="move-button" href="#">update</a></div>
+            </div>
         </div>
         <div id="PageActions" class="actions-set" data-type="page">
             <div class="actions-header">modify selected <b>page</b>:</div>
@@ -74,8 +120,27 @@
                 <div class="input-value"><input class="name-input" type="text" /></div>
                 <div class="input-action"><a class="name-update" href="#">update</a></div>
             </div>
-            Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
-            The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
+            <div class="remove-item">
+                <div class="remove-action"><a class="remove-button" href="#">remove this page</a></div>
+                <div class="remove-note">after removal, the page will still be available for re-use</div>
+            </div>
+            <div class="reorder-item">
+                <div class="reorder-label">reorder pages:</div>
+                <div class="reorder-action"><a class="reorder-button" data-action="up" href="#">move this page up</a></div>
+                <div class="reorder-action"><a class="reorder-button" data-action="down" href="#">move this page down</a></div>
+            </div>
+            <div class="move-item">
+                <div class="move-label">move page to chapter:</div>
+                <div class="move-input"><select></select></div>
+                <div class="move-action"><a class="move-button" href="#">update</a></div>
+            </div>
+            <div class="preview-item">
+                <a class="preview-button" href="#">preview page</a>
+            </div>
+            <div class="edit-item">
+                <a class="edit-button" href="#">edit page</a>
+            </div>
+
         </div>
 
     </div>

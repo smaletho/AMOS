@@ -22,6 +22,44 @@ function initPage() {
         return false;
     });
 
+    $('#ItemActions .version-update').click(function () {
+        var data = {};
+        data.Id = selectedId;
+        data.Version = $('#ItemActions [data-type="' + selectedType + '"] .version-input').val();
+        data.pageQueryModel = pageQueryModel;
+        transmitAction("UpdateBookVersion", updateOutlineResponse, null, 'html', data);
+        return false;
+    });
+
+    $('#ItemActions .add-button').click(function () {
+        var data = {};
+        data.Type = selectedType;
+        data.Id = selectedId;
+        data.pageQueryModel = pageQueryModel;
+        transmitAction("AddItem", updateOutlineResponse, null, 'html', data);
+        return false;
+    });
+
+    $('#ItemActions .remove-button').click(function () {
+        if (!confirm("Are you sure that you want to remove this " + selectedType +"?")) return false;
+        var data = {};
+        data.Type = selectedType;
+        data.Id = selectedId;
+        data.pageQueryModel = pageQueryModel;
+        transmitAction("RemoveItem", updateOutlineResponse, null, 'html', data);
+        return false;
+    });
+
+    $('#ItemActions .reorder-button').click(function () {
+        var data = {};
+        data.Type = selectedType;
+        data.Id = selectedId;
+        data.Action = $(this).data('action');
+        data.pageQueryModel = pageQueryModel;
+        transmitAction("ReorderItem", updateOutlineResponse, null, 'html', data);
+        return false;
+    });
+
 
 
 }
@@ -34,13 +72,30 @@ function initPage() {
 
 function updateOutlineInteractions() {
     $('#BookOutline .item').click(function () {
+        var selectModuleHtml = $('#SelectModule').html();
+        var selectSectionHtml = $('#SelectSection').html();
+        var selectChapterHtml = $('#SelectChapter').html();
+        $('#SectionActions .move-input').html(selectModuleHtml);
+        $('#ChapterActions .move-input').html(selectSectionHtml);
+        $('#PageActions .move-input').html(selectChapterHtml);
+
         selectedType = $(this).data('type');
         selectedId = $(this).data('id');
         selectedName = $(this).find('.name').text();
-        //itemSelected(type, id, name);
-        //selectedId = id;
-        //selectedType = type;
-        //selectedName = name;
+
+        var parentId = $(this).data('parent');
+        switch (selectedType) {
+            case "section":
+                $('#SectionActions .move-select').val(parentId);
+                break;
+            case "chapter":
+                $('#ChapterActions .move-select').val(parentId);
+                break;
+            case "page":
+                $('#PageActions .move-select').val(parentId);
+                break;
+        }
+
         hiliteSelectedItem();
         showActionsForSelectedItem();
     });
@@ -65,6 +120,8 @@ function showActionsForSelectedItem() {
     $('#ItemActions [data-type="' + selectedType + '"] .name-input').val(selectedName);
     switch (selectedType) {
         case "book":
+            var version = $('#BookOutline .book .version span').text();
+            $('#BookActions .version-input').val(version);
             $('#BookActions').show();
             break;
         case "module":

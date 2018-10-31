@@ -111,6 +111,36 @@ namespace Amos.Controllers.Configuration
             db.SaveChanges();
             return BookOutline(UpdateNameRequest.PageQueryModel);
         }
+
+        public ActionResult UpdateBookVersion(UpdateBookVersionRequest UpdateBookVersionRequest)
+        {
+            var db = new ApplicationDbContext();
+            var book = db.Books.Find(UpdateBookVersionRequest.Id);
+            book.Version = UpdateBookVersionRequest.Version;
+            db.SaveChanges();
+            return BookOutline(UpdateBookVersionRequest.PageQueryModel);
+        }
+
+        public ActionResult AddItem(RemoveItemRequest AddItemRequest)
+        {
+            var db = new ApplicationDbContext();
+
+            return BookOutline(AddItemRequest.PageQueryModel);
+        }
+
+        public ActionResult RemoveItem(RemoveItemRequest RemoveItemRequest)
+        {
+            var db = new ApplicationDbContext();
+
+            return BookOutline(RemoveItemRequest.PageQueryModel);
+        }
+
+        public ActionResult ReorderItem(RemoveItemRequest ReorderItemRequest)
+        {
+            var db = new ApplicationDbContext();
+
+            return BookOutline(ReorderItemRequest.PageQueryModel);
+        }
     }
 
     public class PageInitModel
@@ -174,5 +204,33 @@ namespace Amos.Controllers.Configuration
         public PageQueryModel PageQueryModel { get; set; }
     }
 
+    public class UpdateBookVersionRequest
+    {
+        public int Id { get; set; }
+        public string Version { get; set; }
+        public PageQueryModel PageQueryModel { get; set; }
+    }
+
+    public class AddItemRequest
+    {
+        public int Id { get; set; }
+        public string Type { get; set; }
+        public PageQueryModel PageQueryModel { get; set; }
+    }
+
+    public class RemoveItemRequest
+    {
+        public int Id { get; set; }
+        public string Type { get; set; }
+        public PageQueryModel PageQueryModel { get; set; }
+    }
+
+    public class ReorderItemRequest
+    {
+        public int Id { get; set; }
+        public string Type { get; set; }
+        public string Action { get; set; }
+        public PageQueryModel PageQueryModel { get; set; }
+    }
 
 }

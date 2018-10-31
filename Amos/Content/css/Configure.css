@@ -10,16 +10,17 @@
 #BookOutline .book{}
 #BookOutline .book .name{font-size:32px;color:#4800ff;}
 #BookOutline .book .version{font-size:14px;}
+#BookOutline .book .version span{font-weight:bold;}
 
-#BookOutline .module{font-size:24px;padding-top:40px;}
+#BookOutline .module{font-size:24px;padding-top:24px;}
 #BookOutline .module .call{display:table-cell;width:80px;}
 #BookOutline .module .description{display:table-cell;width:500px;font-weight:bold;}
 
-#BookOutline .section{font-size:18px;padding-top:20px;}
+#BookOutline .section{font-size:18px;padding-top:12px;}
 #BookOutline .section .call{display:table-cell;width:80px;}
 #BookOutline .section .description{display:table-cell;width:500px;padding-left:24px;}
 
-#BookOutline .chapter{font-size:14px;padding-top:10px;}
+#BookOutline .chapter{font-size:14px;padding-top:6px;}
 #BookOutline .chapter .call{display:table-cell;width:80px;}
 #BookOutline .chapter .description{display:table-cell;width:500px;padding-left:48px;font-weight:bold;}
 
@@ -27,14 +28,30 @@
 #BookOutline .page .call{display:table-cell;width:80px;}
 #BookOutline .page .description{display:table-cell;width:500px;padding-left:72px;}
 
+#BookOutline #MoveSelectInputs{display:none;}
 
-#ItemActions .actions-header{font-size:18px;margin-bottom:48px;color:#808080;}
+
+#ItemActions .actions-header{font-size:18px;margin-bottom:48px;color:#4800ff;}
 #ItemActions .actions-set{display:none;}
 
 #ItemActions #DefaultActions{display:block;padding-top:100px;font-size:18px;}
 #ItemActions #DefaultActions i{position:relative;top:5px;color:#ccc;padding-right:10px;}
 
-#ItemActions .input-item{}
+#ItemActions .input-item{margin-top:40px;}
 #ItemActions .input-item .input-label{}
 #ItemActions .input-item .input-value input{width:400px;font-size:18px;font-weight:bold;}
 #ItemActions .input-item .input-action{text-align:right;padding-right:8px;}
+
+#ItemActions .add-item{margin-top:40px;}
+
+#ItemActions .remove-item{margin-top:40px;}
+
+#ItemActions .reorder-item{margin-top:40px;}
+
+#ItemActions .move-item{margin-top:40px;}
+#ItemActions .move-item .move-input select{width:400px;}
+#ItemActions .move-item .move-action{text-align:right;padding-right:8px;}
+
+#ItemActions .preview-item{margin-top:40px;}
+
+#ItemActions .edit-item{margin-top:40px;}
