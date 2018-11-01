@@ -45,8 +45,8 @@ function initPage() {
     });
 
     $('#ItemActions .remove-button').click(function () {
+        if (!confirm("Are you sure that you want to remove this " + selectedType + "?")) return false;
         showLoading();
-        if (!confirm("Are you sure that you want to remove this " + selectedType +"?")) return false;
         var data = {};
         data.Type = selectedType;
         data.Id = selectedId;
