@@ -41,7 +41,7 @@
 #ItemActions .actions-header{font-size:18px;margin-bottom:48px;color:#4800ff;}
 #ItemActions .actions-set{display:none;}
 
-#ItemActions #DefaultActions{display:block;padding-top:72px;font-size:18px;}
+#ItemActions #DefaultActions{display:block;font-size:18px;color:#F00;}
 #ItemActions #DefaultActions i{position:relative;top:5px;color:#ccc;padding-right:10px;}
 
 #ItemActions .input-item{margin-top:40px;}

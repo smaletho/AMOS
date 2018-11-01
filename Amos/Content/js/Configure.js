@@ -1,6 +1,6 @@
 ﻿var selectedId = null;
 var selectedType = null;
-var selectedName = null;
+//var selectedName = null;
 var loadingActive = false;
 initPage();
 
@@ -45,8 +45,8 @@ function initPage() {
     });
 
     $('#ItemActions .remove-button').click(function () {
+        if (!confirm("Are you sure that you want to remove this " + selectedType + "?")) return false;
         showLoading();
-        if (!confirm("Are you sure that you want to remove this " + selectedType +"?")) return false;
         var data = {};
         data.Type = selectedType;
         data.Id = selectedId;
@@ -77,8 +77,28 @@ function initPage() {
         return false;
     });
 
+    $('#PreviewButton').click(function () {
+        sessionStorage.setItem('ActivePageId', selectedId);
+        window.location = viewPageUrl.replace('0', selectedId);
+        return false;
+    });
+    $('#EditButton').click(function () {
+        sessionStorage.setItem('ActivePageId', selectedId);
+        window.location = editPageUrl.replace('0', selectedId);
+        return false;
+    });
 
-
+    // ====================
+    // restore selected item if returning from a page view/edit:
+    var activePageId = sessionStorage.getItem('ActivePageId');
+    if (activePageId !== null) {
+        selectedId = activePageId;
+        selectedType = "page";
+        hiliteSelectedItem();
+        showActionsForSelectedItem();
+    }
+    sessionStorage.removeItem('ActivePageId');
+    // ====================
 }
 
 //function updateNameResponse(data) {
@@ -89,29 +109,8 @@ function initPage() {
 
 function updateOutlineInteractions() {
     $('#BookOutline .item').click(function () {
-        var selectModuleHtml = $('#SelectModule').html();
-        var selectSectionHtml = $('#SelectSection').html();
-        var selectChapterHtml = $('#SelectChapter').html();
-        $('#SectionActions .move-input').html(selectModuleHtml);
-        $('#ChapterActions .move-input').html(selectSectionHtml);
-        $('#PageActions .move-input').html(selectChapterHtml);
-
         selectedType = $(this).data('type');
         selectedId = $(this).data('id');
-        selectedName = $(this).find('.name').text();
-
-        var parentId = $(this).data('parent');
-        switch (selectedType) {
-            case "section":
-                $('#SectionActions .move-select').val(parentId);
-                break;
-            case "chapter":
-                $('#ChapterActions .move-select').val(parentId);
-                break;
-            case "page":
-                $('#PageActions .move-select').val(parentId);
-                break;
-        }
 
         hiliteSelectedItem();
         showActionsForSelectedItem();
@@ -135,6 +134,8 @@ function hiliteSelectedItem() {
 function showActionsForSelectedItem() {
     //alert(selectedType + ' ' + selectedId);
     $('#ItemActions .actions-set').hide();
+    var selectedName = $('#BookOutline [data-type="' + selectedType + '"][data-id="' + selectedId + '"] .name').text();
+    var parentId = $('#BookOutline [data-type="' + selectedType + '"][data-id="' + selectedId + '"]').data('parent');
     $('#ItemActions [data-type="' + selectedType + '"] .name-input').val(selectedName);
     switch (selectedType) {
         case "book":
@@ -146,12 +147,21 @@ function showActionsForSelectedItem() {
             $('#ModuleActions').show();
             break;
         case "section":
+            var selectModuleHtml = $('#SelectModule').html();
+            $('#SectionActions .move-input').html(selectModuleHtml);
+            $('#SectionActions .move-select').val(parentId);
             $('#SectionActions').show();
             break;
         case "chapter":
+            var selectSectionHtml = $('#SelectSection').html();
+            $('#ChapterActions .move-input').html(selectSectionHtml);
+            $('#ChapterActions .move-select').val(parentId);
             $('#ChapterActions').show();
             break;
         case "page":
+            var selectChapterHtml = $('#SelectChapter').html();
+            $('#PageActions .move-input').html(selectChapterHtml);
+            $('#PageActions .move-select').val(parentId);
             $('#PageActions').show();
             break;
     }
