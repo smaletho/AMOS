@@ -4,12 +4,13 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>COMfORT 2 - Viewer</title>
+    <title>AMOS - Viewer</title>
     <!--stylesheets-->
     <link rel="stylesheet" href="~/fonts/FiraSans/Fonts.css">
     <link href="~/Content/css/themes.css" rel="stylesheet" />
     <link href="~/Content/css/base.css" rel="stylesheet" />
     <link href="~/Content/css/pageContent.css" rel="stylesheet" />
+    <link href="~/Content/css/viewer.css" rel="stylesheet" />
 
     <!--scripts-->
     <script src="~/Content/js/jquery-3.3.1.min.js"></script>
@@ -46,9 +47,30 @@
         <div id="content">
             <div id="header">
                 <div id="top-bar">
-                    <div>Page name: <b>@Model.PageName</b></div>
-                    <a href="javascript:void(0)" id="shell-assets">view assets</a>
-                    @*<a href="javascript:void(0)" id="editor">editor</a>*@
+                    <table style="display:table;margin:0 auto 0;padding-top:10px">
+                        <tr>
+                            <td width="265" style="text-align:center">
+                                <a href="@Url.Action("ListPages")">
+                                    Back to page list
+                                </a>
+                            </td>
+                            <td width="265" style="text-align:center">
+                                <a href="@Url.Action("ViewEditor", new { id = Model.PageId })">
+                                    Back to Editor
+                                </a>
+                            </td>
+                            <td width="265" style="text-align:center">Page name: <b>@Model.PageName</b></td>
+                            <td width="265" style="text-align:center"><a href="javascript:void(0)" id="shell-assets">view assets</a></td>
+                            <td width="265" style="text-align:center"><span id="xy-coordinates">Top: 0, Left: 0</span><br /></td>
+                            <td width="265" style="text-align:center">
+                                <label>
+                                    <input type="checkbox" id="grid-check" />
+                                    Show Grid
+                                </label>
+                            </td>
+                        </tr>
+                    </table>
+
                 </div>
                 <div id="sections">
                     <div id="section-list"></div>
@@ -60,12 +82,14 @@
 
             <div id="page-content" style="border:1px solid black;">
                 <div id="definitionWindow"></div>
+
+            </div>
+            <div id="grid-window">
             </div>
 
             <div id="footer">
                 @Html.HiddenFor(x => x.PageId)
                 @Html.HiddenFor(x => x.PageName)
-                @*<button id="submit-page" type="submit">Save Page</button>*@
             </div>
         </div>
 

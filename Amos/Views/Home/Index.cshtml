@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "Home";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -41,14 +41,25 @@
 
 <div class="row">
     <div class="col-md-4">
-        <h2>Present Books</h2>
+        <h2>Present</h2>
         <p>View and read all published AMOS books.</p>
-        <p><a class="btn btn-primary btn-lg" href="@Url.Action("ViewBooks")">View Books &raquo;</a></p>
+        <p><a class="btn btn-primary btn-lg" href="@Url.Action("ViewBooks", "Present")">View Books &raquo;</a></p>
     </div>
     <div class="col-md-4">
-        <h2>Configure Books</h2>
-        <p>Edit, modify, delete, and create new books.</p>
-        <p><a class="btn btn-primary btn-lg" href="@Url.Action("ListBooks", "Build")">Configure Books &raquo;</a></p>
+        <h2>Configure</h2>
+        <p>Edit, modify, delete, and create new books and pages.</p>
+        <p>
+            <div class="dropdown">
+                <button class="btn btn-primary btn-lg dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    Configure
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                    <li><a href="@Url.Action("ListBooks", "Build")">List Books</a></li>
+                    <li><a href="@Url.Action("ListPages", "Build")">List Pages</a></li>
+                </ul>
+            </div>
+        </p>
     </div>
     <div class="col-md-4">
         <h2>Subjects</h2>

@@ -1,0 +1,75 @@
+﻿.preview-window {
+    transform-origin: top left;
+    transform: scale(0.5);
+}
+
+.preview-window {
+    padding: 30px 50px;
+    height: 715px;
+    position: relative;
+    font-size: 12pt;
+}
+
+    .preview-window .item {
+        position: absolute;
+    }
+
+    .preview-window .inner-text {
+        /*position:relative;*/
+    }
+
+    .preview-window .header {
+        font-size: 16pt;
+        font-weight: bold;
+    }
+
+    .preview-window button {
+        outline: none;
+        cursor: pointer;
+        padding: 10px 30px;
+        color: white;
+        background-color: black;
+        border: 4px outset gray;
+        border-radius: 10px;
+        font-family: Fira Mono;
+        font-size: 12pt;
+    }
+
+        .preview-window button:active {
+            border: 4px inset black;
+            color: black;
+            background-color: gray;
+        }
+
+        .preview-window button.active {
+            border: 4px inset black;
+            color: black;
+            background-color: gray;
+        }
+
+    .preview-window textarea {
+        font-family: Fira Mono;
+        font-size: 12pt;
+        width: 500px;
+        height: 75px;
+        border: 1px solid black;
+        margin-top: 10px;
+    }
+
+    .preview-window .post-quiz {
+        border: 4px solid black;
+        padding: 20px;
+    }
+
+        .preview-window .post-quiz.correct {
+            border-color: green;
+        }
+
+        .preview-window .post-quiz.incorrect {
+            border-color: red;
+        }
+
+    .preview-window .multiButton {
+        width: 300px !important;
+        padding: 2px;
+    }

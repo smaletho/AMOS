@@ -1,142 +1,4 @@
-
-
-
-function renderInit() {
-    $(".navigateTo").on('click', function () {
-        loadPage($(this).data('id'), "page");
-        return false;
-    });
-
-    $(".definitionPopup").on('click', function () {
-        var pos = $(this).offset();
-
-
-        $("#definitionWindow").css('top', (pos.top - 125) + "px");
-        $("#definitionWindow").css('left', pos.left + "px");
-
-        $("#definitionWindow").show();
-        $("#definitionWindow").text($(this).data('text'));
-        return false;
-    });
-
-    $("#page-content").on('click', function () {
-        $("#definitionWindow").hide();
-        $("#definitionWindow").css('top', '0');
-        $("#definitionWindow").css('left', '0');
-        $("#definitionWindow").text('');
-    });
-
-    if (applicationMode != "viewer") {
-        if ($("#page-content").find(".quiz-submit").length != 0) {
-            // it's a quiz page
-            quizInit();
-        }
-
-        if ($("#page-content").find(".survey-submit").length != 0) {
-            // it's a survey page
-            surveyInit();
-        }
-    }
-
-
-}
-
-function okayToNavigateAway() {
-    if ($("#page-content").find(".quiz-submit").length != 0) {
-        // it's a quiz page
-        var question = $(".quiz-question").first().text();
-        var answer = getQuizAnswer(question);
-        if (answer == "") {
-            openDialog("Please answer the quiz question before navigating to a different page.", "Wait");
-            return false;
-        } else return true;
-    }
-
-    else if ($("#page-content").find(".survey-submit").length != 0) {
-        // it's a survey page
-        var question = $(".survey-question").first().text();
-        var answer = getSurveyAnswer(question);
-        if (answer == "") {
-            openDialog("Please answer the survey question before navigating to a different page.", "Wait");
-            return false;
-        } else return true;
-    }
-
-    else return true;
-}
-
-function surveyInit() {
-
-
-    var question = $(".survey-question").first().text();
-    var answer = getSurveyAnswer(question);
-    if (answer == "") {
-        $(".survey-submit").on('click', function () {
-            var valueAnswer = $('input[name=survey]:checked').val();
-            if (typeof (valueAnswer) === "undefined") {
-                openDialog("Please answer the survey question before navigating to a different page.", "Survey");
-            } else {
-                addSurveyAnswer(question, {
-                    value: valueAnswer,
-                    comments: $("#survey-comment").val()
-                });
-                $(".survey-submit").hide();
-                openDialog("Your response has been submitted.", "Submitted");
-                nextPage();
-            }
-        });
-    } else {
-        // fill values
-        $('input[name=survey][value=' + answer.value + ']').prop('checked', 'checked');
-        $("#survey-comment").val(answer.comments);
-
-        // hide survey submit
-        $(".survey-submit").hide();
-    }
-}
-
-function quizInit() {
-    var question = $(".quiz-question").first().text();
-    var answer = getQuizAnswer(question);
-    if (answer == "") {
-        // load normal, no answer
-        $(".post-quiz").hide();
-        $(".quiz-submit").on('click', function () {
-
-            var userAnswer = $('input[name=quiz]:checked').val();
-            var answer = $(".quiz-question").first().prop('answer');
-
-            if (typeof (userAnswer) === "undefined") {
-                openDialog("Please answer the quiz question before navigating to a different page.", "Quiz");
-            } else {
-
-                addQuizAnswer(question, userAnswer, answer);
-
-                if (userAnswer == answer) {
-                    openDialog("Your answer is correct!", "Correct!");
-                    $(".post-quiz").addClass("correct");
-                    $(".post-quiz").show();
-                } else {
-                    openDialog("Your answer is incorrect.", "Incorrect");
-                    $(".post-quiz").addClass("incorrect");
-                    $(".post-quiz").show();
-                }
-
-                $(".quiz-submit").hide();
-            }
-        });
-    } else {
-        // already answered, 
-        $(".post-quiz").show();
-        $('input[name=quiz][value="' + answer.UserAnswer + '"]').prop('checked', 'checked');
-        $(".quiz-submit").hide();
-
-        if (answer.UserAnswer == answer.CorrectAnswer) $(".post-quiz").addClass("correct");
-        else $(".post-quiz").addClass('incorrect');
-    }
-
-}
-
+﻿// copies of render.js
 function renderElement(element) {
     var newNode;
     switch (element.nodeName.toLowerCase()) {
@@ -195,7 +57,7 @@ function renderElement(element) {
         }
     }
 
-    $("#page-content").append(newNode);
+    return newNode;
 }
 
 function videoNode(element) {
@@ -266,10 +128,6 @@ function buttonNode(element) {
 
                     break;
                 }
-                case "active": {
-                    $(element).addClass("active");
-                    }
-                    break;
                 default:
                     $(newNode).on('click', function () {
                         loadPage(element.id, "page", "button click (" + $(this).text() + ")");
@@ -352,14 +210,6 @@ function textNode(element) {
     $(newNode).html(newHtml);
 
 
-    // use this, and remove the outer text tags
-
-    //$(newNode).html($.trim(html));
-
-    //$(newNode).html($(element).html().trim());
-    //var content = element.textContent;
-    //$(newNode).html(content);
-
     return newNode;
 }
 
@@ -373,9 +223,3 @@ function textStyleMap(element, styles) {
     }
     return element;
 }
-
-
-
-
-
-

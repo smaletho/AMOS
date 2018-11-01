@@ -129,7 +129,7 @@ function firstLoadInit() {
             maintainAspectRatio();
         }, 1000);
     });
-
+    
     $("#exit-button").on('click', function () { exitBook(); });
     $("#help-button").on('click', showInitialHelp);
 

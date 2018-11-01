@@ -1,7 +1,7 @@
 ﻿@model Amos.Models.SubjectBookListModel
 
 @{
-    ViewBag.Title = "List Books";
+    ViewBag.Title = "Subjects";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -54,5 +54,5 @@
             <div class="recent">Last Started: @recentUse</div>
         }
 
-        <a href="@Url.Action("ExportSubjects", new { id=bookId })">export data</a>
+        <a href="@Url.Action("ExportSubject", new { id=bookId })">export data</a>
 }

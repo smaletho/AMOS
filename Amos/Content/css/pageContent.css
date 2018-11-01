@@ -3,7 +3,8 @@
     margin-top: 135px;
     height: 638px;
     position: relative;
-    font-size: 14pt;
+    font-size: 12pt;
+    line-height:22px;
 }
 
     #page-content .item {
@@ -15,7 +16,7 @@
     }
 
     #page-content .header {
-        font-size: 18pt;
+        font-size: 16pt;
         font-weight: bold;
     }
 
@@ -32,6 +33,11 @@
     }
 
         #page-content button:active {
+            border: 4px inset black;
+            color: black;
+            background-color: gray;
+        }
+        #page-content button.active {
             border: 4px inset black;
             color: black;
             background-color: gray;
@@ -58,3 +64,8 @@
         #page-content .post-quiz.incorrect {
             border-color:red;
         }
+
+    #page-content .multiButton {
+        width:300px !important;
+        padding:2px;
+    }

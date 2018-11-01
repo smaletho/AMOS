@@ -2,9 +2,28 @@
 var resizeTimer;
 
 function viewerInit() {
+    fillPageWithGrid();
+
+    $(".grid-box").hover(function () {
+        var x = $(this).data('x');
+        var y = $(this).data('y');
+
+        var str = "Top: " + (y*20) + ", Left: " + (x*25);
+        $("#xy-coordinates").text(str);
+
+
+    }, function () { });
+
+    $("#grid-check").change(function () {
+        if ($(this).is(':checked'))
+            $("#grid-window").show();
+        else
+            $("#grid-window").hide();
+    });
+
     $("#shell-assets").on('click', function () {
         // get all assets with PageId == 0
-        window.open(URL_ViewAssets);
+        window.location = URL_ViewAssets;
     });
 
     $("#editor").on('click', function () {
@@ -48,6 +67,17 @@ function viewerInit() {
 
     // transmit action to get xml
     transmitAction(URL_GetPage, gotPageContent_success, gotPageContent_fail, "xml", null, true);
+}
+
+function fillPageWithGrid() {
+    for (var i = 0; i < 35; i++) {
+        // rows
+        for (var ii = 0; ii < 64; ii++) {
+            $("#grid-window").append('<div class="grid-box" data-x="' + ii + '" data-y="' + i + '"></div>');
+        }
+    }
+
+    
 }
 
 function gotPageContent_success(data) {

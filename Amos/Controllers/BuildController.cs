@@ -22,7 +22,7 @@ namespace Amos.Controllers
         {
             return View();
         }
-
+        
         public ActionResult ListBooks()
         {
             ApplicationDbContext adb = new ApplicationDbContext();
@@ -706,7 +706,18 @@ namespace Amos.Controllers
 
 
 
+        public ActionResult DeleteFile(int id)
+        {
+            int pageId = 0;
 
+            ApplicationDbContext cdb = new ApplicationDbContext();
+            var file = cdb.AmosFiles.Where(x => x.FileId == id).FirstOrDefault();
+            pageId = file.PageId;
+            cdb.AmosFiles.Remove(file);
+            cdb.SaveChanges();
+
+            return RedirectToAction("ViewAssets", new { id = pageId });
+        }
 
         public ActionResult Edit(int id)
         {
@@ -715,6 +726,7 @@ namespace Amos.Controllers
 
         public ActionResult ViewPage(int id)
         {
+            Session["LastPageIdVisited"] = id;
             PageViewModel model = new PageViewModel();
             ApplicationDbContext cdb = new ApplicationDbContext();
             if (id == 0)
@@ -775,31 +787,74 @@ namespace Amos.Controllers
 
         public ActionResult ViewEditor(int id)
         {
+            Session["LastPageIdVisited"] = id;
             ApplicationDbContext cdb = new ApplicationDbContext();
-
-            PageViewModel model = new PageViewModel
+            if (id == 0)
             {
-                PageId = id,
-            };
+                Page page = new Page();
+                page.Create(User.Identity.Name);
+                page.Title = "New Page";
+                page.PageContent = "<page type=\"content\"></page>";
+                page.Type = "content";
+                page.SortOrder = 10;
+                cdb.Pages.Add(page);
+                cdb.SaveChanges();
 
-            var page = cdb.Pages.Where(x => x.PageId == id).FirstOrDefault();
-            if (page != null)
-            {
-                model.PageName = page.Title;
-                model.PageType = page.Type;
-                string oldContent = page.PageContent;
-                model.XmlContent = oldContent.Replace("href=\"javascript:void(0)\"", "href=\"#\"");
+                return RedirectToAction("ViewEditor", new { id = page.PageId });
             }
             else
             {
-                model.PageName = "New Page";
-                model.XmlContent = "<page type=\"content\"></page>";
+                PageViewModel model = new PageViewModel
+                {
+                    PageId = id,
+                };
+
+                var page = cdb.Pages.Where(x => x.PageId == id).FirstOrDefault();
+                if (page != null)
+                {
+                    model.PageName = page.Title;
+                    model.PageType = page.Type;
+                    string oldContent = page.PageContent;
+                    model.XmlContent = oldContent.Replace("href=\"javascript:void(0)\"", "href=\"#\"");
+
+                    XmlDocument doc = new XmlDocument();
+                    try
+                    {
+                        doc.LoadXml(model.XmlContent);
+                    }
+                    catch (XmlException)
+                    {
+                        //sb.AppendLine("ERROR: Unable to parse the XML. Aborting. Exception: " + e.Message);
+                        //return Content(sb.ToString());
+                    }
+
+                    StringBuilder sb = new StringBuilder();
+                    var settings = new XmlWriterSettings();
+                    settings.OmitXmlDeclaration = true;
+                    settings.Indent = true;
+                    settings.NewLineOnAttributes = false;
+                    settings.NewLineChars = "\r\n\r\n";
+
+                    using (var xmlWriter = XmlWriter.Create(sb, settings))
+                    {
+                        doc.Save(xmlWriter);
+                    }
+
+                    model.XmlContent = sb.ToString();
+                }
+                else
+                {
+                    model.PageName = "New Page";
+                    model.XmlContent = "<page type=\"content\"></page>";
+                }
+                
+                return View(model);
             }
-            return View(model);
         }
 
         public ActionResult ViewAssets(int id)
         {
+            Session["LastPageIdVisited"] = id;
             return View("ViewAssets", new AssetModel(id));
         }
 
@@ -1185,7 +1240,7 @@ namespace Amos.Controllers
                                 Title = pag.Title,
                                 Type = pag.Type
                             };
-                            newPage.Create("TODO fix");
+                            newPage.Create(User.Identity.Name);
                             cdb.Pages.Add(newPage);
                             cdb.SaveChanges();
 
@@ -1210,6 +1265,21 @@ namespace Amos.Controllers
 
 
             return RedirectToAction("ListBooks");
+        }
+
+        public ActionResult DuplicatePage(int id)
+        {
+            ApplicationDbContext db = new ApplicationDbContext();
+            var page = db.Pages.Where(x => x.PageId == id).FirstOrDefault();
+
+            Page newPage = new Page();
+            newPage.Create(User.Identity.Name);
+            newPage.PageContent = page.PageContent;
+            newPage.Title = page.Title + " - Copy";
+            newPage.Type = "content";
+            db.Pages.Add(newPage);
+            db.SaveChanges();
+            return RedirectToAction("ListPages");
         }
 
 
@@ -1456,7 +1526,7 @@ namespace Amos.Controllers
             else
             {
                 book.Modify(User.Identity.Name);
-                
+
             }
             try { book.Name = model.S_Book.Name; }
             catch { book.Name = "New Book"; }
@@ -1589,7 +1659,7 @@ namespace Amos.Controllers
                 catch { page.Title = "New Page"; }
 
                 page.SortOrder = pa.SortOrder;
-            
+
                 if (addPage)
                 {
                     db.Pages.Add(page);
@@ -1610,7 +1680,7 @@ namespace Amos.Controllers
 
             return View("BuildList", model);
         }
-        
+
         [HttpPost]
         public ActionResult BuildList(SaveBookModel model)
         {
@@ -1629,7 +1699,7 @@ namespace Amos.Controllers
 
                 var chapters = db.Chapters.Where(x => sectionIds.Contains(x.SectionId));
                 var chapterIds = chapters.Select(x => x.ChapterId).ToList();
-                
+
                 foreach (var page in db.Pages.Where(x => chapterIds.Contains(x.ChapterId)).ToList())
                 {
                     page.BookId = 0;
@@ -1686,7 +1756,7 @@ namespace Amos.Controllers
                 page.SortOrder = 0;
             }
 
-            
+
             db.SaveChanges();
             return Content("success");
         }
@@ -1726,9 +1796,22 @@ namespace Amos.Controllers
 
 
 
+        [HttpPost]
+        public ActionResult GetContent()
+        {
+            ApplicationDbContext db = new ApplicationDbContext();
+            return Json(db.Pages.Where(x => x.BookId == 0).Select(x => new { x.PageId, x.PageContent }));
+        }
 
-
-
+        [HttpPost]
+        public ActionResult DeletePage(int id)
+        {
+            ApplicationDbContext db = new ApplicationDbContext();
+            var page = db.Pages.Where(x => x.PageId == id).FirstOrDefault();
+            db.Pages.Remove(page);
+            db.SaveChanges();
+            return Content("success");
+        }
 
 
 
@@ -1761,5 +1844,5 @@ namespace Amos.Controllers
         }
     }
 
-    
+
 }

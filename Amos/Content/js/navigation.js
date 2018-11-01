@@ -399,6 +399,7 @@ function populateMenus() {
     if ($("#dot-container").is(':empty')) {
         // get all pages in this module
 
+
         var currentSection = "";
         $(mod).find("page").each(function (k, v) {
             
@@ -420,6 +421,13 @@ function populateMenus() {
 
         $("#dot-container").find('.dot').last().addClass('rightborder');
 
+        // check number of pages
+        var pageLen = $(".dot").length;
+        if (pageLen < 70) {
+            $(".dot").css('font-size', '12pt');
+            $(".dot").css('width', '20px');
+        }
+
         //$("#section-content").empty();
         //$(mod).find("section").each(function (k, v) {
         //    var sec = $("<div data-id='" + this.attributes.id.value + "' class='dot-sect'></div>");
@@ -432,8 +440,8 @@ function populateMenus() {
         //    $("#section-content").append(sec);
         //});
         
-        var pageLen = ($(".dot").length * 30) + 2;
-        $("#arrow-content").width(pageLen);
+        //var pageLen = ($(".dot").length * 30) + 2;
+        //$("#arrow-content").width(pageLen);
         //$("#section-content").width(pageLen);
         ////$("#arrow-bar").width(pageLen * 30);
     }

@@ -231,6 +231,7 @@
     <Content Include="Content\css\EditBook - Copy.css" />
     <Content Include="Content\css\EditBook.css" />
     <Content Include="Content\css\pageContent.css" />
+    <Content Include="Content\css\preview.css" />
     <Content Include="Content\css\themes.css" />
     <Content Include="Content\css\viewer.css" />
     <Content Include="Content\font-awesome.css" />
@@ -260,6 +261,7 @@
     <Content Include="Content\js\jquery-ui-1.12.1.min.js" />
     <Content Include="Content\js\navigation.js" />
     <Content Include="Content\js\offline.js" />
+    <Content Include="Content\js\preview-render.js" />
     <Content Include="Content\js\render.js" />
     <Content Include="Content\js\shared.js" />
     <Content Include="Content\js\toc.js" />

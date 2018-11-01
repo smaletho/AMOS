@@ -134,8 +134,8 @@ html {
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 1600px;;
+    height: 900px;
 }
 
 
@@ -158,13 +158,14 @@ html {
 #toc {
     height: 100%; /* 100% Full-height */
     width: 0; /* 0 width - change this with JavaScript */
-    position: fixed; /* Stay in place */
+    position: absolute; /* Stay in place */
     z-index: 1; /* Stay on top */
     top: 0; /* Stay at the top */
     left: 0;
     overflow-x: hidden; /* Disable horizontal scroll */
     transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
     background-color: lightgray;
+    transform-origin: top left;
 }
 
     #toc #menu-close {
@@ -270,7 +271,8 @@ html {
     background-color: white;
     border: 1px solid black;
     margin-top: 3px;
-    padding: 0 10px
+    padding: 0 10px;
+    margin-left:0;
 }
 #menu-open span{
     display:table;
@@ -492,20 +494,29 @@ html {
     margin-left: -1px;
 }
 
-#page-dot-content {width: 1430px; height: 45px;}
-#dot-container {display:table;margin: 0 auto;}
+#page-dot-content {
+    width: 1430px;
+    height: 30px;
+}
+
+
+#dot-container {
+    display: table;
+    margin: 0 auto;
+}
+
 .dot {
     float: left;
-    width: 25px;
+    width: 16px;
     height: 20px;
     border: none;
     text-align: center;
     padding-top: 0;
-    font-weight: bold;
     cursor: pointer;
-    margin-top: 5px;
-    font-size: 12pt;
-    border-bottom:1px solid;
+    margin-top: 15px;
+    font-size: 10pt;
+    border-bottom: 1px solid;
+    font-family: 'Fira Sans Compressed';
 }
     .dot.leftborder {
         border-left: 1px solid black;

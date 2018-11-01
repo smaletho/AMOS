@@ -24,7 +24,7 @@ namespace Amos.Controllers
         }
         
 
-        public ActionResult ExportSubject(int bookId)
+        public ActionResult ExportSubject(int id)
         {
             // if userId == 0, export all subjects
             StringBuilder sb = new StringBuilder();
@@ -32,9 +32,9 @@ namespace Amos.Controllers
 
             List<UserTracker> trackerList = new List<UserTracker>();
             ApplicationDbContext cdb = new ApplicationDbContext();
-            Book book = cdb.Books.Where(x => x.BookId == bookId).FirstOrDefault();
+            Book book = cdb.Books.Where(x => x.BookId == id).FirstOrDefault();
 
-            string strBookId = "b_" + bookId;
+            string strBookId = "b_" + id;
 
             trackerList = cdb.UserTrackers.Where(x => x.BookId == strBookId).ToList();
             

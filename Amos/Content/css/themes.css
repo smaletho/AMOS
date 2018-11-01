@@ -73,6 +73,11 @@
         border-color: #efc94c;
         background-color: #f7e5a8;
     }
+    #content.theme1 button.active {
+        color: #efc94c;
+        border-color: #efc94c;
+        background-color: #f7e5a8;
+    }
 
 
 
@@ -154,6 +159,12 @@
 }
 
     #content.theme2 button:active {
+        color: #505967;
+        border-color: #505967;
+        background-color: #a8acb2;
+    }
+
+    #content.theme2 button.active {
         color: #505967;
         border-color: #505967;
         background-color: #a8acb2;
@@ -241,6 +252,11 @@
         border-color: #2c6192;
         background-color: #96b0c9;
     }
+    #content.theme3 button.active {
+        color: #2c6192;
+        border-color: #2c6192;
+        background-color: #96b0c9;
+    }
 
 
 
@@ -320,6 +336,11 @@
 }
 
     #content.theme4 button:active {
+        color: #444872;
+        border-color: #444872;
+        background-color: #a2a4b9;
+    }
+    #content.theme4 button.active {
         color: #444872;
         border-color: #444872;
         background-color: #a2a4b9;
@@ -407,6 +428,11 @@
         border-color: #45b29d;
         background-color: #a2d9c3;
     }
+    #content.theme5 button.active {
+        color: #45b29d;
+        border-color: #45b29d;
+        background-color: #a2d9c3;
+    }
 
 
 
@@ -486,6 +512,11 @@
 }
 
     #content.theme6 button:active {
+        color: #e58800;
+        border-color: #e58800;
+        background-color: #f2c58d;
+    }
+    #content.theme6 button.active {
         color: #e58800;
         border-color: #e58800;
         background-color: #f2c58d;
@@ -573,6 +604,11 @@
         border-color: #85496f;
         background-color: #c3a3b6;
     }
+    #content.theme7 button.active {
+        color: #85496f;
+        border-color: #85496f;
+        background-color: #c3a3b6;
+    }
 
 
 
@@ -652,6 +688,11 @@
 }
 
     #content.theme8 button:active {
+        color: #df5a49;
+        border-color: #df5a49;
+        background-color: #f2c58d;
+    }
+    #content.theme8 button.active {
         color: #df5a49;
         border-color: #df5a49;
         background-color: #f2c58d;
@@ -736,6 +777,11 @@
 }
 
     #content.theme9 button:active {
+        color: #4e69ac;
+        border-color: #4e69ac;
+        background-color: #a6b4d6;
+    }
+    #content.theme9 button.active {
         color: #4e69ac;
         border-color: #4e69ac;
         background-color: #a6b4d6;
