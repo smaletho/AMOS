@@ -1793,7 +1793,87 @@ namespace Amos.Controllers
 
 
 
+        [HttpPost]
+        public ActionResult AssignButton(int buttonId, int onPageId, int toPageId)
+        {
+            ApplicationDbContext db = new ApplicationDbContext();
+            var onPage = db.Pages.Where(x => x.PageId == onPageId).FirstOrDefault();
+            var toPage = db.Pages.Where(x => x.PageId == toPageId).FirstOrDefault();
+            
+            // buttonId is the count of numbers on one page. works with indexes
+            //  ex: find the 4th button on pageId == onPageId
+            
+            // parse the page
+            XmlDocument xmlDoc = new XmlDocument();
+            List<PageButton> pageButtonList = new List<PageButton>();
+            int buttonCount = 1;
+            try
+            {
+                xmlDoc.LoadXml(onPage.PageContent);
+                foreach (XmlElement contentNode in xmlDoc.ChildNodes[0].ChildNodes)
+                {
+                    if (contentNode.LocalName == "button")
+                    {
+                        try
+                        {
+                            string classList = contentNode.Attributes["class"].Value;
+                            if (!classList.Contains("quiz-submit") && !classList.Contains("survey-submit"))
+                            {
+                                if (buttonCount == buttonId)
+                                {
+                                    // this is the item
+                                    contentNode.Attributes["id"].Value = "p_" + toPageId.ToString();
+                                    break;
+                                }
+                                buttonCount++;
+                            }
 
+                        }
+                        catch
+                        {
+                            // This is here on purpose. Buttons don't always have an attribute "class" so failing is good, because it
+                            //  means it's not a quiz or survey button
+                            if (buttonCount == buttonId)
+                            {
+                                // this is the item
+                                contentNode.Attributes["id"].Value = "p_" + toPageId.ToString();
+                                break;
+                            }
+                            buttonCount++;
+                        }
+                    }
+                    else if (contentNode.LocalName == "text")
+                    {
+                        foreach (XmlNode textChild in contentNode.ChildNodes)
+                        {
+                            try
+                            {
+                                if (textChild.LocalName == "a" && textChild.Attributes["class"].Value.Contains("navigateTo"))
+                                {
+                                    if (buttonCount == buttonId)
+                                    {
+                                        // this is the item
+                                        contentNode.Attributes["id"].Value = "p_" + toPageId.ToString();
+                                        break;
+                                    }
+                                    buttonCount++;
+                                }
+                            }
+                            catch { }
+
+                        }
+
+                    }
+                }
+
+                onPage.PageContent = xmlDoc.OuterXml;
+                db.SaveChanges();
+
+            }
+            catch { }
+
+            return Content("success");
+        }
 
 
         [HttpPost]

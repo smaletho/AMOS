@@ -219,8 +219,10 @@ namespace Amos.Models
             this.PageListModel = new PageListModel(id);
             this.pageButtons = new List<PageButton>();
 
+
             foreach (var page in this.PageListModel.PageList)
             {
+                int buttonCount = 1;
                 // get the content, and turn into XML
                 XmlDocument xmlDoc = new XmlDocument();
                 try
@@ -234,13 +236,18 @@ namespace Amos.Models
                             {
                                 string classList = contentNode.Attributes["class"].Value;
                                 if (!classList.Contains("quiz-submit") && !classList.Contains("survey-submit"))
-                                    this.pageButtons.Add(new PageButton(contentNode, this.PageListModel.PageList, page.PageId, true));
+                                {
+                                    this.pageButtons.Add(new PageButton(buttonCount, contentNode, this.PageListModel.PageList, page.PageId, true));
+                                    buttonCount++;
+                                }
+                                    
                             }
                             catch
                             {
                                 // This is here on purpose. Buttons don't always have an attribute "class" so failing is good, because it
                                 //  means it's not a quiz or survey button
-                                this.pageButtons.Add(new PageButton(contentNode, this.PageListModel.PageList, page.PageId, true));
+                                this.pageButtons.Add(new PageButton(buttonCount, contentNode, this.PageListModel.PageList, page.PageId, true));
+                                buttonCount++;
                             }
                         }
                         else if (contentNode.LocalName == "text")
@@ -250,7 +257,10 @@ namespace Amos.Models
                                 try
                                 {
                                     if (textChild.LocalName == "a" && textChild.Attributes["class"].Value.Contains("navigateTo"))
-                                        this.pageButtons.Add(new PageButton(textChild, this.PageListModel.PageList, page.PageId, false));
+                                    {
+                                        this.pageButtons.Add(new PageButton(buttonCount, textChild, this.PageListModel.PageList, page.PageId, false));
+                                        buttonCount++;
+                                    }
                                 }
                                 catch { }
 
@@ -273,8 +283,9 @@ namespace Amos.Models
     public class PageButton
     {
         public PageButton() { }
-        public PageButton(XmlNode xmlElement, List<Page> pages, int pageId, bool isButton)
+        public PageButton(int num, XmlNode xmlElement, List<Page> pages, int pageId, bool isButton)
         {
+            this.ButtonId = num;
             try
             {
                 this.PageId = pageId;
@@ -305,6 +316,7 @@ namespace Amos.Models
             }
             this.isButton = isButton;
         }
+        public int ButtonId { get; set; }
         public int PageId { get; set; }
         public string ButtonText { get; set; }
         public int NavPageId { get; set; }

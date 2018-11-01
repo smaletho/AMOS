@@ -1,12 +1,11 @@
 ﻿@model Amos.Models.ManagePagesModel
-
 @{
     ViewBag.Title = "Manage";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
 @section styles{
     <style>
+
         .scrollable-menu {
             height: auto;
             max-height: 500px;
@@ -27,12 +26,9 @@
         <span class="input-group-addon" id="basic-addon2">Version</span>
         <input type="text" class="form-control bookVersion" placeholder="Version" aria-label="Version" aria-describedby="basic-addon2" value="@version" />
     </div>
-
 </div>
 
-
 <hr />
-
 @if (Model.PageListModel.GetBook.Published)
 {
     <div class="row">
@@ -114,16 +110,15 @@ else
         connect each button to the corresponding page that you would like it to navigate to.
     </div>
 
-    <table class="table">
+    <table class="table table-hover table-striped">
         <tr>
-            <th>Page Id</th>
+            @*<th>Page Id</th>*@
             <th>Page Name</th>
             <th>Type</th>
             <th>Text</th>
-            <th>Navigate Page Id</th>
+            @*<th>Navigate Page Id</th>*@
             <th>Navigate Page Name</th>
         </tr>
-
         @foreach (var item in Model.pageButtons)
         {
             string title = "";
@@ -136,7 +131,7 @@ else
                 title = "n/a";
             }
             <tr>
-                <td>@item.PageId</td>
+                @*<td>@item.PageId</td>*@
                 <td>@item.getPage.Title</td>
                 @if (item.isButton)
                 {
@@ -151,60 +146,45 @@ else
                     </td>
                 }
                 <td>@item.ButtonText</td>
-                <td>@item.NavPageId</td>
-
+                @*<td>@item.NavPageId</td>*@
                 <td>
                     <div class="dropdown">
-                        <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            @title
-                        </a>
+                        <button class="btn btn-default dropdown-toggle" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @title <span class="caret"></span>
+                        </button>
 
-                        <div class="dropdown-menu  scrollable-menu" aria-labelledby="dropdownMenuLink">
-                            <ul class="list-group">
-                                @foreach (var mod in Model.PageListModel.Modules.OrderBy(x => x.SortOrder))
+                        <ul class="dropdown-menu scrollable-menu" aria-labelledby="dropdownMenuLink">
+                            @foreach (var mod in Model.PageListModel.Modules.OrderBy(x => x.SortOrder))
+                            {
+                                <li class="dropdown-header" style="font-weight:bold">@mod.Name</li>
+                                foreach (var sec in Model.PageListModel.Sections.Where(x => x.ModuleId == mod.ModuleId).OrderBy(x => x.SortOrder))
                                 {
-                                    <li class="list-group-item">
-                                        @mod.Name
-                                        <ul class="list-group">
-                                            @foreach (var sec in Model.PageListModel.Sections.Where(x => x.ModuleId == mod.ModuleId).OrderBy(x => x.SortOrder))
-                                            {
-                                                <li class="list-group-item">
-                                                    @sec.Name
-                                                    <ul class="list-group">
-                                                        @foreach (var cha in Model.PageListModel.Chapters.Where(x => x.SectionId == sec.SectionId).OrderBy(x => x.SortOrder))
-                                                        {
-                                                            <li class="list-group-item">
-                                                                @cha.Name
-                                                                <ul class="list-group">
-                                                                    @foreach (var page in Model.PageListModel.PageList.Where(x => x.ChapterId == cha.ChapterId).OrderBy(x => x.SortOrder))
-                                                                    {
-                                                                        <li class="list-group-item">
-                                                                            <a class="dropdown-item @if(page.PageId == item.NavPageId) { WriteLiteral(" active"); } " href="#">@page.PageId - @page.Title</a>
-                                                                        </li>
-                                                                    }
-                                                                </ul>
-                                                            </li>
-                                                        }
-                                                    </ul>
-                                                </li>
-                                            }
-                                        </ul>
-                                    </li>
+                                    <li class="dropdown-header" style="margin-left:10px;font-style:italic;">@sec.Name</li>
+                                    foreach (var cha in Model.PageListModel.Chapters.Where(x => x.SectionId == sec.SectionId).OrderBy(x => x.SortOrder))
+                                    {
+                                        <li class="dropdown-header" style="margin-left:20px;">@cha.Name</li>
+                                        foreach (var page in Model.PageListModel.PageList.Where(x => x.ChapterId == cha.ChapterId).OrderBy(x => x.SortOrder))
+                                        {
+                                            <li style="margin-left:30px;">
+                                                <a onclick="assignButton(@item.ButtonId, @item.PageId, @page.PageId) " class="dropdown-item @if(page.PageId == item.NavPageId) { WriteLiteral(" active"); } " href="#">@page.PageId - @page.Title</a>
+                                            </li>
+                                        }
+                                    }
                                 }
 
-                            </ul>
-                        </div>
+
+                            }
+                        </ul>
                     </div>
                 </td>
             </tr>
         }
-
     </table>
 }
 
-
-
-
+@helper getDropdownOptions() { 
+    
+}
 
 
 @functions{
@@ -214,7 +194,6 @@ else
         else return "";
     }
 }
-
 @section scripts{
     <script src="~/Content/js/shared.js"></script>
     <script>
@@ -232,7 +211,12 @@ else
         function enableDisable(isPublish) {
             transmitAction('@Url.Action("ChangePublishStatus")', enableDisable_success, enableDisable_fail, "", { BookId: @Model.PageListModel.GetBook.BookId, IsPublish: isPublish }, true);
         }
-    </script>
 
+        function assignButton(buttonId, onPageId, toPageId) {
+            transmitAction('@Url.Action("AssignButton")', function () {
+                location.reload();
+            }, enableDisable_fail, "", { buttonId: buttonId, onPageId: onPageId, toPageId: toPageId }, true);
+        }
+    </script>
 
 }

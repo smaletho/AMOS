@@ -100,7 +100,7 @@ namespace Amos.Models
                             // these elements are pretty weird, and I can't edit the outerXML, so I'm parsing the string
                             string tempContent = p.PageContent;
                             int firstTagIndex = tempContent.IndexOf('>');
-                            string secondContent = tempContent.Substring(firstTagIndex);
+                            string secondContent = tempContent.Substring(firstTagIndex+1);
                             secondContent = secondContent.Replace("</page>", "");
 
 

@@ -144,7 +144,7 @@ namespace Amos.Models
         public int ChapterId { get; set; }
         public int BookId { get; set; }
 
-        public virtual Chapter Chapter { get; set; } // added by Ryan
+        //public virtual Chapter Chapter { get; set; } // added by Ryan
     }
 
 
