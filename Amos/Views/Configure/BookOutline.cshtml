@@ -1,0 +1,107 @@
+﻿@model Amos.Controllers.Configuration.BookOutlineModel
+@{ 
+    int moduleCall = 0;
+    int sectionCall = 0;
+    int chapterCall = 0;
+    int pageCall = 0;
+}
+@*<div>@DateTime.Now</div>*@
+<div class="book item" data-type="book" data-id="@Model.OutlineBook.BookId">
+        <div class="name">@Model.OutlineBook.Name</div>
+        <div class="version">version: <span>@Model.OutlineBook.Version</span></div>
+</div>
+
+@foreach (var currentModule in Model.OutlineModules)
+{
+    moduleCall++;
+    sectionCall = 0;
+    chapterCall = 0;
+    pageCall = 0;
+<div class="module item" data-type="module" data-id="@currentModule.ModuleId">
+    <div class="call">@moduleCall</div>
+    <div class="description"><div class="name">@currentModule.Name</div></div>
+</div>
+
+    var sections = from s in Model.OutlineSections where s.ModuleId == currentModule.ModuleId select s;
+    foreach (var currentSection in sections)
+    {
+        sectionCall++;
+        chapterCall = 0;
+        
+<div class="section item" data-type="section" data-id="@currentSection.SectionId" data-parent="@currentModule.ModuleId">
+    <div class="call">@moduleCall.@sectionCall</div>
+    <div class="description"><div class="name">@currentSection.Name</div></div>
+</div>
+
+        var chapters = from s in Model.OutlineChapters where s.SectionId == currentSection.SectionId select s;
+        foreach (var currentChapter in chapters)
+        {
+            chapterCall++;
+<div class="chapter item" data-type="chapter" data-id="@currentChapter.ChapterId" data-parent="@currentSection.SectionId">
+    <div class="call">@moduleCall.@sectionCall.@chapterCall</div>
+    <div class="description"><div class="name">@currentChapter.Name</div></div>
+</div>
+
+            var pages = from s in Model.OutlinePages where s.ChapterId == currentChapter.ChapterId select s;
+            foreach (var currentPage in pages)
+            {
+                pageCall++;
+<div class="page item" data-type="page" data-id="@currentPage.PageId" data-parent="@currentChapter.ChapterId">
+    <div class="call">@moduleCall.@sectionCall.@chapterCall.@pageCall</div>
+    <div class="description">
+    @if(currentPage.Type != "content")
+    {
+        <span class="@currentPage.Type">@currentPage.Type</span>
+    }
+    <span class="name">@currentPage.Title</span>
+    </div>
+</div>
+
+
+            }
+
+        }
+
+    }
+}
+<div id="MoveSelectInputs">
+    <div id="SelectChapter">
+        <select class="move-select">
+            @foreach (var currentModule in Model.OutlineModules)
+            {
+                <option disabled value="">@currentModule.Name</option>
+                var sections = from s in Model.OutlineSections where s.ModuleId == currentModule.ModuleId select s;
+                foreach (var currentSection in sections)
+                {
+                    <option disabled value="">&nbsp; &nbsp; &nbsp; &nbsp; @currentSection.Name</option>
+                    var chapters = from s in Model.OutlineChapters where s.SectionId == currentSection.SectionId select s;
+                    foreach (var currentChapter in chapters)
+                    {
+                        <option value="@currentChapter.ChapterId">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; @currentChapter.Name</option>
+                    }
+                }
+            }
+        </select>
+    </div>
+    <div id="SelectSection">
+        <select class="move-select">
+            @foreach (var currentModule in Model.OutlineModules)
+            {
+                <option disabled value="">@currentModule.Name</option>
+                var sections = from s in Model.OutlineSections where s.ModuleId == currentModule.ModuleId select s;
+                foreach (var currentSection in sections)
+                {
+                    <option value="@currentSection.SectionId">&nbsp; &nbsp; &nbsp; &nbsp; @currentSection.Name</option>
+                }
+            }
+        </select>
+    </div>
+    <div id="SelectModule">
+        <select class="move-select">
+            @foreach (var currentModule in Model.OutlineModules)
+            {
+                <option value="@currentModule.ModuleId">@currentModule.Name</option>
+            }
+        </select>
+    </div>
+</div>

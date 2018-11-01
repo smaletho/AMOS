@@ -98,7 +98,10 @@ else
 
     <div class="col-md-8 col-md-offset-2">
         <a class="btn btn-default" href="@Url.Action("Edit", new { id=Model.PageListModel.GetBook.BookId })">
-            Click here
+            Click here (old)
+        </a>
+        <a class="btn btn-default" href="@Url.Action("Index","Configure", new { id=Model.PageListModel.GetBook.BookId })">
+            Click here (new)
         </a>
         to edit and organize this book. Here, pages can be added, rearranged, removed, or renamed.
     </div>

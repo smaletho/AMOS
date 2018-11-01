@@ -200,6 +200,7 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\BuildController.cs" />
+    <Compile Include="Controllers\ConfigureController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\PresentController.cs" />
@@ -228,6 +229,7 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\css\base.css" />
     <Content Include="Content\css\bootstrap-tour-standalone.min.css" />
+    <Content Include="Content\css\Configure.css" />
     <Content Include="Content\css\EditBook - Copy.css" />
     <Content Include="Content\css\EditBook.css" />
     <Content Include="Content\css\pageContent.css" />
@@ -255,6 +257,7 @@
     <Content Include="Content\images\themes\9.png" />
     <Content Include="Content\js\base.js" />
     <Content Include="Content\js\bootstrap-tour-standalone.min.js" />
+    <Content Include="Content\js\Configure.js" />
     <Content Include="Content\js\EditBook - Copy.js" />
     <Content Include="Content\js\EditBook.js" />
     <Content Include="Content\js\jquery-3.3.1.min.js" />
@@ -482,6 +485,8 @@
     <Content Include="Views\Build\Build_Section.cshtml" />
     <Content Include="Views\Build\BuildList.cshtml" />
     <Content Include="Views\Build\ListPages.cshtml" />
+    <Content Include="Views\Configure\Index.cshtml" />
+    <Content Include="Views\Configure\BookOutline.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

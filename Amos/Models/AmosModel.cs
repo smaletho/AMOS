@@ -76,6 +76,8 @@ namespace Amos.Models
         public int ModuleId { get; set; }
         //public virtual Module GetModule { get; set; }
 
+        public virtual Module Module { get; set; } // added by Ryan
+
     }
 
     public class Chapter
@@ -90,7 +92,7 @@ namespace Amos.Models
         public int SectionId { get; set; }
         //public virtual Section GetSection { get; set; }
 
-
+        public virtual Section Section { get; set; } // added by Ryan
     }
 
 
@@ -141,6 +143,8 @@ namespace Amos.Models
         public int SortOrder { get; set; }
         public int ChapterId { get; set; }
         public int BookId { get; set; }
+
+        public virtual Chapter Chapter { get; set; } // added by Ryan
     }
 
 
