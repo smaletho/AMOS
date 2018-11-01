@@ -23,6 +23,7 @@
         @{Html.RenderAction("BookOutline", new { PageQueryModel = Model.PageQueryModel });}
     </div>
     <div id="ItemActions">
+        <div id="Loading">Updating...</div>
         <div id="DefaultActions" class="actions-set">
             <i class="fa fa-arrow-left fa-2x"></i>
             Select an item to make modifications.
@@ -134,12 +135,12 @@
                 <div class="move-input"><select></select></div>
                 <div class="move-action"><a class="move-button" href="#">update</a></div>
             </div>
-            <div class="preview-item">
+            @*<div class="preview-item">
                 <a class="preview-button" href="#">preview page</a>
             </div>
             <div class="edit-item">
                 <a class="edit-button" href="#">edit page</a>
-            </div>
+            </div>*@
 
         </div>
 

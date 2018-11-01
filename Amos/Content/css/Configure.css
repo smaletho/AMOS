@@ -2,31 +2,36 @@
 
 #BookOutline{width:700px;border-right:1px solid #ddd;}
 
-#ItemActions{width:440px;/*border-left:1px solid #ddd;*/padding-left:32px;}
+#ItemActions{width:440px;padding-left:32px;position:relative;}
+
+
+
+#Main .loading-fade{opacity: 0.2;}
+#Main #Loading{display:none;position:absolute;top:100px;left:-500px;padding:24px;border:2px solid #999;background-color:#ddd;border-radius:3px;font-weight:bold;font-size:18px;width:300px;text-align:center;}
 
 #BookOutline .item:hover{background-color:#eee;cursor:pointer;}
 #BookOutline .selectedItem{background-color:#9966ff !important;color:#eee !important;}
 
 #BookOutline .book{}
-#BookOutline .book .name{font-size:32px;color:#4800ff;}
+#BookOutline .book .name{font-size:32px;color:#4800ff;line-height:34px;}
 #BookOutline .book .version{font-size:14px;}
 #BookOutline .book .version span{font-weight:bold;}
 
 #BookOutline .module{font-size:24px;padding-top:24px;}
 #BookOutline .module .call{display:table-cell;width:80px;}
-#BookOutline .module .description{display:table-cell;width:500px;font-weight:bold;}
+#BookOutline .module .description{display:table-cell;width:500px;font-weight:bold;line-height:26px;}
 
 #BookOutline .section{font-size:18px;padding-top:12px;}
 #BookOutline .section .call{display:table-cell;width:80px;}
-#BookOutline .section .description{display:table-cell;width:500px;padding-left:24px;}
+#BookOutline .section .description{display:table-cell;width:500px;padding-left:24px;line-height:19px;}
 
 #BookOutline .chapter{font-size:14px;padding-top:6px;}
 #BookOutline .chapter .call{display:table-cell;width:80px;}
-#BookOutline .chapter .description{display:table-cell;width:500px;padding-left:48px;font-weight:bold;}
+#BookOutline .chapter .description{display:table-cell;width:500px;padding-left:48px;font-weight:bold;line-height:14px;}
 
 #BookOutline .page{font-size:14px;}
 #BookOutline .page .call{display:table-cell;width:80px;}
-#BookOutline .page .description{display:table-cell;width:500px;padding-left:72px;}
+#BookOutline .page .description{display:table-cell;width:500px;padding-left:72px;line-height:13px;}
 #BookOutline .page .description .quiz{background-color:#fbb;padding:0px 4px;color:#fff;border-radius:4px;}
 #BookOutline .page .description .survey{background-color:#abf;padding:0px 4px;color:#fff;border-radius:4px;}
 
@@ -36,7 +41,7 @@
 #ItemActions .actions-header{font-size:18px;margin-bottom:48px;color:#4800ff;}
 #ItemActions .actions-set{display:none;}
 
-#ItemActions #DefaultActions{display:block;padding-top:100px;font-size:18px;}
+#ItemActions #DefaultActions{display:block;padding-top:72px;font-size:18px;}
 #ItemActions #DefaultActions i{position:relative;top:5px;color:#ccc;padding-right:10px;}
 
 #ItemActions .input-item{margin-top:40px;}
@@ -47,6 +52,7 @@
 #ItemActions .add-item{margin-top:40px;}
 
 #ItemActions .remove-item{margin-top:40px;}
+#ItemActions .remove-note{font-size:11px;}
 
 #ItemActions .reorder-item{margin-top:40px;}
 

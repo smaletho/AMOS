@@ -1,6 +1,7 @@
 ﻿var selectedId = null;
 var selectedType = null;
 var selectedName = null;
+var loadingActive = false;
 initPage();
 
 
@@ -12,6 +13,7 @@ function initPage() {
     updateOutlineInteractions();
 
     $('#ItemActions .name-update').click(function () {
+        showLoading();
         var data = {};
         data.Type = selectedType;
         data.Id = selectedId;
@@ -23,6 +25,7 @@ function initPage() {
     });
 
     $('#ItemActions .version-update').click(function () {
+        showLoading();
         var data = {};
         data.Id = selectedId;
         data.Version = $('#ItemActions [data-type="' + selectedType + '"] .version-input').val();
@@ -32,6 +35,7 @@ function initPage() {
     });
 
     $('#ItemActions .add-button').click(function () {
+        showLoading();
         var data = {};
         data.Type = selectedType;
         data.Id = selectedId;
@@ -41,6 +45,7 @@ function initPage() {
     });
 
     $('#ItemActions .remove-button').click(function () {
+        showLoading();
         if (!confirm("Are you sure that you want to remove this " + selectedType +"?")) return false;
         var data = {};
         data.Type = selectedType;
@@ -51,6 +56,7 @@ function initPage() {
     });
 
     $('#ItemActions .reorder-button').click(function () {
+        showLoading();
         var data = {};
         data.Type = selectedType;
         data.Id = selectedId;
@@ -61,6 +67,7 @@ function initPage() {
     });
 
     $('#ItemActions .move-button').click(function () {
+        showLoading();
         var data = {};
         data.Type = selectedType;
         data.Id = selectedId;
@@ -159,6 +166,7 @@ function updateOutlineResponse(data) {
     $('#BookOutline').html(data);
     updateOutlineInteractions();
     hiliteSelectedItem();
+    hideLoading();
 }
 
 
@@ -189,4 +197,22 @@ function transmitAction(action, successCallback, errorCallback, returnDataType, 
         success: successCallback,
         error: errorCallback
     });
+}
+
+function showLoading() {
+    loadingActive = true;
+    window.setTimeout(showLoadingDelay, 1500);
+}
+
+function showLoadingDelay() {
+    if (loadingActive) {
+        $('#BookOutline').addClass('loading-fade');
+        $('#Loading').show();
+    }
+}
+
+function hideLoading() {
+    loadingActive = false;
+    $('#BookOutline').removeClass('loading-fade');
+    $('#Loading').hide();
 }

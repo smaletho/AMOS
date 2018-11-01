@@ -23,6 +23,7 @@ namespace Amos.Controllers.Configuration
 
         public ActionResult BookOutline(PageQueryModel PageQueryModel)
         {
+            //System.Threading.Thread.Sleep(250 * (DateTime.Now.Second % 10));
             var bookOutlineModel = new BookOutlineModel();
 
             var db = new ApplicationDbContext();
@@ -287,10 +288,52 @@ namespace Amos.Controllers.Configuration
                     }
                     break;
                 case "section":
-
-
-
-
+                    if (ReorderItemRequest.Action == "up")
+                    {
+                        var section = db.Sections.Find(ReorderItemRequest.Id);
+                        var adjacentSection = (from s in db.Sections where s.ModuleId == section.ModuleId && s.SortOrder < section.SortOrder orderby s.SortOrder descending select s).FirstOrDefault();
+                        if (adjacentSection != null) // there IS an adjacent section within this module to swap with:
+                        {
+                            int swapSortOrder = adjacentSection.SortOrder;
+                            adjacentSection.SortOrder = section.SortOrder;
+                            section.SortOrder = swapSortOrder;
+                        }
+                        else // there is NOT an adjacent section, we will need to move the section to the bottom of an adjacent module:
+                        {
+                            var allModules = (from s in db.Modules orderby  s.SortOrder select s.ModuleId).ToList();
+                            int moduleIndex = allModules.IndexOf(section.ModuleId);
+                            if (moduleIndex > 0) // there IS an adjacent module to move this section to:
+                            {
+                                int targetModuleId = allModules[moduleIndex - 1];
+                                var highestSectionSortOrderInTargetModule = (from s in db.Sections where s.ModuleId == targetModuleId select s.SortOrder).DefaultIfEmpty(0).Max();
+                                section.ModuleId = targetModuleId;
+                                section.SortOrder = highestSectionSortOrderInTargetModule + 1;
+                            } // otherwise, there is no adjacent section AND no adjacent module... the section can be moved no further: take no action.
+                        }
+                    }
+                    if (ReorderItemRequest.Action == "down")
+                    {
+                        var section = db.Sections.Find(ReorderItemRequest.Id);
+                        var adjacentSection = (from s in db.Sections where s.ModuleId == section.ModuleId && s.SortOrder > section.SortOrder orderby s.SortOrder select s).FirstOrDefault();
+                        if (adjacentSection != null) // there IS an adjacent section within this module to swap with:
+                        {
+                            int swapSortOrder = adjacentSection.SortOrder;
+                            adjacentSection.SortOrder = section.SortOrder;
+                            section.SortOrder = swapSortOrder;
+                        }
+                        else // there is NOT an adjacent section, we will need to move the section to the top of an adjacent module:
+                        {
+                            var allModules = (from s in db.Modules orderby s.SortOrder descending select s.ModuleId).ToList();
+                            int moduleIndex = allModules.IndexOf(section.ModuleId);
+                            if (moduleIndex > 0) // there IS an adjacent module to move this section to:
+                            {
+                                int targetModuleId = allModules[moduleIndex - 1];
+                                var lowestSectionSortOrderInTargetModule = (from s in db.Sections where s.ModuleId == targetModuleId select s.SortOrder).DefaultIfEmpty(0).Min();
+                                section.ModuleId = targetModuleId;
+                                section.SortOrder = lowestSectionSortOrderInTargetModule - 1;
+                            } // otherwise, there is no adjacent section AND no adjacent module... the section can be moved no further: take no action.
+                        }
+                    }
                     break;
                 case "chapter":
                     if (ReorderItemRequest.Action == "up")
