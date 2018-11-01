@@ -43,7 +43,8 @@ namespace Amos.Controllers.Configuration
                                                select new OutlineModule
                                                {
                                                    ModuleId = s.ModuleId,
-                                                   Name = s.Name
+                                                   Name = s.Name,
+                                                   Theme = s.Theme,
                                                }).ToList();
             var moduleIdList = (from s in bookOutlineModel.OutlineModules select s.ModuleId);
 
@@ -120,6 +121,15 @@ namespace Amos.Controllers.Configuration
             book.Version = UpdateBookVersionRequest.Version;
             db.SaveChanges();
             return BookOutline(UpdateBookVersionRequest.PageQueryModel);
+        }
+
+        public ActionResult UpdateTheme(UpdateThemeRequest UpdateThemeRequest)
+        {
+            var db = new ApplicationDbContext();
+            var module = db.Modules.Find(UpdateThemeRequest.Id);
+            module.Theme = UpdateThemeRequest.Theme;
+            db.SaveChanges();
+            return BookOutline(UpdateThemeRequest.PageQueryModel);
         }
 
         public ActionResult AddItem(RemoveItemRequest AddItemRequest)
@@ -465,6 +475,7 @@ namespace Amos.Controllers.Configuration
     {
         public int ModuleId { get; set; }
         public string Name { get; set; }
+        public string Theme { get; set; }
     }
 
     public class OutlineSection
@@ -534,5 +545,13 @@ namespace Amos.Controllers.Configuration
         public int TargetParentId { get; set; }
         public PageQueryModel PageQueryModel { get; set; }
     }
+
+    public class UpdateThemeRequest
+    {
+        public int Id { get; set; }
+        public string Theme { get; set; }
+        public PageQueryModel PageQueryModel { get; set; }
+    }
+
 
 }

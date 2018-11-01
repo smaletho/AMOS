@@ -77,6 +77,29 @@ function initPage() {
         return false;
     });
 
+    $('#ItemActions .theme-button').click(function () {
+        var theme = $('#BookOutline .module[data-id="' + selectedId + '"]').data('theme');
+        $('#ThemeSelector .themeBlock').removeClass('selected');
+        $('#ThemeSelector .themeBlock[data-id="' + theme + '"]').addClass('selected');
+        $('#ThemeSelector').show();
+        return false;
+    });
+    $('#ThemeSelector .overlay').click(function () {
+        $('#ThemeSelector').hide();
+        return false;
+    });
+    $('#ThemeSelector .themeBlock').click(function () {
+        var theme = $(this).data('id');
+        $('#ThemeSelector').hide();
+        showLoading();
+        var data = {};
+        data.Id = selectedId;
+        data.Theme = theme;
+        data.pageQueryModel = pageQueryModel;
+        transmitAction("UpdateTheme", updateOutlineResponse, null, 'html', data);
+        return false;
+    });
+
     $('#PreviewButton').click(function () {
         sessionStorage.setItem('ActivePageId', selectedId);
         window.location = viewPageUrl.replace('0', selectedId);

@@ -9,7 +9,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @section Styles{
-    <link rel="stylesheet" href="~/Content/css/Configure.css?v=2">
+    <link rel="stylesheet" href="~/Content/css/Configure.css?v=3">
 }
 
 @*<h2>Configure</h2>*@
@@ -67,6 +67,9 @@
                 <div class="reorder-label">reorder modules:</div>
                 <div class="reorder-action"><a class="reorder-button" data-action="up" href="#">move this module up</a></div>
                 <div class="reorder-action"><a class="reorder-button" data-action="down" href="#">move this module down</a></div>
+            </div>
+            <div class="theme-item">
+                <a class="theme-button" href="#">change the color theme of this module</a>
             </div>
         </div>
         <div id="SectionActions" class="actions-set" data-type="section">
@@ -153,6 +156,38 @@
 
 </div>
 
+<div id="ThemeSelector">
+    <div class="overlay"></div>
+    <div class="themeSelector">
+        <div class="themeBlock" data-id="1">
+            <img class="themeImg" src="~/Content/images/themes/1.png" />
+        </div>
+        <div class="themeBlock" data-id="2">
+            <img class="themeImg" src="~/Content/images/themes/2.png" />
+        </div>
+        <div class="themeBlock" data-id="3">
+            <img class="themeImg" src="~/Content/images/themes/3.png" />
+        </div>
+        <div class="themeBlock" data-id="4">
+            <img class="themeImg" src="~/Content/images/themes/4.png" />
+        </div>
+        <div class="themeBlock" data-id="5">
+            <img class="themeImg" src="~/Content/images/themes/5.png" />
+        </div>
+        <div class="themeBlock" data-id="6">
+            <img class="themeImg" src="~/Content/images/themes/6.png" />
+        </div>
+        <div class="themeBlock" data-id="7">
+            <img class="themeImg" src="~/Content/images/themes/7.png" />
+        </div>
+        <div class="themeBlock" data-id="8">
+            <img class="themeImg" src="~/Content/images/themes/8.png" />
+        </div>
+        <div class="themeBlock" data-id="9">
+            <img class="themeImg" src="~/Content/images/themes/9.png" />
+        </div>
+    </div>
+</div>
 
 
 @section Scripts{
@@ -162,7 +197,7 @@
         var viewPageUrl = '@Url.Action("ViewEditor", "Build", new { id = 0 })';
         var editPageUrl = '@Url.Action("ViewPage", "Build", new { id = 0 })';
     </script>
-    <script type="text/javascript" src="~/Content/js/Configure.js?v=2"></script>
+    <script type="text/javascript" src="~/Content/js/Configure.js?v=3"></script>
 }
 
 

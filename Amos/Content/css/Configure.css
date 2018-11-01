@@ -63,3 +63,13 @@
 #ItemActions .preview-item{margin-top:40px;}
 
 #ItemActions .edit-item{margin-top:40px;}
+
+#ItemActions .theme-item{margin-top:40px;}
+
+#ThemeSelector{z-index:3;display:none;}
+#ThemeSelector .overlay {position:fixed;top:0;left:0;background-color:black;opacity:0.7;width:100%;height:100%;}
+#ThemeSelector .themeSelector {position:fixed;top:50%;left:50%;width:800px;height:500px;background-color:silver;overflow:auto;margin-top:-250px;margin-left:-400px;padding:20px;border:3px solid black;}
+#ThemeSelector .themeSelector img {width:100%;}
+#ThemeSelector .themeSelector .themeBlock {background-color:white;cursor:pointer;display:table;padding:20px;margin-bottom:10px;border:2px solid black;border-radius:5px;}
+#ThemeSelector .themeSelector .themeBlock:hover{background-color:#ebebeb;}
+#ThemeSelector .themeSelector .themeBlock.selected {background-color:#000;}
