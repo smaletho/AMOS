@@ -1,10 +1,15 @@
 ﻿@model Amos.Controllers.Configuration.PageInitModel
 @{
+    // ========= force page to perform fresh load each visit:
+    Response.Cache.SetCacheability(HttpCacheability.NoCache); 
+    Response.Cache.SetNoStore();
+    // =========
+
     ViewBag.Title = "Configure";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @section Styles{
-    <link rel="stylesheet" href="~/Content/css/Configure.css?v=0">
+    <link rel="stylesheet" href="~/Content/css/Configure.css?v=1">
 }
 
 @*<h2>Configure</h2>*@
@@ -135,12 +140,12 @@
                 <div class="move-input"><select></select></div>
                 <div class="move-action"><a class="move-button" href="#">update</a></div>
             </div>
-            @*<div class="preview-item">
-                <a class="preview-button" href="#">preview page</a>
+            <div class="preview-item">
+                <a id="PreviewButton" href="#">preview page</a>
             </div>
             <div class="edit-item">
-                <a class="edit-button" href="#">edit page</a>
-            </div>*@
+                <a id="EditButton" href="#">edit page</a>
+            </div>
 
         </div>
 
@@ -154,8 +159,10 @@
     <script>
         var actionTransmitUrl='@Url.Action("action",new{id=0})';
         var pageQueryModel = @Html.Raw(Json.Encode(Model.PageQueryModel));
+        var viewPageUrl = '@Url.Action("ViewEditor", "Build", new { id = 0 })';
+        var editPageUrl = '@Url.Action("ViewPage", "Build", new { id = 0 })';
     </script>
-    <script type="text/javascript" src="~/Content/js/Configure.js?v=0"></script>
+    <script type="text/javascript" src="~/Content/js/Configure.js?v=1"></script>
 }
 
 
