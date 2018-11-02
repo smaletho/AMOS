@@ -97,6 +97,7 @@
         var wto;
         var applicationMode = "online";
         var URL_Content = '@Url.Content("~/")';
+        var DirtyPage = false;
 
 
         function savePageSuccess(data) {
@@ -108,7 +109,12 @@
             console.log('fail', data);
         }
         $(function () {
+            $(window).bind('beforeunload', function () {
+                if (DirtyPage)
+                    return 'Are you sure you want to leave?';
+            });
 
+            $("#XmlContent").on('change', function () { DirtyPage = true; });
 
             $("#save-page").on('click', function () {
                 savePage(savePageSuccess);

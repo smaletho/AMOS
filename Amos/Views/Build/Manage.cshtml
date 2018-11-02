@@ -45,7 +45,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Unlock book?</h4>
+                    <h4 class="modal-title" id="myModalLabel">Unpublish book?</h4>
                 </div>
                 <div class="modal-body">
                     <p>Un-publishing the book for editing will make the book inaccessible to users while being edited.</p>
@@ -65,7 +65,7 @@ else
     <div class="row">
         <div class="col-md-6 col-md-offset-3 alert alert-info btn" role="alert">
             <a class="alert-link" data-toggle="modal" data-target="#unlockedBookModal">
-                <i class="fa fa-lock"></i>
+                <i class="fa fa-unlock"></i>
                 This book is NOT published, and can be edited. Click to publish.
             </a>
         </div>
@@ -76,7 +76,7 @@ else
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Unlock book?</h4>
+                    <h4 class="modal-title" id="myModalLabel">Publish book?</h4>
                 </div>
                 <div class="modal-body">
                     <p>Publishing this book will allow it to be viewed by all users.</p>
@@ -84,13 +84,18 @@ else
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="enableDisable(true);">continue</button>
+
+                    <button type="button" class="btn btn-primary" id="load" onclick="enableDisable(true)" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Validating...">Validate and Publish</button>
+
+                    @*<button type="button" class="btn btn-primary" onclick="enableDisable(true);">continue</button>*@
                 </div>
             </div>
         </div>
     </div>
 
+    <div class="col-md-8 col-md-offset-2" id="error-list">
 
+    </div>
 
     <div class="col-md-8 col-md-offset-2">
         <a class="btn btn-default" href="@Url.Action("Edit", new { id=Model.PageListModel.GetBook.BookId })">
@@ -106,85 +111,23 @@ else
     <hr />
 
     <div class="container col-md-12" style="margin-top:20px;">
-        Below, you will find a list of links and buttons used within this book. Use this interface to
-        connect each button to the corresponding page that you would like it to navigate to.
+        <p class="alert alert-info">
+            Below, you will find a list of links and buttons used within this book. 
+            <br />Use this interface to
+            connect each button to the corresponding page that you would like it to navigate to.
+        </p>
     </div>
 
-    <table class="table table-hover table-striped">
-        <tr>
-            @*<th>Page Id</th>*@
-            <th>Page Name</th>
-            <th>Type</th>
-            <th>Text</th>
-            @*<th>Navigate Page Id</th>*@
-            <th>Navigate Page Name</th>
-        </tr>
-        @foreach (var item in Model.pageButtons)
-        {
-            string title = "";
-            try
-            {
-                title = item.getNavPage.Title;
-            }
-            catch
-            {
-                title = "n/a";
-            }
-            <tr>
-                @*<td>@item.PageId</td>*@
-                <td>@item.getPage.Title</td>
-                @if (item.isButton)
-                {
-                    <td>
-                        <button class="btn btn-primary">button</button>
-                    </td>
-                }
-                else
-                {
-                    <td>
-                        <a href="javascript:void(0)">link</a>
-                    </td>
-                }
-                <td>@item.ButtonText</td>
-                @*<td>@item.NavPageId</td>*@
-                <td>
-                    <div class="dropdown">
-                        <button class="btn btn-default dropdown-toggle" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            @title <span class="caret"></span>
-                        </button>
+    <table id="button-table" class="table table-hover table-striped">
 
-                        <ul class="dropdown-menu scrollable-menu" aria-labelledby="dropdownMenuLink">
-                            @foreach (var mod in Model.PageListModel.Modules.OrderBy(x => x.SortOrder))
-                            {
-                                <li class="dropdown-header" style="font-weight:bold">@mod.Name</li>
-                                foreach (var sec in Model.PageListModel.Sections.Where(x => x.ModuleId == mod.ModuleId).OrderBy(x => x.SortOrder))
-                                {
-                                    <li class="dropdown-header" style="margin-left:10px;font-style:italic;">@sec.Name</li>
-                                    foreach (var cha in Model.PageListModel.Chapters.Where(x => x.SectionId == sec.SectionId).OrderBy(x => x.SortOrder))
-                                    {
-                                        <li class="dropdown-header" style="margin-left:20px;">@cha.Name</li>
-                                        foreach (var page in Model.PageListModel.PageList.Where(x => x.ChapterId == cha.ChapterId).OrderBy(x => x.SortOrder))
-                                        {
-                                            <li style="margin-left:30px;">
-                                                <a onclick="assignButton(@item.ButtonId, @item.PageId, @page.PageId) " class="dropdown-item @if(page.PageId == item.NavPageId) { WriteLiteral(" active"); } " href="#">@page.PageId - @page.Title</a>
-                                            </li>
-                                        }
-                                    }
-                                }
+        
 
+        @Html.Action("BuildButtonList", new { model = Model})
 
-                            }
-                        </ul>
-                    </div>
-                </td>
-            </tr>
-        }
+        
     </table>
 }
 
-@helper getDropdownOptions() { 
-    
-}
 
 
 @functions{
@@ -197,26 +140,57 @@ else
 @section scripts{
     <script src="~/Content/js/shared.js"></script>
     <script>
+        var model = JSON.parse('@Html.Raw(Json.Encode(Model))');
+
         function enableDisable_success(data) {
             if (data == "success")
                 window.location.reload();
             else {
-                alert(data);
+                $("#error-list").empty();
+                $("#load").button('reset');
+                $("[data-dismiss=modal]").trigger({ type: "click" });
+                if (data.Errors) {
+                    errorStr = "<ul class=\"list-group\">";
+                    for (var i = 0; i < data.Details.split("\n").length; i++) {
+                        newStr = "<li class=\"list-group-item list-group-item-warning\">" + data.Details.split("\n")[i] + "</li>";
+                        if (newStr != "<li class=\"list-group-item list-group-item-warning\"></li>")
+                            errorStr += newStr;
+                    }
+                    errorStr += "</ul>";
+
+                    $("#error-list").append(errorStr);
+                } else {
+                    location.reload();
+                }
             }
         }
         function enableDisable_fail(data) {
             alert("Error");
             console.log("error", data);
-        }
+        }6
         function enableDisable(isPublish) {
+            $("#load").button('loading');
+            
             transmitAction('@Url.Action("ChangePublishStatus")', enableDisable_success, enableDisable_fail, "", { BookId: @Model.PageListModel.GetBook.BookId, IsPublish: isPublish }, true);
         }
 
-        function assignButton(buttonId, onPageId, toPageId) {
-            transmitAction('@Url.Action("AssignButton")', function () {
-                location.reload();
+        function assignButton(buttonId, onPageId, toPageId, element) {
+            $(element).closest("ul").prev("button").button("loading");
+            transmitAction('@Url.Action("AssignButton")', function (data) {
+                $("#button-table").empty();
+                $("#button-table").append(data);
+                $(element).closest("ul").prev("button").button("reset");
             }, enableDisable_fail, "", { buttonId: buttonId, onPageId: onPageId, toPageId: toPageId }, true);
         }
+
+
+
+        @*$(function () {
+            transmitAction('@Url.Action("BuildButtonList")', function (data) {
+                $("#button-table").empty();
+                $("#button-table").append(data);
+            }, function (data) { }, "", { model }, true);
+        });*@
     </script>
 
 }

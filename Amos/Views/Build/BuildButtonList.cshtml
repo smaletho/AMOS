@@ -1,0 +1,73 @@
+﻿@model Amos.Models.ManagePagesModel
+
+<tbody>
+    <tr>
+        @*<th>Page Id</th>*@
+        <th>Page Name</th>
+        <th>Type</th>
+        <th>Text</th>
+        @*<th>Navigate Page Id</th>*@
+        <th>Navigate Page Name</th>
+    </tr>
+
+    @foreach (var item in Model.pageButtons)
+    {
+        string title = "";
+        try
+        {
+            title = item.getNavPage.Title;
+        }
+        catch
+        {
+            title = "n/a";
+        }
+        <tr>
+            @*<td>@item.PageId</td>*@
+            <td>@item.getPage.Title</td>
+            @if (item.isButton)
+            {
+                <td>
+                    <button class="btn btn-primary">button</button>
+                </td>
+            }
+            else
+            {
+                <td>
+                    <a href="javascript:void(0)">link</a>
+                </td>
+            }
+            <td>@item.ButtonText</td>
+            @*<td>@item.NavPageId</td>*@
+            <td>
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        @title <span class="caret"></span>
+                    </button>
+
+                    <ul class="dropdown-menu scrollable-menu" aria-labelledby="dropdownMenuLink">
+                        @foreach (var mod in Model.PageListModel.Modules.OrderBy(x => x.SortOrder))
+                        {
+                            <li class="dropdown-header" style="font-weight:bold">@mod.Name</li>
+                            foreach (var sec in Model.PageListModel.Sections.Where(x => x.ModuleId == mod.ModuleId).OrderBy(x => x.SortOrder))
+                            {
+                                <li class="dropdown-header" style="margin-left:10px;font-style:italic;">@sec.Name</li>
+                                foreach (var cha in Model.PageListModel.Chapters.Where(x => x.SectionId == sec.SectionId).OrderBy(x => x.SortOrder))
+                                {
+                                    <li class="dropdown-header" style="margin-left:20px;">@cha.Name</li>
+                                    foreach (var page in Model.PageListModel.PageList.Where(x => x.ChapterId == cha.ChapterId).OrderBy(x => x.SortOrder))
+                                    {
+                                        <li style="margin-left:30px;">
+                                            <a onclick="assignButton(@item.ButtonId, @item.PageId, @page.PageId, this) " class="dropdown-item @if(page.PageId == item.NavPageId) { WriteLiteral(" active"); } " data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Saving...">@page.PageId - @page.Title</a>
+                                        </li>
+                                    }
+                                }
+                            }
+
+
+                        }
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    }
+</tbody>

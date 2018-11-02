@@ -5,50 +5,77 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>@ViewBag.Title.</h2>
+@section styles{
+    <style>
+        .input-group-addon {
+            width: 90px;
+            text-align: right;
+        }
+
+        .form-control {
+            width: 280px !important;
+            border-top-right-radius: 5px !important;
+            border-bottom-right-radius: 5px !important;
+        }
+
+        .help-block{margin-left:100px;}
+    </style>
+}
+
+@*<h2>@ViewBag.Title.</h2>*@
+
+<h1 style="text-align:center">Log in:</h1>
+
 <div class="row">
-    <div class="col-md-8">
+    @*<div class="col-md-offset-4"></div>*@
+    <div class="col-md-offset-4 col-md-6">
         <section id="loginForm">
             @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
             {
                 @Html.AntiForgeryToken()
-                <h4>Use a local account to log in.</h4>
                 <hr />
                 @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-                <div class="form-group">
-                    @Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label" })
-                    <div class="col-md-10">
-                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+
+                <div class="row">
+                    <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon1">Email</span>
+                        @Html.TextBoxFor(x => x.Email, new { @class = "form-control", placeholder = "Email", aria_describedby = "basic-addon1" })
+                    </div>
+                    <p class="help-block">
                         @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
-                    </div>
+                    </p>
                 </div>
-                <div class="form-group">
-                    @Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })
-                    <div class="col-md-10">
-                        @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+
+                <div class="row">
+                    <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon2">Password</span>
+                        @Html.PasswordFor(x => x.Password, new { @class = "form-control", placeholder = "", aria_describedby = "basic-addon2" })
+                    </div>
+                    <p class="help-block">
                         @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                    </p>
+                </div>
+
+                <div class="row">
+                    <div class="input-group">
+                        <p>
+                            <label>
+                                @Html.CheckBoxFor(m => m.RememberMe)
+                                Remember me?
+                            </label>
+                        </p>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10">
-                        <div class="checkbox">
-                            @Html.CheckBoxFor(m => m.RememberMe)
-                            @Html.LabelFor(m => m.RememberMe)
-                        </div>
-                    </div>
+
+                <div class="row">
+                    <input type="submit" value="Log in" class="btn btn-primary" />
                 </div>
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10">
-                        <input type="submit" value="Log in" class="btn btn-default" />
-                    </div>
-                </div>
-                @*<p>
-                    @Html.ActionLink("Register as a new user", "Register")
-                </p>*@
-                @* Enable this once you have account confirmation enabled for password reset functionality
-                    <p>
-                        @Html.ActionLink("Forgot your password?", "ForgotPassword")
-                    </p>*@
+
+                
+
+
+                
+
             }
         </section>
     </div>

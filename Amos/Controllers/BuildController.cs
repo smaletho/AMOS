@@ -1776,15 +1776,172 @@ namespace Amos.Controllers
         {
             ApplicationDbContext db = new ApplicationDbContext();
             if (!IsPublish)
+            {
                 db.Books.Where(x => x.BookId == BookId).FirstOrDefault().Published = false;
+                db.SaveChanges();
+                return Content("success");
+            }
+                
             else
             {
                 // validate
+                bool foundErrors = false;
+                StringBuilder sb = new StringBuilder();
+
+                // Step 1:
+                //  Ensure the module, section, chapter, and page configuration is correct
+                ManagePagesModel model = new ManagePagesModel(BookId);
+
+                // check the book properties
+                if (string.IsNullOrWhiteSpace(model.PageListModel.GetBook.Name))
+                {
+                    foundErrors = true;
+                    sb.AppendLine("The book must have a name.");
+                }
+                if (string.IsNullOrWhiteSpace(model.PageListModel.GetBook.Version))
+                {
+                    foundErrors = true;
+                    sb.AppendLine("The book must have a version.");
+                }
+
+                // check the modules
+                int moduleCount = 0;
+                foreach(var mod in model.PageListModel.Modules)
+                {
+                    moduleCount++;
+
+                    if (string.IsNullOrWhiteSpace(mod.Name))
+                    {
+                        foundErrors = true;
+                        sb.AppendLine("Module #" + mod.ModuleId + " found without a name.");
+                    }
+                    if (string.IsNullOrWhiteSpace(mod.Theme))
+                    {
+                        foundErrors = true;
+                        sb.AppendLine("Module #" + mod.ModuleId + " found without a theme.");
+                    }
+
+                    // check the sections
+                    int sectionCount = 0;
+                    foreach (var sec in model.PageListModel.Sections.Where(x => x.ModuleId == mod.ModuleId).ToList())
+                    {
+                        sectionCount++;
+
+                        if (string.IsNullOrWhiteSpace(sec.Name))
+                        {
+                            foundErrors = true;
+                            sb.AppendLine("Section #" + sec.SectionId + " found without a name.");
+                        }
+
+                        // check the chapters
+                        int chapterCount = 0;
+                        foreach(var cha in model.PageListModel.Chapters.Where(x => x.SectionId == sec.SectionId).ToList())
+                        {
+                            chapterCount++;
+
+                            if (string.IsNullOrWhiteSpace(cha.Name))
+                            {
+                                foundErrors = true;
+                                sb.AppendLine("Chapter #" + cha.ChapterId + " found without a name.");
+                            }
+
+                            // check the pages
+                            int pageCount = 0;
+                            foreach (var pa in model.PageListModel.PageList.Where(x => x.ChapterId == cha.ChapterId).ToList())
+                            {
+                                pageCount++;
+
+                                if (string.IsNullOrWhiteSpace(pa.Type))
+                                {
+                                    foundErrors = true;
+                                    sb.AppendLine("Page #" + pa.PageId + " found without a proper 'type.'");
+                                }
+
+                                if (string.IsNullOrWhiteSpace(pa.Title))
+                                {
+                                    foundErrors = true;
+                                    sb.AppendLine("Page #" + pa.PageId + " found without a 'title.'");
+                                }
+                            }
+
+                            if (pageCount == 0)
+                            {
+                                foundErrors = true;
+                                sb.AppendLine("No pages found in chapter: " + cha.Name);
+                            }
+                        }
+
+                        if (chapterCount == 0)
+                        {
+                            foundErrors = true;
+                            sb.AppendLine("No chapters found in section: " + sec.Name);
+                        }
+                    }
+
+                    if (sectionCount == 0)
+                    {
+                        foundErrors = true;
+                        sb.AppendLine("No sections found in module: " + mod.Name);
+                    }
+                }
+
+                if (moduleCount == 0)
+                {
+                    foundErrors = true;
+                    sb.AppendLine("No modules found in this book.");
+                }
+
+                // check if any sections, chapters, or pages are unlinked
+                var moduleIds = model.PageListModel.Modules.Select(x => x.ModuleId).ToList();
+                var sectionIds = model.PageListModel.Sections.Select(x => x.SectionId).ToList();
+                var chapterIds = model.PageListModel.Chapters.Select(x => x.ChapterId).ToList();
+                var pageIds = model.PageListModel.PageList.Select(x => x.PageId).ToList();
+
+                var unlinkedSections = model.PageListModel.Sections.Where(x => !moduleIds.Contains(x.ModuleId)).ToList();
+                if (unlinkedSections.Count != 0)
+                {
+                    foundErrors = true;
+                    sb.AppendLine("Found " + unlinkedSections.Count + " sections NOT linked to a module.");
+                }
+
+                var unlinkedChapters = model.PageListModel.Chapters.Where(x => !sectionIds.Contains(x.SectionId)).ToList();
+                if (unlinkedChapters.Count != 0)
+                {
+                    foundErrors = true;
+                    sb.AppendLine("Found " + unlinkedChapters.Count + " chapters NOT linked to a section.");
+                }
+
+                var unlinkedPages = model.PageListModel.PageList.Where(x => !chapterIds.Contains(x.ChapterId)).ToList();
+                if (unlinkedPages.Count != 0)
+                {
+                    foundErrors = true;
+                    sb.AppendLine("Found " + unlinkedPages.Count + " pages NOT linked to a chapter.");
+                }
+
+                if (!foundErrors)
+                {
+                    sb.AppendLine("Book configuration is valid. Checking page buttons...");
+                }
+                foreach(var btn in model.pageButtons)
+                {
+                    if (btn.NavPageId == 0)
+                    {
+                        foundErrors = true;
+                        sb.AppendLine("Unlinked page button found. (Page: " + btn.getPage.Title + " - Button Text: " + btn.ButtonText + ")");
+                    }
+                }
+                db.SaveChanges();
+                sb.AppendLine("No errors found, the book has been saved and published.");
+                
+
+                return Json(new { Errors = foundErrors, Details = sb.ToString() });
             }
-            db.SaveChanges();
-            return Content("success");
         }
 
+        public ActionResult BuildButtonList(ManagePagesModel model)
+        {
+            return View("BuildButtonList", model);
+        }
 
         public ActionResult Manage(int id)
         {
@@ -1872,7 +2029,7 @@ namespace Amos.Controllers
             }
             catch { }
 
-            return Content("success");
+            return View("BuildButtonList", new ManagePagesModel(onPage.BookId));
         }
 
 

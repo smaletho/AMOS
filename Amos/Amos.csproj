@@ -487,6 +487,7 @@
     <Content Include="Views\Build\ListPages.cshtml" />
     <Content Include="Views\Configure\Index.cshtml" />
     <Content Include="Views\Configure\BookOutline.cshtml" />
+    <Content Include="Views\Build\BuildButtonList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
