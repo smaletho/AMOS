@@ -9,7 +9,10 @@ namespace Amos.Controllers.Configuration
 {
     public class ConfigureController : Controller
     {
-        // GET: Configure
+        // ------------------------------------------------------------------------------------------
+        // INITAL LOAD of this page: (Occurs once.)
+        // ------------------------------------------------------------------------------------------
+
         public ActionResult Index(int id)
         {
             int bookId = id;
@@ -28,6 +31,10 @@ namespace Amos.Controllers.Configuration
 
             return View("Index", pageInitModel);
         }
+
+        // ------------------------------------------------------------------------------------------
+        // LOAD AND RENDER the Book Outline that is displayed on the left side of the page. (This is reloaded and rendered each time a change is made.) 
+        // ------------------------------------------------------------------------------------------
 
         public ActionResult BookOutline(PageQueryModel PageQueryModel)
         {
@@ -111,6 +118,11 @@ namespace Amos.Controllers.Configuration
             return View("BookOutline", bookOutlineModel);
         }
 
+        // ------------------------------------------------------------------------------------------
+        // The remaining ACTIONS are executed in response to the various actions occuring on the right side of the page:
+        // ------------------------------------------------------------------------------------------
+
+        // Users changes the NAME/TITLE of any object (book/module/section/chapter/page):
         public ActionResult UpdateName(ActionRequest UpdateNameRequest)
         {
             var db = new ApplicationDbContext();
@@ -141,6 +153,7 @@ namespace Amos.Controllers.Configuration
             return BookOutline(UpdateNameRequest.PageQueryModel);
         }
 
+        // User changes VERSION of a book: 
         public ActionResult UpdateBookVersion(ActionRequest UpdateBookVersionRequest)
         {
             var db = new ApplicationDbContext();
@@ -150,6 +163,7 @@ namespace Amos.Controllers.Configuration
             return BookOutline(UpdateBookVersionRequest.PageQueryModel);
         }
 
+        // User changes the THEME of a module:
         public ActionResult UpdateTheme(ActionRequest UpdateThemeRequest)
         {
             var db = new ApplicationDbContext();
@@ -159,6 +173,7 @@ namespace Amos.Controllers.Configuration
             return BookOutline(UpdateThemeRequest.PageQueryModel);
         }
 
+        // User ADDS a new module, section, chapter, or page:
         public ActionResult AddItem(ActionRequest AddItemRequest)
         {
             var db = new ApplicationDbContext();
@@ -209,6 +224,7 @@ namespace Amos.Controllers.Configuration
             return BookOutline(AddItemRequest.PageQueryModel);
         }
 
+        // User REMOVES any module, section, chapter, or page:
         public ActionResult RemoveItem(ActionRequest RemoveItemRequest)
         {
             var db = new ApplicationDbContext();
@@ -267,6 +283,7 @@ namespace Amos.Controllers.Configuration
             return BookOutline(RemoveItemRequest.PageQueryModel);
         }
 
+        // User MOVEs an item using the select menu. (relocates a page to another chapter, etc.):
         public ActionResult MoveItem(ActionRequest MoveItemRequest)
         {
             var db = new ApplicationDbContext();
@@ -295,6 +312,9 @@ namespace Amos.Controllers.Configuration
             return BookOutline(MoveItemRequest.PageQueryModel);
         }
 
+        // User reorders an item UP or DOWN within the outline:
+        // (This code is lengthy and complex to account for the capability to move items beyond their parent into adjacent parents.)
+        // Example: a page can be moved past the beginning or end of a chapter and into an adjacent chapter.
         public ActionResult ReorderItem(ActionRequest ReorderItemRequest)
         {
             var db = new ApplicationDbContext();
@@ -471,20 +491,28 @@ namespace Amos.Controllers.Configuration
             }
             db.SaveChanges();
             return BookOutline(ReorderItemRequest.PageQueryModel);
-        }
-    }
+        } // End of (giant) action method that performs UP/DOWN page re-ordering.
 
+    }  // END OF CONTROLLER CLASS
+
+    // ------------------------------------------------------------------------------------------
+    //                                  MODELS AND CLASSES
+    // ------------------------------------------------------------------------------------------
+
+    // Model used for the inital page load: (populated only once.)
     public class PageInitModel
     {
         public PageQueryModel PageQueryModel { get; set; }
     }
 
+    // Model that persists through the page lifecycle. This is included with each action request.
     public class PageQueryModel
     {
         public int BookId { get; set; }
         public bool ShowPageContent { get; set; }
     }
 
+    // Model used to render the book outline. This is re-created every time a change is made.
     public class BookOutlineModel
     {
         public PageQueryModel PageQueryModel { get; set; }
@@ -494,6 +522,8 @@ namespace Amos.Controllers.Configuration
         public List<OutlineChapter> OutlineChapters { get; set; }
         public List<OutlinePage> OutlinePages { get; set; }
     }
+
+    // Components making up the book outline:
     public class OutlineBook
     {
         public int BookId { get; set; }
@@ -506,21 +536,18 @@ namespace Amos.Controllers.Configuration
         public string Name { get; set; }
         public string Theme { get; set; }
     }
-
     public class OutlineSection
     {
         public int SectionId { get; set; }
         public int ModuleId { get; set; }
         public string Name { get; set; }
     }
-
     public class OutlineChapter
     {
         public int ChapterId { get; set; }
         public int SectionId { get; set; }
         public string Name { get; set; }
     }
-
     public class OutlinePage
     {
         public int PageId { get; set; }
@@ -530,6 +557,7 @@ namespace Amos.Controllers.Configuration
         public string PageContent { get; set; }
     }
 
+    // Action Request Object. These are created in Javascript and passed to the server side Action methods whenever the user makes a modification to book outline.
     public class ActionRequest
     {
         public int Id { get; set; }
@@ -539,58 +567,6 @@ namespace Amos.Controllers.Configuration
         public int TargetId { get; set; }
         public PageQueryModel PageQueryModel { get; set; }
     }
-
-    //public class UpdateNameRequest
-    //{
-    //    public int Id { get; set; }
-    //    public string Type { get; set; }
-    //    public string Name { get; set; }
-    //    public PageQueryModel PageQueryModel { get; set; }
-    //}
-
-    //public class UpdateBookVersionRequest
-    //{
-    //    public int Id { get; set; }
-    //    public string Version { get; set; }
-    //    public PageQueryModel PageQueryModel { get; set; }
-    //}
-
-    //public class AddItemRequest
-    //{
-    //    public int Id { get; set; }
-    //    public string Type { get; set; }
-    //    public PageQueryModel PageQueryModel { get; set; }
-    //}
-
-    //public class RemoveItemRequest
-    //{
-    //    public int Id { get; set; }
-    //    public string Type { get; set; }
-    //    public PageQueryModel PageQueryModel { get; set; }
-    //}
-
-    //public class ReorderItemRequest
-    //{
-    //    public int Id { get; set; }
-    //    public string Type { get; set; }
-    //    public string Action { get; set; }
-    //    public PageQueryModel PageQueryModel { get; set; }
-    //}
-
-    //public class MoveItemRequest
-    //{
-    //    public int Id { get; set; }
-    //    public string Type { get; set; }
-    //    public int TargetParentId { get; set; }
-    //    public PageQueryModel PageQueryModel { get; set; }
-    //}
-
-    //public class UpdateThemeRequest
-    //{
-    //    public int Id { get; set; }
-    //    public string Theme { get; set; }
-    //    public PageQueryModel PageQueryModel { get; set; }
-    //}
-
+    
 
 }

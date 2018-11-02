@@ -12,154 +12,158 @@
     <link rel="stylesheet" href="~/Content/css/Configure.css?v=4">
 }
 
-@*<h2>Configure</h2>*@
-
-
-
-@*<div style="padding:32px;background-color:red;">This is a test.</div>
-    <div style="padding:32px;background-color:blue;">This is a test.</div>
-    <div style="overflow:hidden;">
-        <div style="padding:32px;background-color:red;float:left;width:400px;">This is a test.<br />This is a test.<br />This is a test.<br />This is a test.<br />This is a test.<br /></div>
-        <div style="padding:32px;background-color:blue;float:left;width:400px;">This is a test.</div>
-    </div>*@
-
-<div id="Main">
-    <div id="BookOutline">
-        <div id="QueryInputs">
-            <div>show leading page text <input type="checkbox" id="ShowPageContent" /></div>
+    <div id="Main">
+        @*==================================
+            LEFT COLUMN:  book outline
+        ====================================*@
+        <div id="BookOutline">
+            <div id="QueryInputs">
+                <div>show leading page text <input type="checkbox" id="ShowPageContent" /></div>
+            </div>
+            <div id="BookOutlineView">
+                @{Html.RenderAction("BookOutline", new { PageQueryModel = Model.PageQueryModel });}
+            </div>
         </div>
-        <div id="BookOutlineView">
-            @{Html.RenderAction("BookOutline", new { PageQueryModel = Model.PageQueryModel });}
+        @*==================================
+            RIGHT COLUMN: various input sets that are displayed, depending on the type of object selected.
+        ====================================*@
+        <div id="ItemActions">
+            <div id="Loading">Updating...</div>
+            <div id="DefaultActions" class="actions-set">
+                <i class="fa fa-arrow-left fa-2x"></i>
+                Select an item to make modifications.
+            </div>
+            @*================================== modify BOOK: =====================================*@
+            <div id="BookActions" class="actions-set" data-type="book">
+                <div class="actions-header">modify selected <b>book</b>:</div>
+                <div class="input-item">
+                    <div class="input-label">book title:</div>
+                    <div class="input-value"><input class="name-input" type="text" /></div>
+                    <div class="input-action"><a class="name-update" href="#">update</a></div>
+                </div>
+                <div class="input-item">
+                    <div class="input-label">book version:</div>
+                    <div class="input-value"><input class="version-input" type="text" /></div>
+                    <div class="input-action"><a class="version-update" href="#">update</a></div>
+                </div>
+                <div class="add-item">
+                    <a class="add-button" href="#">add a new module to this book</a>
+                </div>
+            </div>
+            @*================================== modify MODULE: =====================================*@
+            <div id="ModuleActions" class="actions-set" data-type="module">
+                <div class="actions-header">modify selected <b>module</b>:</div>
+                <div class="input-item">
+                    <div class="input-label">module title:</div>
+                    <div class="input-value"><input class="name-input" type="text" /></div>
+                    <div class="input-action"><a class="name-update" href="#">update</a></div>
+                </div>
+                <div class="add-item">
+                    <a class="add-button" href="#">add a new section to this module</a>
+                </div>
+                <div class="remove-item">
+                    <div class="remove-action"><a class="remove-button" href="#">remove this module</a></div>
+                    <div class="remove-note">after removal, any pages within will still be available for re-use</div>
+                </div>
+                <div class="reorder-item">
+                    <div class="reorder-label">reorder modules:</div>
+                    <div class="reorder-action"><a class="reorder-button" data-action="up" href="#">move this module up</a></div>
+                    <div class="reorder-action"><a class="reorder-button" data-action="down" href="#">move this module down</a></div>
+                </div>
+                <div class="theme-item">
+                    <a class="theme-button" href="#">change the color theme of this module</a>
+                </div>
+            </div>
+            @*================================== modify SECTION: =====================================*@
+            <div id="SectionActions" class="actions-set" data-type="section">
+                <div class="actions-header">modify selected <b>section</b>:</div>
+                <div class="input-item">
+                    <div class="input-label">section title:</div>
+                    <div class="input-value"><input class="name-input" type="text" /></div>
+                    <div class="input-action"><a class="name-update" href="#">update</a></div>
+                </div>
+                <div class="add-item">
+                    <a class="add-button" href="#">add a new chapter to this section</a>
+                </div>
+                <div class="remove-item">
+                    <div class="remove-action"><a class="remove-button" href="#">remove this section</a></div>
+                    <div class="remove-note">after removal, any pages within will still be available for re-use</div>
+                </div>
+                <div class="reorder-item">
+                    <div class="reorder-label">reorder sections:</div>
+                    <div class="reorder-action"><a class="reorder-button" data-action="up" href="#">move this section up</a></div>
+                    <div class="reorder-action"><a class="reorder-button" data-action="down" href="#">move this section down</a></div>
+                </div>
+                <div class="move-item">
+                    <div class="move-label">move section to module:</div>
+                    <div class="move-input"><select></select></div>
+                    <div class="move-action"><a class="move-button" href="#">update</a></div>
+                </div>
+            </div>
+            @*================================== modify CHAPTER: =====================================*@
+            <div id="ChapterActions" class="actions-set" data-type="chapter">
+                <div class="actions-header">modify selected <b>chapter</b>:</div>
+                <div class="input-item">
+                    <div class="input-label">chapter title:</div>
+                    <div class="input-value"><input class="name-input" type="text" /></div>
+                    <div class="input-action"><a class="name-update" href="#">update</a></div>
+                </div>
+                <div class="add-item">
+                    <a class="add-button" href="#">add a new page to this chapter</a>
+                </div>
+                <div class="remove-item">
+                    <div class="remove-action"><a class="remove-button" href="#">remove this chapter</a></div>
+                    <div class="remove-note">after removal, any pages within will still be available for re-use</div>
+                </div>
+                <div class="reorder-item">
+                    <div class="reorder-label">reorder chapters:</div>
+                    <div class="reorder-action"><a class="reorder-button" data-action="up" href="#">move this chapter up</a></div>
+                    <div class="reorder-action"><a class="reorder-button" data-action="down" href="#">move this chapter down</a></div>
+                </div>
+                <div class="move-item">
+                    <div class="move-label">move chapter to section:</div>
+                    <div class="move-input"><select></select></div>
+                    <div class="move-action"><a class="move-button" href="#">update</a></div>
+                </div>
+            </div>
+            @*================================== modify PAGE: =====================================*@
+            <div id="PageActions" class="actions-set" data-type="page">
+                <div class="actions-header">modify selected <b>page</b>:</div>
+                <div class="input-item">
+                    <div class="input-label">page title:</div>
+                    <div class="input-value"><input class="name-input" type="text" /></div>
+                    <div class="input-action"><a class="name-update" href="#">update</a></div>
+                </div>
+                <div class="remove-item">
+                    <div class="remove-action"><a class="remove-button" href="#">remove this page</a></div>
+                    <div class="remove-note">after removal, the page will still be available for re-use</div>
+                </div>
+                <div class="reorder-item">
+                    <div class="reorder-label">reorder pages:</div>
+                    <div class="reorder-action"><a class="reorder-button" data-action="up" href="#">move this page up</a></div>
+                    <div class="reorder-action"><a class="reorder-button" data-action="down" href="#">move this page down</a></div>
+                </div>
+                <div class="move-item">
+                    <div class="move-label">move page to chapter:</div>
+                    <div class="move-input"><select></select></div>
+                    <div class="move-action"><a class="move-button" href="#">update</a></div>
+                </div>
+                <div class="preview-item">
+                    <a id="PreviewButton" href="#">preview page</a>
+                </div>
+                <div class="edit-item">
+                    <a id="EditButton" href="#">edit page</a>
+                </div>
+
+            </div>
+            @*================================================================================*@
         </div>
+
     </div>
-    <div id="ItemActions">
-        <div id="Loading">Updating...</div>
-        <div id="DefaultActions" class="actions-set">
-            <i class="fa fa-arrow-left fa-2x"></i>
-            Select an item to make modifications.
-        </div>
-        <div id="BookActions" class="actions-set" data-type="book">
-            <div class="actions-header">modify selected <b>book</b>:</div>
-            <div class="input-item">
-                <div class="input-label">book title:</div>
-                <div class="input-value"><input class="name-input" type="text" /></div>
-                <div class="input-action"><a class="name-update" href="#">update</a></div>
-            </div>
-            <div class="input-item">
-                <div class="input-label">book version:</div>
-                <div class="input-value"><input class="version-input" type="text" /></div>
-                <div class="input-action"><a class="version-update" href="#">update</a></div>
-            </div>
-            <div class="add-item">
-                <a class="add-button" href="#">add a new module to this book</a>
-            </div>
-        </div>
-        <div id="ModuleActions" class="actions-set" data-type="module">
-            <div class="actions-header">modify selected <b>module</b>:</div>
-            <div class="input-item">
-                <div class="input-label">module title:</div>
-                <div class="input-value"><input class="name-input" type="text" /></div>
-                <div class="input-action"><a class="name-update" href="#">update</a></div>
-            </div>
-            <div class="add-item">
-                <a class="add-button" href="#">add a new section to this module</a>
-            </div>
-            <div class="remove-item">
-                <div class="remove-action"><a class="remove-button" href="#">remove this module</a></div>
-                <div class="remove-note">after removal, any pages within will still be available for re-use</div>
-            </div>
-            <div class="reorder-item">
-                <div class="reorder-label">reorder modules:</div>
-                <div class="reorder-action"><a class="reorder-button" data-action="up" href="#">move this module up</a></div>
-                <div class="reorder-action"><a class="reorder-button" data-action="down" href="#">move this module down</a></div>
-            </div>
-            <div class="theme-item">
-                <a class="theme-button" href="#">change the color theme of this module</a>
-            </div>
-        </div>
-        <div id="SectionActions" class="actions-set" data-type="section">
-            <div class="actions-header">modify selected <b>section</b>:</div>
-            <div class="input-item">
-                <div class="input-label">section title:</div>
-                <div class="input-value"><input class="name-input" type="text" /></div>
-                <div class="input-action"><a class="name-update" href="#">update</a></div>
-            </div>
-            <div class="add-item">
-                <a class="add-button" href="#">add a new chapter to this section</a>
-            </div>
-            <div class="remove-item">
-                <div class="remove-action"><a class="remove-button" href="#">remove this section</a></div>
-                <div class="remove-note">after removal, any pages within will still be available for re-use</div>
-            </div>
-            <div class="reorder-item">
-                <div class="reorder-label">reorder sections:</div>
-                <div class="reorder-action"><a class="reorder-button" data-action="up" href="#">move this section up</a></div>
-                <div class="reorder-action"><a class="reorder-button" data-action="down" href="#">move this section down</a></div>
-            </div>
-            <div class="move-item">
-                <div class="move-label">move section to module:</div>
-                <div class="move-input"><select></select></div>
-                <div class="move-action"><a class="move-button" href="#">update</a></div>
-            </div>
-        </div>
-        <div id="ChapterActions" class="actions-set" data-type="chapter">
-            <div class="actions-header">modify selected <b>chapter</b>:</div>
-            <div class="input-item">
-                <div class="input-label">chapter title:</div>
-                <div class="input-value"><input class="name-input" type="text" /></div>
-                <div class="input-action"><a class="name-update" href="#">update</a></div>
-            </div>
-            <div class="add-item">
-                <a class="add-button" href="#">add a new page to this chapter</a>
-            </div>
-            <div class="remove-item">
-                <div class="remove-action"><a class="remove-button" href="#">remove this chapter</a></div>
-                <div class="remove-note">after removal, any pages within will still be available for re-use</div>
-            </div>
-            <div class="reorder-item">
-                <div class="reorder-label">reorder chapters:</div>
-                <div class="reorder-action"><a class="reorder-button" data-action="up" href="#">move this chapter up</a></div>
-                <div class="reorder-action"><a class="reorder-button" data-action="down" href="#">move this chapter down</a></div>
-            </div>
-            <div class="move-item">
-                <div class="move-label">move chapter to section:</div>
-                <div class="move-input"><select></select></div>
-                <div class="move-action"><a class="move-button" href="#">update</a></div>
-            </div>
-        </div>
-        <div id="PageActions" class="actions-set" data-type="page">
-            <div class="actions-header">modify selected <b>page</b>:</div>
-            <div class="input-item">
-                <div class="input-label">page title:</div>
-                <div class="input-value"><input class="name-input" type="text" /></div>
-                <div class="input-action"><a class="name-update" href="#">update</a></div>
-            </div>
-            <div class="remove-item">
-                <div class="remove-action"><a class="remove-button" href="#">remove this page</a></div>
-                <div class="remove-note">after removal, the page will still be available for re-use</div>
-            </div>
-            <div class="reorder-item">
-                <div class="reorder-label">reorder pages:</div>
-                <div class="reorder-action"><a class="reorder-button" data-action="up" href="#">move this page up</a></div>
-                <div class="reorder-action"><a class="reorder-button" data-action="down" href="#">move this page down</a></div>
-            </div>
-            <div class="move-item">
-                <div class="move-label">move page to chapter:</div>
-                <div class="move-input"><select></select></div>
-                <div class="move-action"><a class="move-button" href="#">update</a></div>
-            </div>
-            <div class="preview-item">
-                <a id="PreviewButton" href="#">preview page</a>
-            </div>
-            <div class="edit-item">
-                <a id="EditButton" href="#">edit page</a>
-            </div>
 
-        </div>
-
-    </div>
-
-</div>
+@*==================================
+    SELECT A THEME modal popup:
+====================================*@
 
 <div id="ThemeSelector">
     <div class="overlay"></div>
@@ -204,5 +208,3 @@
     </script>
     <script type="text/javascript" src="~/Content/js/Configure.js?v=4"></script>
 }
-
-
