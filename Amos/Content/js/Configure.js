@@ -1,6 +1,5 @@
 ﻿var selectedId = null;
 var selectedType = null;
-//var selectedName = null;
 var loadingActive = false;
 initPage();
 
@@ -12,14 +11,20 @@ function initPage() {
     updateItemActionsPosition();
     updateOutlineInteractions();
 
+    $('#ShowPageContent').prop("checked", pageQueryModel.ShowPageContent);
+
+    $('#ShowPageContent').change(function () {
+        pageQueryModel.ShowPageContent = $('#ShowPageContent').prop('checked');
+        updateOutline();
+    });
+
     $('#ItemActions .name-update').click(function () {
         showLoading();
         var data = {};
         data.Type = selectedType;
         data.Id = selectedId;
-        data.Name = $('#ItemActions [data-type="' + selectedType + '"] .name-input').val();
+        data.Text = $('#ItemActions [data-type="' + selectedType + '"] .name-input').val();
         data.pageQueryModel = pageQueryModel;
-        //alert(data.Type + ' ' + data.Id + ' ' + data.Name);
         transmitAction("UpdateName", updateOutlineResponse, null, 'html', data);
         return false;
     });
@@ -28,7 +33,7 @@ function initPage() {
         showLoading();
         var data = {};
         data.Id = selectedId;
-        data.Version = $('#ItemActions [data-type="' + selectedType + '"] .version-input').val();
+        data.Text = $('#ItemActions [data-type="' + selectedType + '"] .version-input').val();
         data.pageQueryModel = pageQueryModel;
         transmitAction("UpdateBookVersion", updateOutlineResponse, null, 'html', data);
         return false;
@@ -71,7 +76,7 @@ function initPage() {
         var data = {};
         data.Type = selectedType;
         data.Id = selectedId;
-        data.TargetParentId = $('#ItemActions [data-type="' + selectedType + '"] .move-select').val();
+        data.TargetId = $('#ItemActions [data-type="' + selectedType + '"] .move-select').val();
         data.pageQueryModel = pageQueryModel;
         transmitAction("MoveItem", updateOutlineResponse, null, 'html', data);
         return false;
@@ -94,7 +99,7 @@ function initPage() {
         showLoading();
         var data = {};
         data.Id = selectedId;
-        data.Theme = theme;
+        data.Text = theme;
         data.pageQueryModel = pageQueryModel;
         transmitAction("UpdateTheme", updateOutlineResponse, null, 'html', data);
         return false;
@@ -124,11 +129,6 @@ function initPage() {
     // ====================
 }
 
-//function updateNameResponse(data) {
-//    $('#BookOutline').html(data);
-//    updateOutlineInteractions();
-//    hiliteSelectedItem();
-//}
 
 function updateOutlineInteractions() {
     $('#BookOutline .item').click(function () {
@@ -141,13 +141,6 @@ function updateOutlineInteractions() {
 }
 
 
-//function itemSelected(type, id, name) {
-//    selectedId = id;
-//    selectedType = type;
-//    selectedName = name;
-//    hiliteSelectedItem();
-//    showActionsForSelectedItem();
-//}
 
 function hiliteSelectedItem() {
     $('#BookOutline .item').removeClass('selectedItem');
@@ -155,7 +148,6 @@ function hiliteSelectedItem() {
 }
 
 function showActionsForSelectedItem() {
-    //alert(selectedType + ' ' + selectedId);
     $('#ItemActions .actions-set').hide();
     var selectedName = $('#BookOutline [data-type="' + selectedType + '"][data-id="' + selectedId + '"] .name').text();
     var parentId = $('#BookOutline [data-type="' + selectedType + '"][data-id="' + selectedId + '"]').data('parent');
@@ -196,7 +188,7 @@ function updateOutline() {
 }
 
 function updateOutlineResponse(data) {
-    $('#BookOutline').html(data);
+    $('#BookOutlineView').html(data);
     updateOutlineInteractions();
     hiliteSelectedItem();
     hideLoading();

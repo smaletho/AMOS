@@ -1,44 +1,46 @@
 ﻿#Main{}
 
-#BookOutline{width:700px;border-right:1px solid #ddd;}
+#BookOutline{width:700px;border-right:1px solid #ddd;position:relative;}
 
 #ItemActions{width:440px;padding-left:32px;position:relative;}
-
-
 
 #Main .loading-fade{opacity: 0.2;}
 #Main #Loading{display:none;position:absolute;top:100px;left:-500px;padding:24px;border:2px solid #999;background-color:#ddd;border-radius:3px;font-weight:bold;font-size:18px;width:300px;text-align:center;}
 
-#BookOutline .item:hover{background-color:#eee;cursor:pointer;}
-#BookOutline .selectedItem{background-color:#9966ff !important;color:#eee !important;}
+#QueryInputs{position:absolute;top:-4px;right:90px;font-size:12px;}
+#QueryInputs input{margin-left:2px;position:relative;top:2px;}
+
+#BookOutline .item:hover{background-color:#eee;color:#000;cursor:pointer;}
+#BookOutline .selectedItem{background-color:#000 !important;color:#eee !important;}
 
 #BookOutline .book{}
-#BookOutline .book .name{font-size:32px;color:#4800ff;line-height:34px;}
+#BookOutline .book .name{font-size:32px;color:#999;line-height:34px;}
 #BookOutline .book .version{font-size:14px;}
 #BookOutline .book .version span{font-weight:bold;}
 
-#BookOutline .module{font-size:24px;padding-top:24px;}
-#BookOutline .module .call{display:table-cell;width:80px;}
-#BookOutline .module .description{display:table-cell;width:500px;font-weight:bold;line-height:26px;}
+#BookOutline .module{font-size:24px;margin-top:12px;padding-top:12px;}
+#BookOutline .module .call{display:table-cell;width:36px;/*border-width:2px;border-style:solid;*/border-radius:6px;text-align:center;font-weight:bold;}
+#BookOutline .module .description{display:table-cell;width:560px;padding-left:44px;font-weight:bold;line-height:26px;}
 
 #BookOutline .section{font-size:18px;padding-top:12px;}
-#BookOutline .section .call{display:table-cell;width:80px;}
+#BookOutline .section .call{display:table-cell;width:80px;padding-left:4px;}
 #BookOutline .section .description{display:table-cell;width:500px;padding-left:24px;line-height:19px;}
 
 #BookOutline .chapter{font-size:14px;padding-top:6px;}
-#BookOutline .chapter .call{display:table-cell;width:80px;}
-#BookOutline .chapter .description{display:table-cell;width:500px;padding-left:48px;font-weight:bold;line-height:14px;}
+#BookOutline .chapter .call{display:table-cell;width:80px;padding-left:4px;}
+#BookOutline .chapter .description{display:table-cell;width:560px;padding-left:48px;font-weight:bold;line-height:14px;}
 
 #BookOutline .page{font-size:14px;}
-#BookOutline .page .call{display:table-cell;width:80px;}
-#BookOutline .page .description{display:table-cell;width:500px;padding-left:72px;line-height:13px;}
+#BookOutline .page .call{display:table-cell;width:80px;padding-left:4px;}
+#BookOutline .page .description{display:table-cell;width:560px;padding-left:72px;line-height:13px;}
 #BookOutline .page .description .quiz{background-color:#fbb;padding:0px 4px;color:#fff;border-radius:4px;}
 #BookOutline .page .description .survey{background-color:#abf;padding:0px 4px;color:#fff;border-radius:4px;}
+#BookOutline .page .description .content{font-size:11px;font-weight:300;padding-top:1px;padding-bottom:2px;overflow: hidden;/*width:520px;*/max-height:24px;line-height:11px;}
 
 #BookOutline #MoveSelectInputs{display:none;}
 
 
-#ItemActions .actions-header{font-size:18px;margin-bottom:48px;color:#4800ff;}
+#ItemActions .actions-header{font-size:18px;margin-bottom:48px;color:#999;}
 #ItemActions .actions-set{display:none;}
 
 #ItemActions #DefaultActions{display:block;font-size:18px;color:#F00;}
@@ -73,3 +75,14 @@
 #ThemeSelector .themeSelector .themeBlock {background-color:white;cursor:pointer;display:table;padding:20px;margin-bottom:10px;border:2px solid black;border-radius:5px;}
 #ThemeSelector .themeSelector .themeBlock:hover{background-color:#ebebeb;}
 #ThemeSelector .themeSelector .themeBlock.selected {background-color:#000;}
+
+
+#BookOutline .module .theme_1 {color:#efc94c;background-color: #f7e5a8;}
+#BookOutline .module .theme_2 {color:#505967;background-color: #a8acb2;}
+#BookOutline .module .theme_3 {color:#2c6192;background-color: #96b0c9;}
+#BookOutline .module .theme_4 {color:#444872;background-color: #a2a4b9;}
+#BookOutline .module .theme_5 {color:#45b29d;background-color: #a2d9c3;}
+#BookOutline .module .theme_6 {color:#e58800;background-color: #f2c58d;}
+#BookOutline .module .theme_7 {color:#85496f;background-color: #c3a3b6;}
+#BookOutline .module .theme_8 {color:#df5a49;background-color: #f2c58d;}
+#BookOutline .module .theme_9 {color:#4e69ac;background-color: #a6b4d6;}

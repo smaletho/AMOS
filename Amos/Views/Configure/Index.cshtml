@@ -9,7 +9,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @section Styles{
-    <link rel="stylesheet" href="~/Content/css/Configure.css?v=3">
+    <link rel="stylesheet" href="~/Content/css/Configure.css?v=4">
 }
 
 @*<h2>Configure</h2>*@
@@ -25,7 +25,12 @@
 
 <div id="Main">
     <div id="BookOutline">
-        @{Html.RenderAction("BookOutline", new { PageQueryModel = Model.PageQueryModel });}
+        <div id="QueryInputs">
+            <div>show leading page text <input type="checkbox" id="ShowPageContent" /></div>
+        </div>
+        <div id="BookOutlineView">
+            @{Html.RenderAction("BookOutline", new { PageQueryModel = Model.PageQueryModel });}
+        </div>
     </div>
     <div id="ItemActions">
         <div id="Loading">Updating...</div>
@@ -197,7 +202,7 @@
         var viewPageUrl = '@Url.Action("ViewEditor", "Build", new { id = 0 })';
         var editPageUrl = '@Url.Action("ViewPage", "Build", new { id = 0 })';
     </script>
-    <script type="text/javascript" src="~/Content/js/Configure.js?v=3"></script>
+    <script type="text/javascript" src="~/Content/js/Configure.js?v=4"></script>
 }
 
 

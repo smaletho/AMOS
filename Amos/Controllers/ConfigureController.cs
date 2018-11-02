@@ -18,13 +18,24 @@ namespace Amos.Controllers.Configuration
             pageInitModel.PageQueryModel = new PageQueryModel();
             pageInitModel.PageQueryModel.BookId = bookId;
 
+            if (Session["ShowPageContent"] == null)
+            {
+                pageInitModel.PageQueryModel.ShowPageContent = false;
+            } else
+            {
+                pageInitModel.PageQueryModel.ShowPageContent = (bool)Session["ShowPageContent"];
+            }
+
             return View("Index", pageInitModel);
         }
 
         public ActionResult BookOutline(PageQueryModel PageQueryModel)
         {
             //System.Threading.Thread.Sleep(250 * (DateTime.Now.Second % 10));
+            Session["ShowPageContent"] = PageQueryModel.ShowPageContent;
+            
             var bookOutlineModel = new BookOutlineModel();
+            bookOutlineModel.PageQueryModel = PageQueryModel;
 
             var db = new ApplicationDbContext();
 
@@ -49,90 +60,106 @@ namespace Amos.Controllers.Configuration
             var moduleIdList = (from s in bookOutlineModel.OutlineModules select s.ModuleId);
 
             bookOutlineModel.OutlineSections = (from s in db.Sections
-                                               where moduleIdList.Contains(s.ModuleId)
+                                                where moduleIdList.Contains(s.ModuleId)
                                                 orderby s.SortOrder
-                                               select new OutlineSection
-                                               {
-                                                   SectionId = s.SectionId,
-                                                   ModuleId = s.ModuleId,
-                                                   Name = s.Name
-                                               }).ToList();
+                                                select new OutlineSection
+                                                {
+                                                    SectionId = s.SectionId,
+                                                    ModuleId = s.ModuleId,
+                                                    Name = s.Name
+                                                }).ToList();
             var sectionIdList = (from s in bookOutlineModel.OutlineSections select s.SectionId);
 
             bookOutlineModel.OutlineChapters = (from s in db.Chapters
-                                               where sectionIdList.Contains(s.SectionId)
+                                                where sectionIdList.Contains(s.SectionId)
                                                 orderby s.SortOrder
-                                               select new OutlineChapter
-                                               {
-                                                   ChapterId = s.ChapterId,
-                                                   SectionId = s.SectionId,
-                                                   Name = s.Name
-                                               }).ToList();
+                                                select new OutlineChapter
+                                                {
+                                                    ChapterId = s.ChapterId,
+                                                    SectionId = s.SectionId,
+                                                    Name = s.Name
+                                                }).ToList();
 
-            bookOutlineModel.OutlinePages = (from s in db.Pages
-                                               where s.BookId == PageQueryModel.BookId
-                                               orderby s.SortOrder
-                                               select new OutlinePage
-                                               {
-                                                   PageId = s.PageId,
-                                                   ChapterId = s.ChapterId,
-                                                   Title = s.Title,
-                                                   Type = s.Type,
-                                                   //PageContent = s.PageContent
-                                               }).ToList();
+            if (PageQueryModel.ShowPageContent)
+            {
+                bookOutlineModel.OutlinePages = (from s in db.Pages
+                                                 where s.BookId == PageQueryModel.BookId
+                                                 orderby s.SortOrder
+                                                 select new OutlinePage
+                                                 {
+                                                     PageId = s.PageId,
+                                                     ChapterId = s.ChapterId,
+                                                     Title = s.Title,
+                                                     Type = s.Type,
+                                                     PageContent = s.PageContent
+                                                 }).ToList();
+            } else
+            {
+                bookOutlineModel.OutlinePages = (from s in db.Pages
+                                                 where s.BookId == PageQueryModel.BookId
+                                                 orderby s.SortOrder
+                                                 select new OutlinePage
+                                                 {
+                                                     PageId = s.PageId,
+                                                     ChapterId = s.ChapterId,
+                                                     Title = s.Title,
+                                                     Type = s.Type,
+                                                 }).ToList();
+            }
 
-            return View("BookOutline",bookOutlineModel);
+
+            return View("BookOutline", bookOutlineModel);
         }
 
-        public ActionResult UpdateName(UpdateNameRequest UpdateNameRequest)
+        public ActionResult UpdateName(ActionRequest UpdateNameRequest)
         {
             var db = new ApplicationDbContext();
             switch (UpdateNameRequest.Type)
             {
                 case "book":
                     var book = db.Books.Find(UpdateNameRequest.Id);
-                    book.Name = UpdateNameRequest.Name;
+                    book.Name = UpdateNameRequest.Text;
                     break;
                 case "module":
                     var module = db.Modules.Find(UpdateNameRequest.Id);
-                    module.Name = UpdateNameRequest.Name;
+                    module.Name = UpdateNameRequest.Text;
                     break;
                 case "section":
                     var section = db.Sections.Find(UpdateNameRequest.Id);
-                    section.Name = UpdateNameRequest.Name;
+                    section.Name = UpdateNameRequest.Text;
                     break;
                 case "chapter":
                     var chapter = db.Chapters.Find(UpdateNameRequest.Id);
-                    chapter.Name = UpdateNameRequest.Name;
+                    chapter.Name = UpdateNameRequest.Text;
                     break;
                 case "page":
                     var page = db.Pages.Find(UpdateNameRequest.Id);
-                    page.Title = UpdateNameRequest.Name;
+                    page.Title = UpdateNameRequest.Text;
                     break;
             }
             db.SaveChanges();
             return BookOutline(UpdateNameRequest.PageQueryModel);
         }
 
-        public ActionResult UpdateBookVersion(UpdateBookVersionRequest UpdateBookVersionRequest)
+        public ActionResult UpdateBookVersion(ActionRequest UpdateBookVersionRequest)
         {
             var db = new ApplicationDbContext();
             var book = db.Books.Find(UpdateBookVersionRequest.Id);
-            book.Version = UpdateBookVersionRequest.Version;
+            book.Version = UpdateBookVersionRequest.Text;
             db.SaveChanges();
             return BookOutline(UpdateBookVersionRequest.PageQueryModel);
         }
 
-        public ActionResult UpdateTheme(UpdateThemeRequest UpdateThemeRequest)
+        public ActionResult UpdateTheme(ActionRequest UpdateThemeRequest)
         {
             var db = new ApplicationDbContext();
             var module = db.Modules.Find(UpdateThemeRequest.Id);
-            module.Theme = UpdateThemeRequest.Theme;
+            module.Theme = UpdateThemeRequest.Text;
             db.SaveChanges();
             return BookOutline(UpdateThemeRequest.PageQueryModel);
         }
 
-        public ActionResult AddItem(RemoveItemRequest AddItemRequest)
+        public ActionResult AddItem(ActionRequest AddItemRequest)
         {
             var db = new ApplicationDbContext();
             switch (AddItemRequest.Type)
@@ -182,7 +209,7 @@ namespace Amos.Controllers.Configuration
             return BookOutline(AddItemRequest.PageQueryModel);
         }
 
-        public ActionResult RemoveItem(RemoveItemRequest RemoveItemRequest)
+        public ActionResult RemoveItem(ActionRequest RemoveItemRequest)
         {
             var db = new ApplicationDbContext();
             switch (RemoveItemRequest.Type)
@@ -222,7 +249,7 @@ namespace Amos.Controllers.Configuration
                     var chapter = db.Chapters.Find(RemoveItemRequest.Id);
                     db.Chapters.Remove(chapter);
                     var pages = (from s in db.Pages where s.ChapterId == RemoveItemRequest.Id select s);
-                    foreach(var page2 in pages)
+                    foreach (var page2 in pages)
                     {
                         page2.BookId = 0;
                         page2.ChapterId = 0;
@@ -240,27 +267,27 @@ namespace Amos.Controllers.Configuration
             return BookOutline(RemoveItemRequest.PageQueryModel);
         }
 
-        public ActionResult MoveItem(MoveItemRequest MoveItemRequest)
+        public ActionResult MoveItem(ActionRequest MoveItemRequest)
         {
             var db = new ApplicationDbContext();
             switch (MoveItemRequest.Type)
             {
                 case "section":
-                    var highestExistingSectionSortOrder = (from s in db.Sections where s.ModuleId == MoveItemRequest.TargetParentId select s.SortOrder).DefaultIfEmpty(0).Max();
+                    var highestExistingSectionSortOrder = (from s in db.Sections where s.ModuleId == MoveItemRequest.TargetId select s.SortOrder).DefaultIfEmpty(0).Max();
                     var section = db.Sections.Find(MoveItemRequest.Id);
-                    section.ModuleId = MoveItemRequest.TargetParentId;
+                    section.ModuleId = MoveItemRequest.TargetId;
                     section.SortOrder = highestExistingSectionSortOrder + 1;
                     break;
                 case "chapter":
-                    var highestExistingChapterSortOrder = (from s in db.Chapters where s.SectionId == MoveItemRequest.TargetParentId select s.SortOrder).DefaultIfEmpty(0).Max();
+                    var highestExistingChapterSortOrder = (from s in db.Chapters where s.SectionId == MoveItemRequest.TargetId select s.SortOrder).DefaultIfEmpty(0).Max();
                     var chapter = db.Chapters.Find(MoveItemRequest.Id);
-                    chapter.SectionId = MoveItemRequest.TargetParentId;
+                    chapter.SectionId = MoveItemRequest.TargetId;
                     chapter.SortOrder = highestExistingChapterSortOrder + 1;
                     break;
                 case "page":
-                    var highestExistingPageSortOrder = (from s in db.Pages where s.ChapterId == MoveItemRequest.TargetParentId select s.SortOrder).DefaultIfEmpty(0).Max();
+                    var highestExistingPageSortOrder = (from s in db.Pages where s.ChapterId == MoveItemRequest.TargetId select s.SortOrder).DefaultIfEmpty(0).Max();
                     var page = db.Pages.Find(MoveItemRequest.Id);
-                    page.ChapterId = MoveItemRequest.TargetParentId;
+                    page.ChapterId = MoveItemRequest.TargetId;
                     page.SortOrder = highestExistingPageSortOrder + 1;
                     break;
             }
@@ -268,7 +295,7 @@ namespace Amos.Controllers.Configuration
             return BookOutline(MoveItemRequest.PageQueryModel);
         }
 
-        public ActionResult ReorderItem(ReorderItemRequest ReorderItemRequest)
+        public ActionResult ReorderItem(ActionRequest ReorderItemRequest)
         {
             var db = new ApplicationDbContext();
             switch (ReorderItemRequest.Type)
@@ -283,7 +310,7 @@ namespace Amos.Controllers.Configuration
                             int swapSortOrder = adjacentModule.SortOrder;
                             adjacentModule.SortOrder = module.SortOrder;
                             module.SortOrder = swapSortOrder;
-                        } 
+                        }
                     }
                     if (ReorderItemRequest.Action == "down")
                     {
@@ -294,7 +321,7 @@ namespace Amos.Controllers.Configuration
                             int swapSortOrder = adjacentModule.SortOrder;
                             adjacentModule.SortOrder = module.SortOrder;
                             module.SortOrder = swapSortOrder;
-                        } 
+                        }
                     }
                     break;
                 case "section":
@@ -310,7 +337,7 @@ namespace Amos.Controllers.Configuration
                         }
                         else // there is NOT an adjacent section, we will need to move the section to the bottom of an adjacent module:
                         {
-                            var allModules = (from s in db.Modules orderby  s.SortOrder select s.ModuleId).ToList();
+                            var allModules = (from s in db.Modules orderby s.SortOrder select s.ModuleId).ToList();
                             int moduleIndex = allModules.IndexOf(section.ModuleId);
                             if (moduleIndex > 0) // there IS an adjacent module to move this section to:
                             {
@@ -358,7 +385,7 @@ namespace Amos.Controllers.Configuration
                         }
                         else // there is NOT an adjacent chapter, we will need to move the chapter to the bottom of an adjacent section:
                         {
-                            var allSections = (from s in db.Sections orderby s.Module.SortOrder,  s.SortOrder select s.SectionId).ToList();
+                            var allSections = (from s in db.Sections orderby s.Module.SortOrder, s.SortOrder select s.SectionId).ToList();
                             int sectionIndex = allSections.IndexOf(chapter.SectionId);
                             if (sectionIndex > 0) // there IS an adjacent section to move this chapter to:
                             {
@@ -455,10 +482,12 @@ namespace Amos.Controllers.Configuration
     public class PageQueryModel
     {
         public int BookId { get; set; }
+        public bool ShowPageContent { get; set; }
     }
 
     public class BookOutlineModel
     {
+        public PageQueryModel PageQueryModel { get; set; }
         public OutlineBook OutlineBook { get; set; }
         public List<OutlineModule> OutlineModules { get; set; }
         public List<OutlineSection> OutlineSections { get; set; }
@@ -501,57 +530,67 @@ namespace Amos.Controllers.Configuration
         public string PageContent { get; set; }
     }
 
-    public class UpdateNameRequest
-    {
-        public int Id { get; set; }
-        public string Type { get; set; }
-        public string Name { get; set; }
-        public PageQueryModel PageQueryModel { get; set; }
-    }
-
-    public class UpdateBookVersionRequest
-    {
-        public int Id { get; set; }
-        public string Version { get; set; }
-        public PageQueryModel PageQueryModel { get; set; }
-    }
-
-    public class AddItemRequest
-    {
-        public int Id { get; set; }
-        public string Type { get; set; }
-        public PageQueryModel PageQueryModel { get; set; }
-    }
-
-    public class RemoveItemRequest
-    {
-        public int Id { get; set; }
-        public string Type { get; set; }
-        public PageQueryModel PageQueryModel { get; set; }
-    }
-
-    public class ReorderItemRequest
+    public class ActionRequest
     {
         public int Id { get; set; }
         public string Type { get; set; }
         public string Action { get; set; }
+        public string Text { get; set; }
+        public int TargetId { get; set; }
         public PageQueryModel PageQueryModel { get; set; }
     }
 
-    public class MoveItemRequest
-    {
-        public int Id { get; set; }
-        public string Type { get; set; }
-        public int TargetParentId { get; set; }
-        public PageQueryModel PageQueryModel { get; set; }
-    }
+    //public class UpdateNameRequest
+    //{
+    //    public int Id { get; set; }
+    //    public string Type { get; set; }
+    //    public string Name { get; set; }
+    //    public PageQueryModel PageQueryModel { get; set; }
+    //}
 
-    public class UpdateThemeRequest
-    {
-        public int Id { get; set; }
-        public string Theme { get; set; }
-        public PageQueryModel PageQueryModel { get; set; }
-    }
+    //public class UpdateBookVersionRequest
+    //{
+    //    public int Id { get; set; }
+    //    public string Version { get; set; }
+    //    public PageQueryModel PageQueryModel { get; set; }
+    //}
+
+    //public class AddItemRequest
+    //{
+    //    public int Id { get; set; }
+    //    public string Type { get; set; }
+    //    public PageQueryModel PageQueryModel { get; set; }
+    //}
+
+    //public class RemoveItemRequest
+    //{
+    //    public int Id { get; set; }
+    //    public string Type { get; set; }
+    //    public PageQueryModel PageQueryModel { get; set; }
+    //}
+
+    //public class ReorderItemRequest
+    //{
+    //    public int Id { get; set; }
+    //    public string Type { get; set; }
+    //    public string Action { get; set; }
+    //    public PageQueryModel PageQueryModel { get; set; }
+    //}
+
+    //public class MoveItemRequest
+    //{
+    //    public int Id { get; set; }
+    //    public string Type { get; set; }
+    //    public int TargetParentId { get; set; }
+    //    public PageQueryModel PageQueryModel { get; set; }
+    //}
+
+    //public class UpdateThemeRequest
+    //{
+    //    public int Id { get; set; }
+    //    public string Theme { get; set; }
+    //    public PageQueryModel PageQueryModel { get; set; }
+    //}
 
 
 }

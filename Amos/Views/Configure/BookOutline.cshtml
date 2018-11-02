@@ -5,7 +5,7 @@
     int chapterCall = 0;
     int pageCall = 0;
 }
-@*<div>@DateTime.Now</div>*@
+
 <div class="book item" data-type="book" data-id="@Model.OutlineBook.BookId">
         <div class="name">@Model.OutlineBook.Name</div>
         <div class="version">version: <span>@Model.OutlineBook.Version</span></div>
@@ -18,7 +18,7 @@
     chapterCall = 0;
     pageCall = 0;
 <div class="module item" data-type="module" data-id="@currentModule.ModuleId" data-theme="@currentModule.Theme">
-    <div class="call">@moduleCall</div>
+    <div class="call theme_@currentModule.Theme">@moduleCall</div>
     <div class="description"><div class="name">@currentModule.Name</div></div>
 </div>
 
@@ -54,10 +54,12 @@
         <span class="@currentPage.Type">@currentPage.Type</span>
     }
     <span class="name">@currentPage.Title</span>
+        @if (Model.PageQueryModel.ShowPageContent)
+        {
+    <div class="content">@System.Text.RegularExpressions.Regex.Replace(currentPage.PageContent, "<.*?>", String.Empty)</div>
+        }
     </div>
 </div>
-
-
             }
 
         }
