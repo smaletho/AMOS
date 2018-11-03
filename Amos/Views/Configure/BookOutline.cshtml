@@ -1,71 +1,91 @@
 ﻿@model Amos.Controllers.Configuration.BookOutlineModel
-@{ 
+@{
     int moduleCall = 0;
     int sectionCall = 0;
     int chapterCall = 0;
     int pageCall = 0;
 }
 
+@*==================================
+        BOOK item (displayed once; not in a loop)
+    ====================================*@
 <div class="book item" data-type="book" data-id="@Model.OutlineBook.BookId">
-        <div class="name">@Model.OutlineBook.Name</div>
-        <div class="version">version: <span>@Model.OutlineBook.Version</span></div>
+    <div class="name">@Model.OutlineBook.Name</div>
+    <div class="version">version: <span>@Model.OutlineBook.Version</span></div>
 </div>
 
 @foreach (var currentModule in Model.OutlineModules)
 {
+    @*==================================
+            MODULE item (layer 1 of a nested set of loops)
+        ====================================*@
     moduleCall++;
     sectionCall = 0;
     chapterCall = 0;
     pageCall = 0;
-<div class="module item" data-type="module" data-id="@currentModule.ModuleId" data-theme="@currentModule.Theme">
-    <div class="call theme_@currentModule.Theme">@moduleCall</div>
-    <div class="description"><div class="name">@currentModule.Name</div></div>
-</div>
+    <div class="module item" data-type="module" data-id="@currentModule.ModuleId" data-theme="@currentModule.Theme">
+        <div class="call theme_@currentModule.Theme">@moduleCall</div>
+        <div class="description"><div class="name">@currentModule.Name</div></div>
+    </div>
 
     var sections = from s in Model.OutlineSections where s.ModuleId == currentModule.ModuleId select s;
     foreach (var currentSection in sections)
     {
+        @*==================================
+                SECTION item (layer 2 of a nested set of loops)
+            ====================================*@
         sectionCall++;
         chapterCall = 0;
-        
-<div class="section item" data-type="section" data-id="@currentSection.SectionId" data-parent="@currentModule.ModuleId">
-    <div class="call">@moduleCall.@sectionCall</div>
-    <div class="description"><div class="name">@currentSection.Name</div></div>
-</div>
+
+        <div class="section item" data-type="section" data-id="@currentSection.SectionId" data-parent="@currentModule.ModuleId">
+            <div class="call">@moduleCall.@sectionCall</div>
+            <div class="description"><div class="name">@currentSection.Name</div></div>
+        </div>
 
         var chapters = from s in Model.OutlineChapters where s.SectionId == currentSection.SectionId select s;
         foreach (var currentChapter in chapters)
         {
+            @*==================================
+                    CHAPTER item (layer 3 of a nested set of loops)
+                ====================================*@
             chapterCall++;
-<div class="chapter item" data-type="chapter" data-id="@currentChapter.ChapterId" data-parent="@currentSection.SectionId">
-    <div class="call">@moduleCall.@sectionCall.@chapterCall</div>
-    <div class="description"><div class="name">@currentChapter.Name</div></div>
-</div>
+            <div class="chapter item" data-type="chapter" data-id="@currentChapter.ChapterId" data-parent="@currentSection.SectionId">
+                <div class="call">@moduleCall.@sectionCall.@chapterCall</div>
+                <div class="description"><div class="name">@currentChapter.Name</div></div>
+            </div>
 
             var pages = from s in Model.OutlinePages where s.ChapterId == currentChapter.ChapterId select s;
             foreach (var currentPage in pages)
             {
+                @*==================================
+                        PAGE item (layer 4 of a nested set of loops)
+                    ====================================*@
                 pageCall++;
-<div class="page item" data-type="page" data-id="@currentPage.PageId" data-parent="@currentChapter.ChapterId">
-    <div class="call">@moduleCall.@sectionCall.@chapterCall.@pageCall</div>
-    <div class="description">
-    @if(currentPage.Type != "content")
-    {
-        <span class="@currentPage.Type">@currentPage.Type</span>
-    }
-    <span class="name">@currentPage.Title</span>
-        @if (Model.PageQueryModel.ShowPageContent)
-        {
-    <div class="content">@System.Text.RegularExpressions.Regex.Replace(currentPage.PageContent, "<.*?>", String.Empty)</div>
-        }
-    </div>
-</div>
-            }
+                <div class="page item" data-type="page" data-id="@currentPage.PageId" data-parent="@currentChapter.ChapterId">
+                    <div class="call">@moduleCall.@sectionCall.@chapterCall.@pageCall</div>
+                    <div class="description">
+                        @if (currentPage.Type != "content")
+                        {
+                            <span class="@currentPage.Type">@currentPage.Type</span>
+                        }
+                        <span class="name">@currentPage.Title</span>
+                        @if (Model.PageQueryModel.ShowPageContent)
+                        {
+                            <div class="content">@System.Text.RegularExpressions.Regex.Replace(currentPage.PageContent, "<.*?>", String.Empty)</div>
+                        }
+                    </div>
+                </div>
+            }  // end looping through pages
+        } // end looping through chapters
+    } // end looping through sections
+} @*// end looping through modules*@
 
-        }
-
-    }
-}
+@*==================================
+        These are 3 different select inputs that appear amongst the user "MOVE to" actions when a page, chapter, or section is selected.
+        These are not actually displayed with the rest of this view. (display:none).
+        When needed, they are copied (via jQuery) to their actual place in the right column.
+        This is done this way since these select menus change whenever a change to the outline is made. 
+    ====================================*@
 <div id="MoveSelectInputs">
     <div id="SelectChapter">
         <select class="move-select">

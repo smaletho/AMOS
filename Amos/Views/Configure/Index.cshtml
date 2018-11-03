@@ -9,7 +9,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @section Styles{
-    <link rel="stylesheet" href="~/Content/css/Configure.css?v=4">
+    <link rel="stylesheet" href="~/Content/css/Configure.css?v=5">
 }
 
     <div id="Main">
@@ -21,6 +21,7 @@
                 <div>show leading page text <input type="checkbox" id="ShowPageContent" /></div>
             </div>
             <div id="BookOutlineView">
+                @*================================== Inserted here: VIEW file "BookOutline.cshtml". This is refreshed everytime a user makes a change to the book outline ====================================*@
                 @{Html.RenderAction("BookOutline", new { PageQueryModel = Model.PageQueryModel });}
             </div>
         </div>
@@ -206,5 +207,5 @@
         var viewPageUrl = '@Url.Action("ViewEditor", "Build", new { id = 0 })';
         var editPageUrl = '@Url.Action("ViewPage", "Build", new { id = 0 })';
     </script>
-    <script type="text/javascript" src="~/Content/js/Configure.js?v=4"></script>
+    <script type="text/javascript" src="~/Content/js/Configure.js?v=5"></script>
 }

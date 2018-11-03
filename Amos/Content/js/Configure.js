@@ -1,22 +1,43 @@
-﻿var selectedId = null;
+﻿// THESE VARIABLES ARE PRESISTED THROUGHOUT THE PAGE LIFE-CYCLE:
+// (all other varibles are local to their functions)
+var selectedId = null;
 var selectedType = null;
 var loadingActive = false;
+// Note: there are additional javascript variables set within the HTML view. (These are found at the bottom of the "index.cshtml" view file.) These values are set up and in place BEFORE any of the following code executes.
+
+
+// ======================================
+// EXECUTED ONCE ON INITIAL PAGE LOAD:
+// (1) misc setup
+// (1) Attach functionality to controls.
+// (2) If needed, restore the previously selcted item. (highlight item in outline; display associated controls)
+// ======================================
 initPage();
-
-
-
 
 function initPage() {
 
-    updateItemActionsPosition();
+    // set up window scroll behavior to lock right column elements in place: 
+    $(window).scroll(function () {
+        updateRightColumnPosition();
+    });
+    $(window).resize(function () {
+        updateRightColumnPosition();
+    });
+
+    updateRightColumnPosition();
+
+    // apply initial functionality to book outline line items:
     updateOutlineInteractions();
 
+    // set up filter controls:
     $('#ShowPageContent').prop("checked", pageQueryModel.ShowPageContent);
 
     $('#ShowPageContent').change(function () {
         pageQueryModel.ShowPageContent = $('#ShowPageContent').prop('checked');
-        updateOutline();
+        transmitAction("BookOutline", updateOutlineResponse, null, 'html', pageQueryModel);
     });
+
+    // ---- apply actions to all right-column page controls: ----
 
     $('#ItemActions .name-update').click(function () {
         showLoading();
@@ -130,6 +151,10 @@ function initPage() {
 }
 
 
+// ======================================
+// EXECUTED WHENEVER THE BOOK OUTLINE IS REFRESHED:
+//  Attach functionality to every line item in the outline:
+// ======================================
 function updateOutlineInteractions() {
     $('#BookOutline .item').click(function () {
         selectedType = $(this).data('type');
@@ -141,12 +166,19 @@ function updateOutlineInteractions() {
 }
 
 
-
+// ======================================
+// Update visual highlight of selected item in book outline: 
+// (Executed whenever the user clicks a line item in the book outline.)
+// ======================================
 function hiliteSelectedItem() {
     $('#BookOutline .item').removeClass('selectedItem');
     $('#BookOutline .item[data-type="' + selectedType + '"][data-id="' + selectedId + '"]').addClass('selectedItem');
 }
 
+// ======================================
+// Set up and display controls in the right column that go with the currently selected item in the book outline:
+// (Executed whenever the user clicks a line item in the book outline.)
+// ======================================
 function showActionsForSelectedItem() {
     $('#ItemActions .actions-set').hide();
     var selectedName = $('#BookOutline [data-type="' + selectedType + '"][data-id="' + selectedId + '"] .name').text();
@@ -183,10 +215,9 @@ function showActionsForSelectedItem() {
 }
 
 
-function updateOutline() {
-    transmitAction("BookOutline", updateOutlineResponse, null, 'html', pageQueryModel);
-}
-
+// ======================================
+// Executed at the conclusion of each user action... after the server has responded with a refreshed view of the book outline:
+// ======================================
 function updateOutlineResponse(data) {
     $('#BookOutlineView').html(data);
     updateOutlineInteractions();
@@ -195,14 +226,11 @@ function updateOutlineResponse(data) {
 }
 
 
-$(window).scroll(function () {
-    updateItemActionsPosition();
-});
-$(window).resize(function () {
-    updateItemActionsPosition();
-});
-
-function updateItemActionsPosition() {
+// ======================================
+// Executed whenever the user changes the page scroll position or window shape. Display right column components locked in place:
+// (When IE is dead, this can be done with pure CSS {position:sticky;})
+// ======================================
+function updateRightColumnPosition() {
     var scrollY = $(window).scrollTop();
     var outlineX = $('#BookOutline').position().left;
     var outlineY = $('#BookOutline').position().top;
@@ -212,6 +240,9 @@ function updateItemActionsPosition() {
     $('#ItemActions').css('top', Math.max(outlineY - scrollY, 0));
 }
 
+// ======================================
+// Shorthand function for our ajax transmissions to the server:
+// ======================================
 function transmitAction(action, successCallback, errorCallback, returnDataType, data) {
     $.ajax({
         url: actionTransmitUrl.replace('action', action),
@@ -224,18 +255,20 @@ function transmitAction(action, successCallback, errorCallback, returnDataType, 
     });
 }
 
+// ======================================
+// Show and Hide the "UPDATING..." gray-out of the LEFT COLUMN whenever an update to the book outline has been requested.
+// There is a slight delay, so this will only appear for longer refreshes.
+// ======================================
 function showLoading() {
     loadingActive = true;
     window.setTimeout(showLoadingDelay, 1500);
 }
-
 function showLoadingDelay() {
     if (loadingActive) {
         $('#BookOutline').addClass('loading-fade');
         $('#Loading').show();
     }
 }
-
 function hideLoading() {
     loadingActive = false;
     $('#BookOutline').removeClass('loading-fade');

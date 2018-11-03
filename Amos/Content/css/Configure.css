@@ -1,4 +1,7 @@
-﻿#Main{}
+﻿/* --------------------------------------------------- */
+/* ------- MAIN PAGE STRUCTURE (TWO COLUMNS) --------- */
+/* --------------------------------------------------- */
+#Main{}
 
 #BookOutline{width:700px;border-right:1px solid #ddd;position:relative;}
 
@@ -7,8 +10,16 @@
 #Main .loading-fade{opacity: 0.2;}
 #Main #Loading{display:none;position:absolute;top:100px;left:-500px;padding:24px;border:2px solid #999;background-color:#ddd;border-radius:3px;font-weight:bold;font-size:18px;width:300px;text-align:center;}
 
+/* --------------------------------------------------- */
+/* PAGE FILTERS (this is rudimentry, since this consists only of a single checkbox atthis time)  */
+/* --------------------------------------------------- */
+
 #QueryInputs{position:absolute;top:-4px;right:90px;font-size:12px;}
 #QueryInputs input{margin-left:2px;position:relative;top:2px;}
+
+/* --------------------------------------------------- */
+/* The LEFT column, which displays the BOOK OUTLINE  */
+/* --------------------------------------------------- */
 
 #BookOutline .item:hover{background-color:#eee;color:#000;cursor:pointer;}
 #BookOutline .selectedItem{background-color:#000 !important;color:#eee !important;}
@@ -19,7 +30,7 @@
 #BookOutline .book .version span{font-weight:bold;}
 
 #BookOutline .module{font-size:24px;margin-top:12px;padding-top:12px;}
-#BookOutline .module .call{display:table-cell;width:36px;/*border-width:2px;border-style:solid;*/border-radius:6px;text-align:center;font-weight:bold;}
+#BookOutline .module .call{display:table-cell;width:36px;border-radius:6px;text-align:center;font-weight:bold;}
 #BookOutline .module .description{display:table-cell;width:560px;padding-left:44px;font-weight:bold;line-height:26px;}
 
 #BookOutline .section{font-size:18px;padding-top:12px;}
@@ -35,10 +46,13 @@
 #BookOutline .page .description{display:table-cell;width:560px;padding-left:72px;line-height:13px;}
 #BookOutline .page .description .quiz{background-color:#fbb;padding:0px 4px;color:#fff;border-radius:4px;}
 #BookOutline .page .description .survey{background-color:#abf;padding:0px 4px;color:#fff;border-radius:4px;}
-#BookOutline .page .description .content{font-size:11px;font-weight:300;padding-top:1px;padding-bottom:2px;overflow: hidden;/*width:520px;*/max-height:24px;line-height:11px;}
+#BookOutline .page .description .content{font-size:11px;font-weight:300;padding-top:1px;padding-bottom:2px;overflow: hidden;max-height:24px;line-height:11px;}
 
 #BookOutline #MoveSelectInputs{display:none;}
 
+/* --------------------------------------------------- */
+/* The RIGHT column, which displays the various controls for modifying a selected item in the book outline  */
+/* --------------------------------------------------- */
 
 #ItemActions .actions-header{font-size:18px;margin-bottom:48px;color:#999;}
 #ItemActions .actions-set{display:none;}
@@ -68,6 +82,9 @@
 
 #ItemActions .theme-item{margin-top:40px;}
 
+/* --------------------------------------------------- */
+/* ------- MODAL POPUP: Select a THEME --------------- */
+/* --------------------------------------------------- */
 #ThemeSelector{z-index:3;display:none;}
 #ThemeSelector .overlay {position:fixed;top:0;left:0;background-color:black;opacity:0.7;width:100%;height:100%;}
 #ThemeSelector .themeSelector {position:fixed;top:50%;left:50%;width:800px;height:500px;background-color:silver;overflow:auto;margin-top:-250px;margin-left:-400px;padding:20px;border:3px solid black;}
@@ -76,7 +93,9 @@
 #ThemeSelector .themeSelector .themeBlock:hover{background-color:#ebebeb;}
 #ThemeSelector .themeSelector .themeBlock.selected {background-color:#000;}
 
-
+/* --------------------------------------------------- */
+/* ------- colors for the 9 different themes: -------- */
+/* --------------------------------------------------- */
 #BookOutline .module .theme_1 {color:#efc94c;background-color: #f7e5a8;}
 #BookOutline .module .theme_2 {color:#505967;background-color: #a8acb2;}
 #BookOutline .module .theme_3 {color:#2c6192;background-color: #96b0c9;}
