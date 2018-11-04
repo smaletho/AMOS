@@ -54,13 +54,28 @@
 /* The RIGHT column, which displays the various controls for modifying a selected item in the book outline  */
 /* --------------------------------------------------- */
 
-#ItemActions .actions-header{font-size:18px;margin-bottom:48px;color:#999;}
+#ItemActions .actions-header{font-size:18px;color:#999;}
 #ItemActions .actions-set{display:none;}
 
 #ItemActions #DefaultActions{display:block;font-size:18px;color:#F00;}
 #ItemActions #DefaultActions i{position:relative;top:5px;color:#ccc;padding-right:10px;}
 
-#ItemActions .input-item{margin-top:40px;}
+#ItemActions .actions-set .form-group{overflow:hidden;}
+#ItemActions .actions-set .name-group{margin-top:30px;}
+#ItemActions .actions-set .reorder-group{margin-top:20px;}
+#ItemActions .actions-set .remove-group{margin-top:36px;}
+#ItemActions .actions-set .view-group{margin-top:50px;}
+
+#ItemActions .actions-set label{margin-bottom:0px;margin-top:6px;}
+#ItemActions .actions-set .name-input{font-size:20px;}
+#ItemActions .actions-set .name-update,.move-button{margin-top:4px;float:right;}
+#ItemActions .actions-set .remove-group{margin-left:60px;margin-right:60px;}
+#ItemActions .actions-set .remove-note{font-size:11px;text-align:center;}
+#ItemActions .actions-set .btn-block{text-align:left;}
+#ItemActions .actions-set .btn-block i{width:40px;}
+
+
+/*#ItemActions .input-item{margin-top:40px;}
 #ItemActions .input-item .input-label{}
 #ItemActions .input-item .input-value input{width:400px;font-size:18px;font-weight:bold;}
 #ItemActions .input-item .input-action{text-align:right;padding-right:8px;}
@@ -80,7 +95,7 @@
 
 #ItemActions .edit-item{margin-top:40px;}
 
-#ItemActions .theme-item{margin-top:40px;}
+#ItemActions .theme-item{margin-top:40px;}*/
 
 /* --------------------------------------------------- */
 /* ------- MODAL POPUP: Select a THEME --------------- */
