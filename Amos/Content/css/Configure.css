@@ -3,7 +3,7 @@
 /* --------------------------------------------------- */
 #Main{}
 
-#BookOutline{width:700px;border-right:1px solid #ddd;position:relative;}
+#BookOutline{width:700px;border-right:1px solid #000;position:relative;}
 
 #ItemActions{width:440px;padding-left:32px;position:relative;}
 
@@ -62,40 +62,19 @@
 
 #ItemActions .actions-set .form-group{overflow:hidden;}
 #ItemActions .actions-set .name-group{margin-top:30px;}
+#ItemActions .actions-set .theme-group{margin-top:20px;margin-bottom:50px;}
 #ItemActions .actions-set .reorder-group{margin-top:20px;}
 #ItemActions .actions-set .remove-group{margin-top:36px;}
+#ItemActions .actions-set .add-group{margin-top:50px;}
 #ItemActions .actions-set .view-group{margin-top:50px;}
 
 #ItemActions .actions-set label{margin-bottom:0px;margin-top:6px;}
 #ItemActions .actions-set .name-input{font-size:20px;}
-#ItemActions .actions-set .name-update,.move-button{margin-top:4px;float:right;}
-#ItemActions .actions-set .remove-group{margin-left:60px;margin-right:60px;}
+#ItemActions .actions-set .name-update,.move-button,.version-update{margin-top:4px;float:right;}
+#ItemActions .actions-set .remove-group{margin-left:42px;margin-right:42px;}
 #ItemActions .actions-set .remove-note{font-size:11px;text-align:center;}
 #ItemActions .actions-set .btn-block{text-align:left;}
 #ItemActions .actions-set .btn-block i{width:40px;}
-
-
-/*#ItemActions .input-item{margin-top:40px;}
-#ItemActions .input-item .input-label{}
-#ItemActions .input-item .input-value input{width:400px;font-size:18px;font-weight:bold;}
-#ItemActions .input-item .input-action{text-align:right;padding-right:8px;}
-
-#ItemActions .add-item{margin-top:40px;}
-
-#ItemActions .remove-item{margin-top:40px;}
-#ItemActions .remove-note{font-size:11px;}
-
-#ItemActions .reorder-item{margin-top:40px;}
-
-#ItemActions .move-item{margin-top:40px;}
-#ItemActions .move-item .move-input select{width:400px;}
-#ItemActions .move-item .move-action{text-align:right;padding-right:8px;}
-
-#ItemActions .preview-item{margin-top:40px;}
-
-#ItemActions .edit-item{margin-top:40px;}
-
-#ItemActions .theme-item{margin-top:40px;}*/
 
 /* --------------------------------------------------- */
 /* ------- MODAL POPUP: Select a THEME --------------- */

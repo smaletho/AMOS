@@ -9,7 +9,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @section Styles{
-    <link rel="stylesheet" href="~/Content/css/Configure.css?v=5">
+    <link rel="stylesheet" href="~/Content/css/Configure.css?v=6">
 }
 
     <div id="Main">
@@ -37,95 +37,90 @@
             @*================================== modify BOOK: =====================================*@
             <div id="BookActions" class="actions-set" data-type="book">
                 <div class="actions-header">modify selected <b>book</b>:</div>
-                <div class="form-group">
+                <div class="form-group name-group">
                     <label>book title:</label>
                     <input class="form-control name-input" type="text" />
                     <button class="btn btn-primary btn-sm name-update" type="submit">update</button>
                 </div>
-                <div class="form-group">
+                <div class="form-group name-group">
                     <label>book version:</label>
                     <input class="form-control version-input" type="text" />
                     <button class="btn btn-primary btn-sm version-update" type="submit">update</button>
                 </div>
-                <div class="form-group">
-                    <a class="add-button" href="#">add a new module to this book</a>
+                <div class="form-group add-group">
+                    <button type="button" class="btn btn-primary btn-block add-button"><i class="fa fa-plus fa-fw fa-lg"></i>add a new module to this book</button>
                 </div>
             </div>
             @*================================== modify MODULE: =====================================*@
             <div id="ModuleActions" class="actions-set" data-type="module">
                 <div class="actions-header">modify selected <b>module</b>:</div>
-                <div class="form-group">
+                <div class="form-group name-group">
                     <label>module title:</label>
                     <input class="form-control name-input" type="text" />
                     <button class="btn btn-primary btn-sm name-update" type="submit">update</button>
                 </div>
-                <div class="form-group">
-                    <a class="add-button" href="#">add a new section to this module</a>
+                <div class="form-group theme-group">
+                    <button type="button" class="btn btn-primary btn-block theme-button"><i class="fa fa-paint-brush fa-fw fa-lg"></i>change the color theme of this module</button>
                 </div>
-                <div class="form-group">
-                    <div class="remove-action"><a class="remove-button" href="#">remove this module</a></div>
+                <div class="form-group reorder-group">
+                    <label>reorder modules:</label>
+                    <button type="button" class="btn btn-primary btn-block reorder-button" data-action="up"><i class="fa fa-arrow-up fa-fw fa-lg"></i>move this module up</button>
+                    <button type="button" class="btn btn-primary btn-block reorder-button" data-action="down"><i class="fa fa-arrow-down fa-fw fa-lg"></i>move this module down</button>
+                </div>
+                <div class="form-group remove-group">
+                    <button type="button" class="btn btn-warning btn-block btn-xs remove-button"><i class="fa fa-trash fa-fw fa-lg"></i>remove this module</button>
                     <div class="remove-note">after removal, any pages within will still be available for re-use</div>
                 </div>
-                <div class="form-group">
-                    <div class="reorder-label">reorder modules:</div>
-                    <div class="reorder-action"><a class="reorder-button" data-action="up" href="#">move this module up</a></div>
-                    <div class="reorder-action"><a class="reorder-button" data-action="down" href="#">move this module down</a></div>
-                </div>
-                <div class="form-group">
-                    <a class="theme-button" href="#">change the color theme of this module</a>
+                <div class="form-group add-group">
+                    <button type="button" class="btn btn-primary btn-block add-button"><i class="fa fa-plus fa-fw fa-lg"></i>add a new section to this module</button>
                 </div>
             </div>
             @*================================== modify SECTION: =====================================*@
             <div id="SectionActions" class="actions-set" data-type="section">
                 <div class="actions-header">modify selected <b>section</b>:</div>
-                <div class="form-group">
+                <div class="form-group name-group">
                     <label>section title:</label>
                     <input class="form-control name-input" type="text" />
                     <button class="btn btn-primary btn-sm name-update" type="submit">update</button>
                 </div>
-                <div class="form-group">
-                    <a class="add-button" href="#">add a new chapter to this section</a>
-                </div>
-                <div class="form-group">
-                    <div class="remove-action"><a class="remove-button" href="#">remove this section</a></div>
-                    <div class="remove-note">after removal, any pages within will still be available for re-use</div>
-                </div>
-                <div class="form-group">
-                    <div class="reorder-label">reorder sections:</div>
-                    <div class="reorder-action"><a class="reorder-button" data-action="up" href="#">move this section up</a></div>
-                    <div class="reorder-action"><a class="reorder-button" data-action="down" href="#">move this section down</a></div>
-                </div>
-                <div class="form-group">
-                    @*<div class="move-label">move section to module:</div>*@
+                <div class="form-group reorder-group">
+                    <label>reorder sections:</label>
+                    <button type="button" class="btn btn-primary btn-block reorder-button" data-action="up"><i class="fa fa-arrow-up fa-fw fa-lg"></i>move this section up</button>
+                    <button type="button" class="btn btn-primary btn-block reorder-button" data-action="down"><i class="fa fa-arrow-down fa-fw fa-lg"></i>move this section down</button>
                     <label>move section to module:</label>
                     <div class="move-input"><select></select></div>
                     <button class="btn btn-primary btn-sm move-button" type="submit">update</button>
+                </div>
+                <div class="form-group remove-group">
+                    <button type="button" class="btn btn-warning btn-block btn-xs remove-button"><i class="fa fa-trash fa-fw fa-lg"></i>remove this section</button>
+                    <div class="remove-note">after removal, any pages within will still be available for re-use</div>
+                </div>
+                <div class="form-group add-group">
+                    <button type="button" class="btn btn-primary btn-block add-button"><i class="fa fa-plus fa-fw fa-lg"></i>add a new chapter to this section</button>
                 </div>
             </div>
             @*================================== modify CHAPTER: =====================================*@
             <div id="ChapterActions" class="actions-set" data-type="chapter">
                 <div class="actions-header">modify selected <b>chapter</b>:</div>
-                <div class="form-group">
+                <div class="form-group name-group">
                     <label>chapter title:</label>
                     <input class="form-control name-input" type="text" />
                     <button class="btn btn-primary btn-sm name-update" type="submit">update</button>
                 </div>
-                <div class="form-group">
-                    <a class="add-button" href="#">add a new page to this chapter</a>
-                </div>
-                <div class="form-group">
-                    <div class="remove-action"><a class="remove-button" href="#">remove this chapter</a></div>
-                    <div class="remove-note">after removal, any pages within will still be available for re-use</div>
-                </div>
-                <div class="form-group">
-                    <div class="reorder-label">reorder chapters:</div>
-                    <div class="reorder-action"><a class="reorder-button" data-action="up" href="#">move this chapter up</a></div>
-                    <div class="reorder-action"><a class="reorder-button" data-action="down" href="#">move this chapter down</a></div>
-                </div>
-                <div class="form-group">
+                <div class="form-group reorder-group">
+                    <label>reorder chapters:</label>
+                    <button type="button" class="btn btn-primary btn-block reorder-button" data-action="up"><i class="fa fa-arrow-up fa-fw fa-lg"></i>move this chapter up</button>
+                    <button type="button" class="btn btn-primary btn-block reorder-button" data-action="down"><i class="fa fa-arrow-down fa-fw fa-lg"></i>move this chapter down</button>
                     <label>move chapter to section:</label>
                     <div class="move-input"><select></select></div>
                     <button class="btn btn-primary btn-sm move-button" type="submit">update</button>
+                </div>
+                <div class="form-group remove-group">
+                    <button type="button" class="btn btn-warning btn-block btn-xs remove-button"><i class="fa fa-trash fa-fw fa-lg"></i>remove this chapter</button>
+                    <div class="remove-note">after removal, any pages within will still be available for re-use</div>
+                </div>
+                <div class="form-group add-group">
+                    <button type="button" class="btn btn-primary btn-block add-button"><i class="fa fa-plus fa-fw fa-lg"></i>add a new page to this chapter</button>
                 </div>
             </div>
             @*================================== modify PAGE: =====================================*@
@@ -136,37 +131,22 @@
                     <input class="form-control name-input" type="text" />
                     <button class="btn btn-primary btn-sm name-update" type="submit">update</button>
                 </div>
-
                 <div class="form-group reorder-group">
                     <label>reorder pages:</label>
                     <button type="button" class="btn btn-primary btn-block reorder-button" data-action="up"><i class="fa fa-arrow-up fa-fw fa-lg"></i>move this page up</button>
                     <button type="button" class="btn btn-primary btn-block reorder-button" data-action="down"><i class="fa fa-arrow-down fa-fw fa-lg"></i>move this page down</button>
-                    @*<div class="reorder-action"><a class="reorder-button" data-action="up" href="#">move this page up</a></div>
-            <div class="reorder-action"><a class="reorder-button" data-action="down" href="#">move this page down</a></div>*@
                     <label>move page to chapter:</label>
                     <div class="move-input"><select></select></div>
                     <button class="btn btn-primary btn-sm move-button" type="submit">update</button>
                 </div>
-                @*<div class="form-group">
-            <label>move page to chapter:</label>
-            <div class="move-input"><select></select></div>
-            <button class="btn btn-primary btn-sm move-button" type="submit">update</button>
-        </div>*@
                 <div class="form-group remove-group">
-                    @*<div class="remove-action"><a class="remove-button" href="#">remove this page</a></div>*@
                     <button type="button" class="btn btn-warning btn-block btn-xs remove-button"><i class="fa fa-times fa-fw fa-lg"></i>remove this page</button>
                     <div class="remove-note">after removal, the page will still be available for re-use</div>
                 </div>
                 <div class="form-group view-group">
                     <button type="button" id="EditButton" class="btn btn-success btn-block"><i class="fa fa-pencil fa-fw fa-lg"></i>edit page</button>
                     <button type="button" id="PreviewButton" class="btn btn-success btn-block"><i class="fa fa-eye fa-fw fa-lg"></i>preview page</button>
-                    @*<a id="EditButton" href="#">edit page</a>*@
-                    @*<a id="PreviewButton" href="#">preview page</a>*@
                 </div>
-                @*<div class="form-group">
-
-                   
-                </div>*@
             </div>
             @*================================================================================*@
         </div>
@@ -218,5 +198,5 @@
         var editPageUrl = '@Url.Action("ViewEditor", "Build", new { id = 0 })';
         var viewPageUrl = '@Url.Action("ViewPage", "Build", new { id = 0 })';
     </script>
-    <script type="text/javascript" src="~/Content/js/Configure.js?v=5"></script>
+    <script type="text/javascript" src="~/Content/js/Configure.js?v=6"></script>
 }
