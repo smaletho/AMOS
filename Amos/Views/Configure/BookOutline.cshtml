@@ -4,6 +4,23 @@
     int sectionCall = 0;
     int chapterCall = 0;
     int pageCall = 0;
+    // cycle through book hierarchy to determine if the book is currently valid: (all modules, sections, and chapters have pages)
+    bool bookIsValid = true;
+    foreach (var currentModule in Model.OutlineModules)
+    {
+        var sections = from s in Model.OutlineSections where s.ModuleId == currentModule.ModuleId select s;
+        if (sections.Count() == 0) { bookIsValid = false; }
+        foreach (var currentSection in sections)
+        {
+            var chapters = from s in Model.OutlineChapters where s.SectionId == currentSection.SectionId select s;
+            if (chapters.Count() == 0) { bookIsValid = false; }
+            foreach (var currentChapter in chapters)
+            {
+                var pages = from s in Model.OutlinePages where s.ChapterId == currentChapter.ChapterId select s;
+                if (pages.Count() == 0) { bookIsValid = false; }
+            }
+        }
+    }
 }
 
 @*==================================
@@ -13,9 +30,14 @@
     <div class="name">@Model.OutlineBook.Name</div>
     <div class="version">version: <span>@Model.OutlineBook.Version</span></div>
 </div>
+@if (!bookIsValid)
+{
+    <div class="book-invalid"><i class="fa fa-exclamation-triangle"></i> This book cannot be published until every module, section, and chapter includes at least one page.</div>
+}
 
 @foreach (var currentModule in Model.OutlineModules)
 {
+    var sections = from s in Model.OutlineSections where s.ModuleId == currentModule.ModuleId select s;
     @*==================================
             MODULE item (layer 1 of a nested set of loops)
         ====================================*@
@@ -25,12 +47,19 @@
     pageCall = 0;
     <div class="module item" data-type="module" data-id="@currentModule.ModuleId" data-theme="@currentModule.Theme">
         <div class="call theme_@currentModule.Theme">@moduleCall</div>
-        <div class="description"><div class="name">@currentModule.Name</div></div>
+        <div class="description">
+            @if (sections.Count() == 0)
+            {
+                <i class="fa fa-exclamation-triangle"></i>
+            }
+            <span class="name">@currentModule.Name</span>
+        </div>
     </div>
 
-    var sections = from s in Model.OutlineSections where s.ModuleId == currentModule.ModuleId select s;
+
     foreach (var currentSection in sections)
     {
+        var chapters = from s in Model.OutlineChapters where s.SectionId == currentSection.SectionId select s;
         @*==================================
                 SECTION item (layer 2 of a nested set of loops)
             ====================================*@
@@ -39,22 +68,35 @@
 
         <div class="section item" data-type="section" data-id="@currentSection.SectionId" data-parent="@currentModule.ModuleId">
             <div class="call">@moduleCall.@sectionCall</div>
-            <div class="description"><div class="name">@currentSection.Name</div></div>
+            <div class="description">
+                @if (chapters.Count() == 0)
+                {
+                    <i class="fa fa-exclamation-triangle"></i>
+                }
+                <span class="name">@currentSection.Name</span>
+            </div>
         </div>
 
-        var chapters = from s in Model.OutlineChapters where s.SectionId == currentSection.SectionId select s;
+
         foreach (var currentChapter in chapters)
         {
+            var pages = from s in Model.OutlinePages where s.ChapterId == currentChapter.ChapterId select s;
             @*==================================
                     CHAPTER item (layer 3 of a nested set of loops)
                 ====================================*@
             chapterCall++;
             <div class="chapter item" data-type="chapter" data-id="@currentChapter.ChapterId" data-parent="@currentSection.SectionId">
                 <div class="call">@moduleCall.@sectionCall.@chapterCall</div>
-                <div class="description"><div class="name">@currentChapter.Name</div></div>
+                <div class="description">
+                    @if (pages.Count() == 0)
+                    {
+                        <i class="fa fa-exclamation-triangle"></i>
+                    }
+                    <span class="name">@currentChapter.Name</span>
+                </div>
             </div>
 
-            var pages = from s in Model.OutlinePages where s.ChapterId == currentChapter.ChapterId select s;
+
             foreach (var currentPage in pages)
             {
                 @*==================================
@@ -84,7 +126,7 @@
         These are 3 different select inputs that appear amongst the user "MOVE to" actions when a page, chapter, or section is selected.
         These are not actually displayed with the rest of this view. (display:none).
         When needed, they are copied (via jQuery) to their actual place in the right column.
-        This is done this way since these select menus change whenever a change to the outline is made. 
+        This is done this way since these select menus change whenever a change to the outline is made.
     ====================================*@
 <div id="MoveSelectInputs">
     <div id="SelectChapter">
@@ -95,11 +137,11 @@
                 var sections = from s in Model.OutlineSections where s.ModuleId == currentModule.ModuleId select s;
                 foreach (var currentSection in sections)
                 {
-                <option disabled value="">&nbsp; &nbsp; &nbsp; @currentSection.Name</option>
+                    <option disabled value="">&nbsp; &nbsp; &nbsp; @currentSection.Name</option>
                     var chapters = from s in Model.OutlineChapters where s.SectionId == currentSection.SectionId select s;
                     foreach (var currentChapter in chapters)
                     {
-                    <option value="@currentChapter.ChapterId">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; @currentChapter.Name</option>
+                        <option value="@currentChapter.ChapterId">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; @currentChapter.Name</option>
                     }
                 }
             }
