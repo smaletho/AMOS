@@ -204,21 +204,21 @@ namespace Amos.Controllers.Configuration
                     newChapter.SectionId = AddItemRequest.Id;
                     db.Chapters.Add(newChapter);
                     break;
-                case "chapter": // new pages are added at BOTTOM
-                    var highestExistingPageSortOrder = (from s in db.Pages where s.ChapterId == AddItemRequest.Id select s.SortOrder).DefaultIfEmpty(0).Max();
-                    var newPage = new Page();
-                    newPage.SortOrder = highestExistingPageSortOrder + 1;
-                    newPage.Title = "Untitled Page";
-                    newPage.ChapterId = AddItemRequest.Id;
-                    newPage.BookId = AddItemRequest.PageQueryModel.BookId;
-                    newPage.PageContent = "";
-                    newPage.CreatedBy = User.Identity.Name;
-                    newPage.CreateDate = DateTime.Now;
-                    newPage.ModifiedBy = User.Identity.Name;
-                    newPage.ModifyDate = newPage.CreateDate;
-                    newPage.Type = "content";
-                    db.Pages.Add(newPage);
-                    break;
+                //case "chapter": // new pages are added at BOTTOM    <<--- this is now handled from an external page.  Save this code block for a bit.
+                //    var highestExistingPageSortOrder = (from s in db.Pages where s.ChapterId == AddItemRequest.Id select s.SortOrder).DefaultIfEmpty(0).Max();
+                //    var newPage = new Page();
+                //    newPage.SortOrder = highestExistingPageSortOrder + 1;
+                //    newPage.Title = "Untitled Page";
+                //    newPage.ChapterId = AddItemRequest.Id;
+                //    newPage.BookId = AddItemRequest.PageQueryModel.BookId;
+                //    newPage.PageContent = "";
+                //    newPage.CreatedBy = User.Identity.Name;
+                //    newPage.CreateDate = DateTime.Now;
+                //    newPage.ModifiedBy = User.Identity.Name;
+                //    newPage.ModifyDate = newPage.CreateDate;
+                //    newPage.Type = "content";
+                //    db.Pages.Add(newPage);
+                //    break;
             }
             db.SaveChanges();
             return BookOutline(AddItemRequest.PageQueryModel);

@@ -60,6 +60,13 @@ function initPage() {
         return false;
     });
 
+    $('#ItemActions .new-page-button').click(function () {
+        var bookId = pageQueryModel.BookId;
+        var chapterId = selectedId;
+        window.location = addPageUrl + "?BookId=" + bookId + "&ChapterId=" + chapterId;
+        return false;
+    });
+
     $('#ItemActions .add-button').click(function () {
         showLoading();
         var data = {};

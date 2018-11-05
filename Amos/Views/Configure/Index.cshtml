@@ -9,7 +9,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @section Styles{
-    <link rel="stylesheet" href="~/Content/css/Configure.css?v=6">
+    <link rel="stylesheet" href="~/Content/css/Configure.css?v=7">
 }
 
     <div id="Main">
@@ -120,7 +120,7 @@
                     <div class="remove-note">after removal, any pages within will still be available for re-use</div>
                 </div>
                 <div class="form-group add-group">
-                    <button type="button" class="btn btn-primary btn-block add-button"><i class="fa fa-plus fa-fw fa-lg"></i>add a new page to this chapter</button>
+                    <button type="button" class="btn btn-primary btn-block new-page-button"><i class="fa fa-plus fa-fw fa-lg"></i>add a new page to this chapter</button>
                 </div>
             </div>
             @*================================== modify PAGE: =====================================*@
@@ -195,8 +195,9 @@
     <script>
         var actionTransmitUrl='@Url.Action("action",new{id=0})';
         var pageQueryModel = @Html.Raw(Json.Encode(Model.PageQueryModel));
+        var addPageUrl = '@Url.Action("AddPage", "Build", new { id = 0 })';
         var editPageUrl = '@Url.Action("ViewEditor", "Build", new { id = 0 })';
         var viewPageUrl = '@Url.Action("ViewPage", "Build", new { id = 0 })';
     </script>
-    <script type="text/javascript" src="~/Content/js/Configure.js?v=6"></script>
+    <script type="text/javascript" src="~/Content/js/Configure.js?v=7"></script>
 }
