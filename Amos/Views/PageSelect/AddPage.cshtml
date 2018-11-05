@@ -1,0 +1,149 @@
+﻿@model Amos.Models.ChoosePageModel
+@{
+    ViewBag.Title = "Select Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@section styles{
+    <link href="~/Content/css/preview.css" rel="stylesheet" />
+    <style>
+        .modal-lg {
+            height: 480px;
+        }
+
+            .modal-lg .modal-footer {
+                margin-top: -360px;
+            }
+    </style>
+
+}
+
+<h2>Select page:</h2>
+
+<table class="table table-striped table-hover">
+    <tr>
+        <td>Id</td>
+        <th>Page Name</th>
+        <th>Page Type</th>
+        <th>Modified</th>
+        <th>Created</th>
+        <th></th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model.PageList.OrderBy(x => x.Title))
+    {
+        <tr class="page-row" data-pageid="@item.PageId">
+            <td>
+                @Html.DisplayFor(modelItem => item.PageId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Type)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ModifyDate)<br />
+                @Html.DisplayFor(modelItem => item.ModifiedBy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreateDate)<br />
+                @Html.DisplayFor(modelItem => item.CreatedBy)
+            </td>
+            <td>
+                <button class="btn btn-default" data-toggle="modal" data-target="#previewDialog" data-pageid="@item.PageId">preview</button>
+            </td>
+            <td>
+                <button class="btn btn-primary" onclick="selectPage(@item.PageId, @Model.BookId, @Model.ChapterId)">Select Page</button>
+            </td>
+
+        </tr>
+    }
+
+</table>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" id="previewDialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Page Preview</h4>
+            </div>
+            <div class="modal-body preview-window">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                @*<button type="button" onclick="deletePage(this)" id="confirmDeleteButton" data-pageid="0" class="btn btn-primary">Delete</button>*@
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+@section scripts{
+    <script>
+        var applicationMode = "online";
+        var URL_Content = '@Url.Content("~/")';
+        var pageContentAndId = [];
+    </script>
+    <script src="~/Content/js/preview-render.js"></script>
+
+    <script src="~/Content/js/shared.js"></script>
+    <script>
+        function selectPage(pageId, bookId, chapterId) {
+            transmitAction('@Url.Action("DoAddPage")', function (data) {
+                window.location = '@Url.Action("Index", "Configure", new { id=Model.BookId })';
+            }, transmitFail, "", {
+                PageId: pageId,
+                BookId: bookId, 
+                ChapterId: chapterId
+            }, true);
+        }
+
+
+        function transmitFail(data) {
+            alert('Error');
+            console.log('error', data);
+        }
+
+
+        $(function () {
+
+
+            $("#previewDialog").on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget); // Button that triggered the modal
+                var pageId = button.data('pageid'); // Extract info from data-* attributes
+
+                var modal = $(this)
+                $(modal).find('.preview-window').empty();
+
+                for (var i = 0; i < pageContentAndId.length; i++) {
+                    if (pageContentAndId[i].PageId == pageId) {
+                        var content = pageContentAndId[i].PageContent;
+                        var xml = $.parseXML(content);
+                        $(xml).contents().contents().each(function () {
+                            //console.log(this);
+                            if (!blankTextNode(this))
+                                $(modal).find('.preview-window').first().append(renderElement(this));
+                        });
+                        break;
+                    }
+                }
+
+            });
+
+            transmitAction('@Url.Action("GetContent", "Build")', function (data) {
+
+                pageContentAndId = data;
+
+            }, transmitFail, "", {}, true);
+
+
+        });
+    </script>
+
+}
+

@@ -195,7 +195,7 @@
     <script>
         var actionTransmitUrl='@Url.Action("action",new{id=0})';
         var pageQueryModel = @Html.Raw(Json.Encode(Model.PageQueryModel));
-        var addPageUrl = '@Url.Action("AddPage", "Build", new { id = 0 })';
+        var addPageUrl = '@Url.Action("AddPage", "PageSelect", new { id = 0 })';
         var editPageUrl = '@Url.Action("ViewEditor", "Build", new { id = 0 })';
         var viewPageUrl = '@Url.Action("ViewPage", "Build", new { id = 0 })';
     </script>

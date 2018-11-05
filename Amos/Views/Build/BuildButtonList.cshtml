@@ -21,7 +21,7 @@
         {
             title = "n/a";
         }
-        <tr>
+        <tr @if (title == "n/a") { WriteLiteral("class='danger'"); }>
             @*<td>@item.PageId</td>*@
             <td>@item.getPage.Title</td>
             @if (item.isButton)
@@ -71,3 +71,12 @@
         </tr>
     }
 </tbody>
+
+@functions{
+    string getContextClass(Amos.Models.PageButton btn)
+    {
+        if (btn.NavPageId == 0) return " class='danger'";
+        else return "";
+    }
+
+}

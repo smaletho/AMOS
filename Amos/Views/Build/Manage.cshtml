@@ -11,6 +11,10 @@
             max-height: 500px;
             overflow-x: hidden;
         }
+        .btn-group-justified .btn-group {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
     </style>
 }
 @{
@@ -87,9 +91,17 @@ else
 
                     <button type="button" class="btn btn-primary" id="load" onclick="enableDisable(true)" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Validating...">Validate and Publish</button>
 
-                    @*<button type="button" class="btn btn-primary" onclick="enableDisable(true);">continue</button>*@
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="btn-group-justified" style="width:50%;margin:0 auto">
+        <div class="btn-group">
+            <a class="btn btn-primary" href="@Url.Action("Index","Configure", new { id=Model.PageListModel.GetBook.BookId })">Organize Book &amp; Pages</a>
+        </div>
+        <div class="btn-group">
+            <a class="btn btn-primary" href="@Url.Action("ManageButtons", new { id=Model.PageListModel.GetBook.BookId })">Manage Page Buttons</a>
         </div>
     </div>
 
@@ -97,7 +109,7 @@ else
 
     </div>
 
-    <div class="col-md-8 col-md-offset-2">
+    @*<div class="col-md-8 col-md-offset-2">
         <a class="btn btn-default" href="@Url.Action("Edit", new { id=Model.PageListModel.GetBook.BookId })">
             Click here (old)
         </a>
@@ -112,7 +124,7 @@ else
 
     <div class="container col-md-12" style="margin-top:20px;">
         <p class="alert alert-info">
-            Below, you will find a list of links and buttons used within this book. 
+            Below, you will find a list of links and buttons used within this book.
             <br />Use this interface to
             connect each button to the corresponding page that you would like it to navigate to.
         </p>
@@ -120,12 +132,12 @@ else
 
     <table id="button-table" class="table table-hover table-striped">
 
-        
 
-        @Html.Action("BuildButtonList", new { model = Model})
 
-        
-    </table>
+        @Html.Action("BuildButtonList", new { model = Model })
+
+
+    </table>*@
 }
 
 
@@ -167,10 +179,10 @@ else
         function enableDisable_fail(data) {
             alert("Error");
             console.log("error", data);
-        }6
+        }
         function enableDisable(isPublish) {
             $("#load").button('loading');
-            
+
             transmitAction('@Url.Action("ChangePublishStatus")', enableDisable_success, enableDisable_fail, "", { BookId: @Model.PageListModel.GetBook.BookId, IsPublish: isPublish }, true);
         }
 

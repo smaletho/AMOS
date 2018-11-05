@@ -1931,12 +1931,18 @@ namespace Amos.Controllers
                     sb.AppendLine("Book configuration is valid. Checking page buttons...");
                 }
 
+                List<int> currentPageIds = model.PageListModel.PageList.Select(x => x.PageId).ToList();
                 foreach(var btn in model.pageButtons)
                 {
                     if (btn.NavPageId == 0)
                     {
                         foundErrors = true;
                         sb.AppendLine("Unlinked page button found. (Page: " + btn.getPage.Title + " - Button Text: " + btn.ButtonText + ")");
+                    }
+                    else if (!currentPageIds.Contains(btn.NavPageId))
+                    {
+                        foundErrors = true;
+                        sb.AppendLine("Button links to a page not included in the book. Current Page #" + btn.PageId);
                     }
                 }
 
@@ -2071,7 +2077,10 @@ namespace Amos.Controllers
 
 
 
-
+        public ActionResult ManageButtons(int id)
+        {
+            return View(new ManagePagesModel(id));
+        }
 
 
         [HttpPost]

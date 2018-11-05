@@ -203,6 +203,7 @@
     <Compile Include="Controllers\ConfigureController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\PageSelectController.cs" />
     <Compile Include="Controllers\PresentController.cs" />
     <Compile Include="Controllers\SubjectController.cs" />
     <Compile Include="Controllers\ViewController.cs" />
@@ -216,6 +217,7 @@
     <Compile Include="Models\FileType.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\PageSelectModel.cs" />
     <Compile Include="Models\SaveBookModel.cs" />
     <Compile Include="Models\SubjectViewModel.cs" />
     <Compile Include="Models\ViewModel.cs" />
@@ -488,6 +490,8 @@
     <Content Include="Views\Configure\Index.cshtml" />
     <Content Include="Views\Configure\BookOutline.cshtml" />
     <Content Include="Views\Build\BuildButtonList.cshtml" />
+    <Content Include="Views\PageSelect\AddPage.cshtml" />
+    <Content Include="Views\Build\ManageButtons.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

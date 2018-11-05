@@ -1,0 +1,55 @@
+﻿
+@model Amos.Models.ManagePagesModel
+@{
+    ViewBag.Title = "Manage";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section styles{
+    <style>
+        .scrollable-menu {
+            height: auto;
+            max-height: 500px;
+            overflow-x: hidden;
+        }
+    </style>
+}
+
+<h1>Manage Buttons</h1>
+
+<a class="btn btn-primary" href="@Url.Action("Manage", new { id=Model.PageListModel.GetBook.BookId })">
+    <i class="fa fa-arrow-left"></i> Back to Manage Book
+</a>
+
+<div class="container col-md-12" style="margin-top:20px;">
+    <p class="alert alert-info">
+        Below, you will find a list of links and buttons used within this book.
+        <br />Use this interface to
+        connect each button to the corresponding page that you would like it to navigate to.
+    </p>
+</div>
+
+<table id="button-table" class="table table-hover table-striped">
+
+    @Html.Action("BuildButtonList", new { model = Model })
+
+</table>
+
+@section scripts{
+<script src="~/Content/js/shared.js"></script>
+    <script>
+        function assignButton(buttonId, onPageId, toPageId, element) {
+            $(element).closest("ul").prev("button").button("loading");
+            transmitAction('@Url.Action("AssignButton")', function (data) {
+                $("#button-table").empty();
+                $("#button-table").append(data);
+                $(element).closest("ul").prev("button").button("reset");
+            }, enableDisable_fail, "", { buttonId: buttonId, onPageId: onPageId, toPageId: toPageId }, true);
+        }
+
+        function enableDisable_fail(data) {
+            alert("Error");
+            console.log("error", data);
+        }
+
+    </script>
+}
