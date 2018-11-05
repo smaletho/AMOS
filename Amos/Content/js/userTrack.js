@@ -23,7 +23,7 @@ function initTracking() {
 }
 
 function subjectLogin() {
-    var email = $("#subject-email").val().trim();
+    var email = $("#subject-email").val().trim().toLowerCase();
     if (email == null || email == "") {
         openDialog("Please enter your email address.", "Error");
     } else {

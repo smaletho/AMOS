@@ -21,10 +21,10 @@
 
 }
 
-<h2>ListPages</h2>
+<h2>Unlinked Pages</h2>
 
 <p>
-    @Html.ActionLink("Create New Page", "ViewEditor", new { id = 0 })
+    <a class="btn btn-primary" href="@Url.Action("ViewEditor", new { id=0 })">Create Page</a>
 </p>
 <table class="table table-striped table-hover">
     <tr>

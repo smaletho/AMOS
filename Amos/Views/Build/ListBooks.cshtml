@@ -5,14 +5,24 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@section styles{
+<style>
+    .btn-group-justified .btn-group {padding-left:10px;padding-right:10px;}
+    </style>    
+    
+}
 
 <h2>AMOS Books</h2>
 
 <div class="btn-group-justified" style="margin-bottom:10px">
-    <a href="@Url.Action("Create")" class="btn btn-default">New Book</a>
-    <a href="@Url.Action("ViewEditor", new { id = 0 })" class="btn btn-default">New Page</a>
-    <a href="@Url.Action("ListPages")" class="btn btn-default">Import Book</a>
-    <a href="@Url.Action("ImportBook")" class="btn btn-default">View Unlinked Pages</a>
+    <div class="btn-group"><a href="@Url.Action("Create")" class="btn btn-primary">New Book</a></div>
+    <div class="btn-group"><a href="@Url.Action("ViewEditor", new { id = 0 })" class="btn btn-primary">New Page</a></div>
+    <div class="btn-group"><a href="@Url.Action("ImportBook")" class="btn btn-primary">Import Book</a></div>
+    <div class="btn-group"><a href="@Url.Action("ListPages")" class="btn btn-primary">View Unlinked Pages</a></div>
+    
+    
+    
+    
 </div>
 
 <p class="help-block">Note: only <b>published</b> books can be exported or downloaded.</p>
@@ -80,8 +90,8 @@
                             <li><a href="javascript:void(0)" onclick="confirmDelete(@item.BookId)">Delete</a></li>
                             <li><a href="@Url.Action("Duplicate", new { id = item.BookId })">Duplicate</a></li>
                             <li role="separator" class="divider"></li>
-                            <li><a href="@Url.Action("Export", new { id = item.BookId })">Export Data</a></li>
-                            <li><a href="@Url.Action("Download", new { id = item.BookId })">Download</a></li>
+                            <li><a href="@Url.Action("Export", new { id = item.BookId })">Export Configuration</a></li>
+                            <li><a href="@Url.Action("Download", new { id = item.BookId })">Download (for offline use)</a></li>
                         }
                         else
                         {

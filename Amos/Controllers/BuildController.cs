@@ -446,6 +446,10 @@ namespace Amos.Controllers
                                             fName += ".png";
                                             newFileName += "i_" + f.FileId.ToString() + ".png";
                                             break;
+                                        case "image/gif":
+                                            fName += ".gif";
+                                            newFileName += "i_" + f.FileId.ToString() + ".gif";
+                                            break;
                                     }
                                     break;
                                 case FileType.Video:
@@ -626,6 +630,10 @@ namespace Amos.Controllers
                                         case "image/png":
                                             fName += ".png";
                                             newFileName += "images/i_" + f.FileId.ToString() + ".png";
+                                            break;
+                                        case "image/gif":
+                                            fName += ".gif";
+                                            newFileName += "images/i_" + f.FileId.ToString() + ".gif";
                                             break;
                                     }
                                     break;
@@ -1922,6 +1930,7 @@ namespace Amos.Controllers
                 {
                     sb.AppendLine("Book configuration is valid. Checking page buttons...");
                 }
+
                 foreach(var btn in model.pageButtons)
                 {
                     if (btn.NavPageId == 0)
@@ -1930,11 +1939,21 @@ namespace Amos.Controllers
                         sb.AppendLine("Unlinked page button found. (Page: " + btn.getPage.Title + " - Button Text: " + btn.ButtonText + ")");
                     }
                 }
-                db.SaveChanges();
-                sb.AppendLine("No errors found, the book has been saved and published.");
-                
 
-                return Json(new { Errors = foundErrors, Details = sb.ToString() });
+                if (!foundErrors)
+                {
+                    Book book = db.Books.Where(x => x.BookId == BookId).FirstOrDefault();
+                    book.Published = true;
+                    book.Modify(User.Identity.Name);
+                    sb.AppendLine("No errors found, the book has been saved and published.");
+
+                    db.SaveChanges();
+                    return Content("success");
+                }
+                else
+                {
+                    return Json(new { Errors = foundErrors, Details = sb.ToString() });
+                }
             }
         }
 

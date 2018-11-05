@@ -304,12 +304,15 @@ function imageNode(element) {
                     if (element.hasAttribute("type")) {
                         switch (element.attributes["type"].value) {
                             default:
+                            case "jpeg":
                             case "jpg":
                                 newSrc += ".jpg";
                                 break;
                             case "png":
                                 newSrc += ".png";
                                 break;
+                            case "gif":
+                                newSrc += ".gif"
 
                         }
                     } else {

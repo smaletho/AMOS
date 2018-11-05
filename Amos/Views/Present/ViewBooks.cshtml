@@ -29,7 +29,7 @@
                 @Html.DisplayFor(modelItem => item.Version)
             </td>
             <td>
-                @Html.ActionLink("view", "Index", "View", new { id = item.BookId }, null)
+                <a class="btn btn-primary" href="@Url.Action("Index", "View", new { id = item.BookId })">View</a>
             </td>
         </tr>
     }

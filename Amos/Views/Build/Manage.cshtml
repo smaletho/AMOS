@@ -140,7 +140,7 @@ else
 @section scripts{
     <script src="~/Content/js/shared.js"></script>
     <script>
-        var model = JSON.parse('@Html.Raw(Json.Encode(Model))');
+        @*var model = JSON.parse('@Html.Raw(Json.Encode(Model))');*@
 
         function enableDisable_success(data) {
             if (data == "success")
