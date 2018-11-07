@@ -12,6 +12,10 @@
     <link rel="stylesheet" href="~/Content/css/Configure.css?v=8">
 }
 
+<a href="@Url.Action("Manage", "Build", new { id=Model.PageQueryModel.BookId })" class="btn btn-default" style="margin-bottom:20px;">
+    <i class="fa fa-arrow-left"></i> Back to manage book
+</a>
+
     <div id="Main">
         @*==================================
             LEFT COLUMN:  book outline

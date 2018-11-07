@@ -1286,7 +1286,24 @@ namespace Amos.Controllers
             newPage.Title = page.Title + " - Copy";
             newPage.Type = "content";
             db.Pages.Add(newPage);
+
             db.SaveChanges();
+
+            var files = db.AmosFiles.Where(x => x.PageId == id).ToList();
+            foreach (var file in files)
+            {
+                AmosFile f = new AmosFile();
+                f.PageId = newPage.PageId;
+                f.Content = file.Content;
+                f.ContentType = file.ContentType;
+                f.FileName = file.FileName;
+                f.FileType = file.FileType;
+
+                db.AmosFiles.Add(f);
+            }
+            db.SaveChanges();
+
+
             return RedirectToAction("ListPages");
         }
 

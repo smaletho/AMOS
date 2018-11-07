@@ -42,56 +42,45 @@ function processOfflinePageContents() {
 
 }
 
-//function processOfflineXml() {
-//    // replace all "page" nodes with empty ones that reference other objects
-//    PageContent = [];
+function displayUserData() {
+    //  Exporting subject data when using offline version
 
+    var csv = "";
 
-//    $(ConfigXml).contents().each(function processNodes() {
-        
-//        // check for empty node
-//        if (!blankTextNode(this)) {
-//            if (this.nodeName.toLowerCase() === "page") {
-//                // I'm cutting out all the stuff page contents when it can be sent from the server
-//                var id = $(this).prop('id');
+    // Quiz responses
+    csv += "Quiz Responses\n";
+    csv += "User, Question, User Answer, Correct Answer, Time Answered\n";
+    for (var i = 0; i < UserTracker.QuizResponses.length; i++) {
+        csv += "\"" + UserTracker.Email + "\", " +
+            "\"" + UserTracker.QuizResponses[i].Question + "\", " +
+            "\"" + UserTracker.QuizResponses[i].UserAnswer + "\", " +
+            "\"" + UserTracker.QuizResponses[i].CorrectAnswer + "\", " +
+            "\"" + UserTracker.QuizResponses[i].Time + "\"\n";
+    }
 
-//                var parentChapter = $(this).parent("chapter");
-//                var parentSection = $(parentChapter).parent("section");
-//                var parentModule = $(parentSection).parent("module");
+    csv += "\nSurvey Responses\n";
+    csv += "User, Question, Time Answered, User Answer, Comments\n";
+    for (var i = 0; i < UserTracker.SurveyResponses.length; i++) {
+        csv += UserTracker.Email + ", " +
+            "\"" + UserTracker.SurveyResponses[i].Question + "\", " +
+            "\"" + UserTracker.SurveyResponses[i].Time + "\", " +
+            "\"" + UserTracker.SurveyResponses[i].UserAnswer.value + "\", " +
+            "\"" + UserTracker.SurveyResponses[i].UserAnswer.comments + "\"\n";
+    }
 
-//                PageContent.push({
-//                    Module: $(parentModule).prop('id'),
-//                    Section: $(parentSection).prop('id'),
-//                    Chapter: $(parentChapter).prop('id'),
-//                    Page: id,
-//                    content: this.cloneNode(true),
-//                });
+    csv += "\nActivity Tracker\n";
+    csv += "User, To, From, Description, Time\n";
+    for (var i = 0; i < UserTracker.ActivityTracking.length; i++) {
+        csv += UserTracker.Email + ", " +
+            "\"" + UserTracker.ActivityTracking[i].to + "\", " +
+            "\"" + UserTracker.ActivityTracking[i].from + "\", " +
+            "\"" + UserTracker.ActivityTracking[i].description + "\", " +
+            "\"" + UserTracker.ActivityTracking[i].time + "\"\n";
+    }
 
-//                // make an empty page piece
-//                var blankPage = document.createElement("page");
-//                $(blankPage).prop('id', id);
-//                this.parentNode.replaceChild(blankPage, this);
-
-//            }
-
-//            // recurse
-//            $(this).contents().each(processNodes);
-//        }
-//    });
-
-//    updateLoadingText('Finished processing book');
-
-//    setTimeout(function () {
-//        updateLoadingText('');
-//        $("#loading").hide();
-//        $("#main-window").css('display', 'table');
-
-//        secondInit();
-//    }, 1000);
-
-//    // process the pages now
-//    //  to: base.js
-//    //processPages(PageContent);
-
-    
-//}
+    var hiddenElement = document.createElement('a');
+    hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+    hiddenElement.target = '_blank';
+    hiddenElement.download = 'export.csv';
+    hiddenElement.click();
+}

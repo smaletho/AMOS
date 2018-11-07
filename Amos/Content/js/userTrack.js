@@ -163,7 +163,8 @@ function addUserNavigation(from, to, how) {
 }
 
 function saveTracker() {
-    saveUserTracking();
+    if (applicationMode != "offline")
+        saveUserTracking();
     window.localStorage.setItem(UserTracker.Email, JSON.stringify(UserTracker));
 }
 

@@ -159,7 +159,12 @@ function exitBook(str) {
     openConfirmationDialog(str, function () {
         UserTracker.ExitTime = new Date();
         saveTracker();
-        window.localStorage.clear();
-        window.location = URL_GoHome;
+
+        if (applicationMode == "offline") {
+            displayUserData();
+        } else {
+            window.localStorage.clear();
+            window.location = URL_GoHome;
+        }
     });
 }
