@@ -35,21 +35,9 @@
 </table>
 
 @section scripts{
-<script src="~/Content/js/shared.js"></script>
+    <script src="~/Content/js/shared.js"></script>
     <script>
-        function assignButton(buttonId, onPageId, toPageId, element) {
-            $(element).closest("ul").prev("button").button("loading");
-            transmitAction('@Url.Action("AssignButton")', function (data) {
-                $("#button-table").empty();
-                $("#button-table").append(data);
-                $(element).closest("ul").prev("button").button("reset");
-            }, enableDisable_fail, "", { buttonId: buttonId, onPageId: onPageId, toPageId: toPageId }, true);
-        }
-
-        function enableDisable_fail(data) {
-            alert("Error");
-            console.log("error", data);
-        }
-
+        var URL_AssignButton = '@Url.Action("AssignButton")';
     </script>
-}
+    <script src="~/Content/js/ManageButtons.js"></script>
+    }

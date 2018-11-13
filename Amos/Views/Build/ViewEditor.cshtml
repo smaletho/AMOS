@@ -35,10 +35,21 @@
 
 <div class="container-fluid" style="width:50%;margin-top:20px;text-align:center">
     <div class="col-lg-4">
-        <a href="@Url.Action("ListPages")" type="button" class="btn btn-default">
-            <i class="fa fa-arrow-left"></i>
-            Back to list
-        </a>
+        @if (Model.BookId == 0)
+        {
+            <a href="@Url.Action("ListPages")" type="button" class="btn btn-default">
+                <i class="fa fa-arrow-left"></i>
+                Back to list
+            </a>
+        }
+        else
+        {
+            <a href="@Url.Action("Index", "Configure", new { id = Model.BookId })" type="button" class="btn btn-default">
+                <i class="fa fa-arrow-left"></i>
+                Back to outline
+            </a>
+        }
+
     </div>
     <div class="col-lg-4">
         <button id="save-page" type="button" class="btn btn-primary">
@@ -257,7 +268,7 @@
                         $(".preview-window").first().append(renderElement(this));
                 });
             } catch{}
-            
+
 
         }
 

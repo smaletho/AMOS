@@ -8,11 +8,11 @@ $(function () {
 
     // If location.hostname == "", it means that the app is running as a "file" not on a server
     //  therefore, we're offline, so do that load instead
-    if (location.hostname == "") {
+    if (location.hostname === "") {
         // when this function finishes, it will call the remaining init
         applicationMode = "offline";
         offlineLoadInit();
-    } else if (location.pathname.indexOf("Build") != -1) {
+    } else if (location.pathname.indexOf("Build") !== -1) {
         // using the page viewer.
         applicationMode = "viewer";
         viewerInit();

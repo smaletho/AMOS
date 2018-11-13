@@ -50,6 +50,7 @@ namespace Amos.Models
         public int PageId { get; set; }
         public string PageName { get; set; }
         public string PageType { get; set; }
+        public int BookId { get; set; }
     }
 
     public class PageListModel

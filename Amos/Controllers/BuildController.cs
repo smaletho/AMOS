@@ -22,7 +22,7 @@ namespace Amos.Controllers
         {
             return View();
         }
-        
+
         public ActionResult ListBooks()
         {
             ApplicationDbContext adb = new ApplicationDbContext();
@@ -416,6 +416,8 @@ namespace Amos.Controllers
             string fullFileName = Server.MapPath("~/ZipDump/export_" + bookName + "_" + dt + ".zip");
             string fileName = "export_" + bookName + "_" + dt + ".zip";
 
+            Dictionary<string, string> fileNameToExtension = new Dictionary<string, string>();
+
             // write each of these to a file
             using (ZipFile zip = new ZipFile())
             {
@@ -441,14 +443,17 @@ namespace Amos.Controllers
                                         case "image/jpeg":
                                             fName += ".jpg";
                                             newFileName += "i_" + f.FileId.ToString() + ".jpg";
+                                            fileNameToExtension.Add("i_" + f.FileId.ToString(), "jpg");
                                             break;
                                         case "image/png":
                                             fName += ".png";
                                             newFileName += "i_" + f.FileId.ToString() + ".png";
+                                            fileNameToExtension.Add("i_" + f.FileId.ToString(), "png");
                                             break;
                                         case "image/gif":
                                             fName += ".gif";
                                             newFileName += "i_" + f.FileId.ToString() + ".gif";
+                                            fileNameToExtension.Add("i_" + f.FileId.ToString(), "gif");
                                             break;
                                     }
                                     break;
@@ -459,6 +464,7 @@ namespace Amos.Controllers
                                         case "video/mp4":
                                             fName += ".mp4";
                                             newFileName += "v_" + f.FileId.ToString() + ".mp4";
+                                            fileNameToExtension.Add("v_" + f.FileId.ToString(), "mp4");
                                             break;
                                     }
                                     break;
@@ -468,7 +474,6 @@ namespace Amos.Controllers
                             using (var tw = new StreamWriter(fName, true))
                             {
                                 tw.BaseStream.Write(f.Content, 0, f.Content.Length);
-
                                 zip.AddFile(fName).FileName = newFileName;
                             }
                             count++;
@@ -480,6 +485,27 @@ namespace Amos.Controllers
                 string configFileName = Server.MapPath("~/ZipDump/config.xml");
                 using (var tw = new StreamWriter(configFileName, true))
                 {
+                    // Images need to have the right file type associated with them. It's not always explicitly specified
+                    XmlNodeList imageNodeList = bookModel.ConfigXml.SelectNodes("//image");
+                    foreach (XmlElement node in imageNodeList)
+                    {
+                        if (node.Attributes["type"] == null)
+                        {
+                            try
+                            {
+                                string fileExtension = fileNameToExtension[node.Attributes["source"].Value];
+                                node.SetAttribute("type", fileExtension);
+                            }
+                            catch
+                            {
+
+                            }
+
+                        }
+                    }
+                    //XmlNodeList videoNodeList = bookModel.ConfigXml.SelectNodes("//video");
+
+
                     tw.Write(bookModel.ConfigXml.OuterXml);
                     zip.AddFile(configFileName).FileName = "config.xml";
                 }
@@ -563,6 +589,68 @@ namespace Amos.Controllers
 
                 }
 
+                // first get all the pages in the book
+                //var bookPages = cdb.BookPages.Where(x => x.BookId == theBook.BookId).Select(x => x.PageId).ToList();
+                var pages = cdb.Pages.Where(x => x.BookId == theBook.BookId).ToList();
+                Dictionary<string, string> fileNameToExtension = new Dictionary<string, string>();
+                foreach (var p in pages)
+                {
+                    // find all associated files with that page
+                    var files = cdb.AmosFiles.Where(x => x.PageId == p.PageId).ToList();
+                    int count = 1;
+                    foreach (var f in files)
+                    {
+                        if (f.Content != null)
+                        {
+                            string fName = Server.MapPath("~/ZipDump/f_" + f.FileId.ToString() + "_" + dt);
+                            string newFileName = "/Content/";
+                            switch (f.FileType)
+                            {
+                                case FileType.Photo:
+                                    switch (f.ContentType)
+                                    {
+                                        case "image/jpg":
+                                        case "image/jpeg":
+                                            fName += ".jpg";
+                                            newFileName += "images/i_" + f.FileId.ToString() + ".jpg";
+                                            fileNameToExtension.Add("i_" + f.FileId.ToString(), "jpg");
+                                            break;
+                                        case "image/png":
+                                            fName += ".png";
+                                            newFileName += "images/i_" + f.FileId.ToString() + ".png";
+                                            fileNameToExtension.Add("i_" + f.FileId.ToString(), "png");
+                                            break;
+                                        case "image/gif":
+                                            fName += ".gif";
+                                            newFileName += "images/i_" + f.FileId.ToString() + ".gif";
+                                            fileNameToExtension.Add("i_" + f.FileId.ToString(), "gif");
+                                            break;
+                                    }
+                                    break;
+                                case FileType.Video:
+                                    switch (f.ContentType)
+                                    {
+                                        case "video/mp4":
+                                            fName += ".mp4";
+                                            newFileName += "images/v_" + f.FileId.ToString() + ".mp4";
+                                            fileNameToExtension.Add("i_" + f.FileId.ToString(), "mp4");
+                                            break;
+                                    }
+                                    break;
+                            }
+
+                            // write the file to the stream
+                            using (var tw = new StreamWriter(fName, true))
+                            {
+                                tw.BaseStream.Write(f.Content, 0, f.Content.Length);
+
+                                zip.AddFile(fName).FileName = newFileName;
+                            }
+                            count++;
+                        }
+                    }
+                }
+
                 using (var tw = new StreamWriter(configFile1, true))
                 {
                     // create the config file
@@ -593,6 +681,26 @@ namespace Amos.Controllers
 
                     foreach (var page in contentLs)
                     {
+                        // update the "type" attribute for images
+                        try
+                        {
+                            XmlDocument x = new XmlDocument();
+                            x.LoadXml(page);
+                            XmlNodeList imageNodeList = x.SelectNodes("//image");
+                            foreach (XmlElement node in imageNodeList)
+                            {
+                                if (node.Attributes["type"] == null)
+                                {
+                                    try
+                                    {
+                                        string fileExtension = fileNameToExtension[node.Attributes["source"].Value];
+                                        node.SetAttribute("type", fileExtension);
+                                    }
+                                    catch { }
+                                }
+                            }
+                        }
+                        catch { }
                         tw.WriteLine("offline_PageGuts.push(`" + page + "`);");
                     }
 
@@ -603,62 +711,7 @@ namespace Amos.Controllers
 
                 // map the images too
 
-                // first get all the pages in the book
-                //var bookPages = cdb.BookPages.Where(x => x.BookId == theBook.BookId).Select(x => x.PageId).ToList();
-                var pages = cdb.Pages.Where(x => x.BookId == theBook.BookId).ToList();
-                foreach (var p in pages)
-                {
-                    // find all associated files with that page
-                    var files = cdb.AmosFiles.Where(x => x.PageId == p.PageId).ToList();
-                    int count = 1;
-                    foreach (var f in files)
-                    {
-                        if (f.Content != null)
-                        {
-                            string fName = Server.MapPath("~/ZipDump/f_" + f.FileId.ToString() + "_" + dt);
-                            string newFileName = "/Content/";
-                            switch (f.FileType)
-                            {
-                                case FileType.Photo:
-                                    switch (f.ContentType)
-                                    {
-                                        case "image/jpg":
-                                        case "image/jpeg":
-                                            fName += ".jpg";
-                                            newFileName += "images/i_" + f.FileId.ToString() + ".jpg";
-                                            break;
-                                        case "image/png":
-                                            fName += ".png";
-                                            newFileName += "images/i_" + f.FileId.ToString() + ".png";
-                                            break;
-                                        case "image/gif":
-                                            fName += ".gif";
-                                            newFileName += "images/i_" + f.FileId.ToString() + ".gif";
-                                            break;
-                                    }
-                                    break;
-                                case FileType.Video:
-                                    switch (f.ContentType)
-                                    {
-                                        case "video/mp4":
-                                            fName += ".mp4";
-                                            newFileName += "images/v_" + f.FileId.ToString() + ".mp4";
-                                            break;
-                                    }
-                                    break;
-                            }
 
-                            // write the file to the stream
-                            using (var tw = new StreamWriter(fName, true))
-                            {
-                                tw.BaseStream.Write(f.Content, 0, f.Content.Length);
-
-                                zip.AddFile(fName).FileName = newFileName;
-                            }
-                            count++;
-                        }
-                    }
-                }
 
 
 
@@ -742,6 +795,7 @@ namespace Amos.Controllers
                 model.PageId = 0;
                 model.PageName = "New Page";
                 model.XmlContent = "<page type=\"content\"></page>";
+                model.BookId = 0;
             }
             else
             {
@@ -750,6 +804,7 @@ namespace Amos.Controllers
                 model.PageId = id;
                 model.XmlContent = page.PageContent;
                 model.PageName = page.Title;
+                model.BookId = page.BookId;
             }
 
 
@@ -824,6 +879,7 @@ namespace Amos.Controllers
                     model.PageType = page.Type;
                     string oldContent = page.PageContent;
                     model.XmlContent = oldContent.Replace("href=\"javascript:void(0)\"", "href=\"#\"");
+                    model.BookId = page.BookId;
 
                     XmlDocument doc = new XmlDocument();
                     try
@@ -854,8 +910,9 @@ namespace Amos.Controllers
                 {
                     model.PageName = "New Page";
                     model.XmlContent = "<page type=\"content\"></page>";
+                    model.BookId = 0;
                 }
-                
+
                 return View(model);
             }
         }
@@ -1122,7 +1179,7 @@ namespace Amos.Controllers
                             try
                             {
                                 int id = Convert.ToInt32(fileId.Split('_')[1]);
-                                var dbImage = cdb.AmosFiles.Where(x => x.FileId == id).FirstOrDefault();
+                                var dbImage = cdb.AmosFiles.Where(x => x.FileId == id && x.PageId == page.PageId).FirstOrDefault();
                                 if (dbImage != null)
                                 {
                                     dbImage.PageId = page.PageId;
@@ -1202,6 +1259,10 @@ namespace Amos.Controllers
             cdb.Books.Add(newBook);
             cdb.SaveChanges();
 
+            // Key: Old Page Id     Value: New Page Id
+            Dictionary<int, int> PageIdPairs = new Dictionary<int, int>();
+            Dictionary<int, int> oldToNewFileIds = new Dictionary<int, int>();
+
             foreach (var mod in modules)
             {
                 Module newModule = new Module
@@ -1252,6 +1313,8 @@ namespace Amos.Controllers
                             cdb.Pages.Add(newPage);
                             cdb.SaveChanges();
 
+                            PageIdPairs.Add(pag.PageId, newPage.PageId);
+
                             foreach (var file in files.Where(x => x.PageId == pag.PageId).ToList())
                             {
                                 AmosFile newFile = new AmosFile
@@ -1264,12 +1327,47 @@ namespace Amos.Controllers
                                 };
                                 cdb.AmosFiles.Add(newFile);
                                 cdb.SaveChanges();
+
+                                oldToNewFileIds.Add(file.FileId, newFile.FileId);
                             }
                         }
                     }
                 }
             }
 
+            // Fix all the page buttons
+            ManagePagesModel managePagesModel = new ManagePagesModel(newBook.BookId);
+            foreach (var button in managePagesModel.pageButtons)
+            {
+                AssignButton(button.ButtonId, button.PageId, PageIdPairs[button.NavPageId]);
+            }
+
+
+            foreach(var page in managePagesModel.PageListModel.PageList)
+            {
+                XmlDocument doc = new XmlDocument();
+                doc.LoadXml(page.PageContent);
+                foreach(XmlElement img in doc.SelectNodes("//image"))
+                {
+                    var oldSource = img.GetAttribute("source").Split('_');
+                    int oldSourceId = Convert.ToInt32(oldSource[1]);
+
+                    string newSource = "i_" + oldToNewFileIds[oldSourceId];
+                    img.SetAttribute("source", newSource);
+                }
+
+                foreach(XmlElement vid in doc.SelectNodes("//video"))
+                {
+                    var oldSource = vid.GetAttribute("source").Split('_');
+                    int oldSourceId = Convert.ToInt32(oldSource[1]);
+
+                    string newSource = "v_" + oldToNewFileIds[oldSourceId];
+                    vid.SetAttribute("source", newSource);
+                }
+
+                page.PageContent = doc.OuterXml;
+                cdb.SaveChanges();
+            }
 
 
             return RedirectToAction("ListBooks");
@@ -1806,7 +1904,7 @@ namespace Amos.Controllers
                 db.SaveChanges();
                 return Content("success");
             }
-                
+
             else
             {
                 // validate
@@ -1831,7 +1929,7 @@ namespace Amos.Controllers
 
                 // check the modules
                 int moduleCount = 0;
-                foreach(var mod in model.PageListModel.Modules)
+                foreach (var mod in model.PageListModel.Modules)
                 {
                     moduleCount++;
 
@@ -1860,7 +1958,7 @@ namespace Amos.Controllers
 
                         // check the chapters
                         int chapterCount = 0;
-                        foreach(var cha in model.PageListModel.Chapters.Where(x => x.SectionId == sec.SectionId).ToList())
+                        foreach (var cha in model.PageListModel.Chapters.Where(x => x.SectionId == sec.SectionId).ToList())
                         {
                             chapterCount++;
 
@@ -1949,7 +2047,7 @@ namespace Amos.Controllers
                 }
 
                 List<int> currentPageIds = model.PageListModel.PageList.Select(x => x.PageId).ToList();
-                foreach(var btn in model.pageButtons)
+                foreach (var btn in model.pageButtons)
                 {
                     if (btn.NavPageId == 0)
                     {
@@ -1998,10 +2096,10 @@ namespace Amos.Controllers
             ApplicationDbContext db = new ApplicationDbContext();
             var onPage = db.Pages.Where(x => x.PageId == onPageId).FirstOrDefault();
             var toPage = db.Pages.Where(x => x.PageId == toPageId).FirstOrDefault();
-            
+
             // buttonId is the count of numbers on one page. works with indexes
             //  ex: find the 4th button on pageId == onPageId
-            
+
             // parse the page
             XmlDocument xmlDoc = new XmlDocument();
             List<PageButton> pageButtonList = new List<PageButton>();
@@ -2021,7 +2119,7 @@ namespace Amos.Controllers
                                 if (buttonCount == buttonId)
                                 {
                                     // this is the item
-                                    contentNode.Attributes["id"].Value = "p_" + toPageId.ToString();
+                                    contentNode.SetAttribute("id", "p_" + toPageId.ToString());
                                     break;
                                 }
                                 buttonCount++;
@@ -2035,7 +2133,7 @@ namespace Amos.Controllers
                             if (buttonCount == buttonId)
                             {
                                 // this is the item
-                                contentNode.Attributes["id"].Value = "p_" + toPageId.ToString();
+                                contentNode.SetAttribute("id", "p_" + toPageId.ToString());
                                 break;
                             }
                             buttonCount++;
@@ -2052,7 +2150,7 @@ namespace Amos.Controllers
                                     if (buttonCount == buttonId)
                                     {
                                         // this is the item
-                                        contentNode.Attributes["id"].Value = "p_" + toPageId.ToString();
+                                        contentNode.SetAttribute("id", "p_" + toPageId.ToString());
                                         break;
                                     }
                                     buttonCount++;

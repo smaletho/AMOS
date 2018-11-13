@@ -511,18 +511,17 @@ html {
     height: 20px;
     border: none;
     text-align: center;
-    padding-top: 0;
+    padding-top: 5px;
     cursor: pointer;
     margin-top: 15px;
     font-size: 10pt;
-    border-bottom: 1px solid;
     font-family: 'Fira Sans Compressed';
 }
     .dot.leftborder {
-        border-left: 1px solid black;
+        border-left: 3px solid gray;
     }
     .dot.rightborder {
-        border-right: 1px solid black;
+        border-right: 3px solid gray;
     }
     .dot.selected{
         background-color:black;

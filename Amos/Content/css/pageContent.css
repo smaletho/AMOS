@@ -20,6 +20,11 @@
         font-weight: bold;
     }
 
+    #page-content .sub-header {
+        font-weight:400;
+        font-size:14pt;
+    }
+
     #page-content button {
         outline: none;
         cursor: pointer;

@@ -12,7 +12,7 @@
 
 function initTracking() {
 
-    if (applicationMode != "viewer") {
+    if (applicationMode !== "viewer") {
         
         setInterval(saveUserTracking, 30000);
 
@@ -24,7 +24,7 @@ function initTracking() {
 
 function subjectLogin() {
     var email = $("#subject-email").val().trim().toLowerCase();
-    if (email == null || email == "") {
+    if (email === null || email === "") {
         openDialog("Please enter your email address.", "Error");
     } else {
         UserTracker.Email = email;
@@ -33,9 +33,9 @@ function subjectLogin() {
         // check local storage on this machine
         var existingData = window.localStorage.getItem(email);
 
-        if (existingData == null) {
+        if (existingData === null) {
             // nothing was found on this machine, if online, check the server
-            if (applicationMode == "online") {
+            if (applicationMode === "online") {
                 checkOnlineTracking(email);
             } else {
                 // running offline, and no matching email was found.
@@ -44,34 +44,47 @@ function subjectLogin() {
                 UserTracker.CurrentLocation = CurrentLocation;
                 UserTracker.Email = email;
                 UserTracker.StartTime = new Date();
+                closeSubjectDialog();
+                thirdInit();
             }
         } else {
             // check if existing data is for the same book we're viewing now
             var tempTracker = JSON.parse(existingData);
-            if (tempTracker.CurrentLocation != null) {
-                if (getBookId() == tempTracker.CurrentLocation.Book) {
+            if (tempTracker.CurrentLocation !== null) {
+                if (getBookId() === tempTracker.CurrentLocation.Book) {
                     // same book. 
-                    UserTracker = JSON.parse(existingData);
+                    openConfirmationDialog("I found a matching user on this machine. Would you like to pick up where you left off, or start a new session? Click 'okay' to continue, or 'cancel' to start over.", function () {
+                        UserTracker = JSON.parse(existingData);
+                        closeSubjectDialog();
+                        thirdInit();
+                    }, function () {
+                        window.localStorage.clear();
+                        closeSubjectDialog();
+                        thirdInit();
+                        });
+                    
                 } else {
                     // not the same book. remove the object
                     window.localStorage.clear();
+                    closeSubjectDialog();
+                    thirdInit();
                 }
             } else {
                 // something is off, start over
                 window.localStorage.clear();
+                closeSubjectDialog();
+                thirdInit();
             }
 
         }
-        closeSubjectDialog();
-        thirdInit();
     }
 }
 
 
 function getSurveyAnswer(question) {
-    if (UserTracker.SurveyResponses == null) UserTracker.SurveyResponses = [];
+    if (UserTracker.SurveyResponses === null) UserTracker.SurveyResponses = [];
     for (var i = 0; i < UserTracker.SurveyResponses.length; i++) {
-        if (UserTracker.SurveyResponses[i].Question == question) {
+        if (UserTracker.SurveyResponses[i].Question === question) {
             return UserTracker.SurveyResponses[i].UserAnswer;
         }
     }
@@ -79,7 +92,7 @@ function getSurveyAnswer(question) {
 }
 
 function addSurveyAnswer(question, userAnswer) {
-    if (UserTracker.QuizResponses == null) UserTracker.QuizResponses = [];
+    if (UserTracker.QuizResponses === null) UserTracker.QuizResponses = [];
     UserTracker.SurveyResponses.push({
         Question: question,
         UserAnswer: userAnswer,
@@ -89,9 +102,9 @@ function addSurveyAnswer(question, userAnswer) {
 }
 
 function getQuizAnswer(question) {
-    if (UserTracker.QuizResponses == null) UserTracker.QuizResponses = [];
+    if (UserTracker.QuizResponses === null) UserTracker.QuizResponses = [];
     for (var i = 0; i < UserTracker.QuizResponses.length; i++) {
-        if (UserTracker.QuizResponses[i].Question == question) {
+        if (UserTracker.QuizResponses[i].Question === question) {
             return UserTracker.QuizResponses[i];
         }
     }
@@ -99,7 +112,7 @@ function getQuizAnswer(question) {
 }
 
 function addQuizAnswer(question, userAnswer, correctAnswer) {
-    if (UserTracker.QuizResponses == null) UserTracker.QuizResponses = [];
+    if (UserTracker.QuizResponses === null) UserTracker.QuizResponses = [];
     UserTracker.QuizResponses.push({
         Question: question,
         UserAnswer: userAnswer,
@@ -110,16 +123,22 @@ function addQuizAnswer(question, userAnswer, correctAnswer) {
 }
 
 
-
-
 function checkOnlineTracking(email) {
     // check online
     transmitAction(URL_LoadTracker, checkOnlineTracking_success, checkOnlineTracking_fail, "json", { email: email, id: getBookId() }, false);
 }
 
 function checkOnlineTracking_success(data) {
-    if (data != "none") {
-        UserTracker = JSON.parse(data);
+    if (data !== "none") {
+        openConfirmationDialog("I found a matching user on this machine. Would you like to pick up where you left off, or start a new session? Click 'okay' to continue, or 'cancel' to start over.", function () {
+            UserTracker = JSON.parse(data);
+            closeSubjectDialog();
+            thirdInit();
+        }, function () {
+            window.localStorage.clear();
+            closeSubjectDialog();
+            thirdInit();
+        });
     }
         
 }
@@ -153,7 +172,7 @@ function addUserNavigation(from, to, how) {
     };
     UserTracker.ActivityTracking.push(navOb);
 
-    if (UserTracker.VisitedPages.indexOf(to.Page) == -1) 
+    if (UserTracker.VisitedPages.indexOf(to.Page) === -1) 
         UserTracker.VisitedPages.push(to.Page);
     
     UpdateCurrentLocation(to);
@@ -163,7 +182,7 @@ function addUserNavigation(from, to, how) {
 }
 
 function saveTracker() {
-    if (applicationMode != "offline")
+    if (applicationMode !== "offline")
         saveUserTracking();
     window.localStorage.setItem(UserTracker.Email, JSON.stringify(UserTracker));
 }

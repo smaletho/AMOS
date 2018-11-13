@@ -110,6 +110,11 @@ function closeDialog() {
 }
 
 function openSubjectDialog() {
+    $("#subject-login").keypress(function (e) {
+        if (e.keyCode === $.ui.keyCode.ENTER) {
+            subjectLogin();
+        }
+    });
     $("#subject-login").dialog('open');
 }
 
@@ -118,7 +123,7 @@ function closeSubjectDialog() {
     $("#subject-login").dialog('close');
 }
 
-function openConfirmationDialog(text, callback) {
+function openConfirmationDialog(text, callback, cancelCallback) {
     $("#confirm-dialog").dialog("option", "buttons", [
         {
             text: "Okay",
@@ -131,8 +136,11 @@ function openConfirmationDialog(text, callback) {
             text: "Cancel",
             click: function () {
                 $(this).dialog("close");
+                if (cancelCallback && typeof cancelCallback === "function") {
+                    cancelCallback();
+                }
             }
-        },
+        }
     ]);
 
     $("#confirm-dialog-content").text(text);
@@ -154,13 +162,13 @@ function getBookId() {
 
 function exitBook(str) {
     // open confirmation
-    if (typeof (str) === "undefined" || str == "") str = "Would you like to exit this book?";
+    if (typeof str === "undefined" || str === "") str = "Would you like to exit this book?";
 
     openConfirmationDialog(str, function () {
         UserTracker.ExitTime = new Date();
         saveTracker();
 
-        if (applicationMode == "offline") {
+        if (applicationMode === "offline") {
             displayUserData();
         } else {
             window.localStorage.clear();

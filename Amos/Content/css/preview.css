@@ -23,6 +23,11 @@
         font-weight: bold;
     }
 
+    .preview-window .sub-header {
+        font-weight:400;
+        font-size:14pt;
+    }
+
     .preview-window button {
         outline: none;
         cursor: pointer;
