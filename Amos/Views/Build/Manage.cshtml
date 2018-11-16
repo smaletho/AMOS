@@ -195,7 +195,12 @@ else
             }, enableDisable_fail, "", { buttonId: buttonId, onPageId: onPageId, toPageId: toPageId }, true);
         }
 
-
+        $(function () {
+            $(".btn").button();
+            $(".btn").on('click', function () {
+                $(this).button("loading");
+            });
+        });
 
         @*$(function () {
             transmitAction('@Url.Action("BuildButtonList")', function (data) {

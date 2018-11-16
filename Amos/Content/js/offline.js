@@ -18,7 +18,7 @@ function processOfflinePageContents() {
     //  fills offline_PageGuts
     loadGuts();
 
-    if (PageContent.length != offline_PageGuts.length) {
+    if (PageContent.length !== offline_PageGuts.length) {
         alert("Fail!");
         return false;
     } else {
@@ -46,11 +46,12 @@ function displayUserData() {
     //  Exporting subject data when using offline version
 
     var csv = "";
+    var i = 0;
 
     // Quiz responses
     csv += "Quiz Responses\n";
     csv += "User, Question, User Answer, Correct Answer, Time Answered\n";
-    for (var i = 0; i < UserTracker.QuizResponses.length; i++) {
+    for (i = 0; i < UserTracker.QuizResponses.length; i++) {
         csv += "\"" + UserTracker.Email + "\", " +
             "\"" + UserTracker.QuizResponses[i].Question + "\", " +
             "\"" + UserTracker.QuizResponses[i].UserAnswer + "\", " +
@@ -60,7 +61,7 @@ function displayUserData() {
 
     csv += "\nSurvey Responses\n";
     csv += "User, Question, Time Answered, User Answer, Comments\n";
-    for (var i = 0; i < UserTracker.SurveyResponses.length; i++) {
+    for (i = 0; i < UserTracker.SurveyResponses.length; i++) {
         csv += UserTracker.Email + ", " +
             "\"" + UserTracker.SurveyResponses[i].Question + "\", " +
             "\"" + UserTracker.SurveyResponses[i].Time + "\", " +
@@ -70,7 +71,7 @@ function displayUserData() {
 
     csv += "\nActivity Tracker\n";
     csv += "User, To, From, Description, Time\n";
-    for (var i = 0; i < UserTracker.ActivityTracking.length; i++) {
+    for (i = 0; i < UserTracker.ActivityTracking.length; i++) {
         csv += UserTracker.Email + ", " +
             "\"" + UserTracker.ActivityTracking[i].to + "\", " +
             "\"" + UserTracker.ActivityTracking[i].from + "\", " +

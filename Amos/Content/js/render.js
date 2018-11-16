@@ -16,23 +16,131 @@ function renderInit() {
 
         $("#definitionWindow").show();
         $("#definitionWindow").text($(this).data('text'));
+
+        addUserActionLog("Definition clicked. Text: " + $(this).text().trim());
         return false;
     });
 
-    $("#page-content").on('click', function () {
+    $(".content-window").on('click', function () {
         $("#definitionWindow").hide();
         $("#definitionWindow").css('top', '0');
         $("#definitionWindow").css('left', '0');
-        $("#definitionWindow").text('');
+        $("#definitionWindow").empty();
+
+        $("#popupWindow").empty();
     });
 
-    if (applicationMode != "viewer") {
-        if ($("#page-content").find(".quiz-submit").length != 0) {
+    $(".content-window img").on('click', function () {
+        var clonedImg = $(this).clone();
+        openModalPopup();
+        $("#full-modal-content").css('background-image', 'url(' + $(clonedImg).prop('src') + ')');
+    });
+
+    $(".dialogLink").on('click', function () {
+
+        var text = $(this).data('text');
+        var item = $(this).data('content');
+
+        $("#popup-text").text(text);
+
+        if (item !== "undefined") {
+            var src = "";
+            var newSrc = "";
+
+            if (item.indexOf("i") !== -1) {
+                // it's an image
+                var newNode = $("<img></img>");
+                $(newNode).addClass("item");
+                $(newNode).width($(this).data('size'));
+
+                src = item;
+                newSrc = "";
+
+                // running offline
+                if (applicationMode === "offline") {
+                    // TODO: catch other types of images
+
+                    newSrc = "./Content/images/" + src;
+                    if (element.hasAttribute("type")) {
+                        switch (element.attributes["type"].value) {
+                            default:
+                            case "jpeg":
+                            case "jpg":
+                                newSrc += ".jpg";
+                                break;
+                            case "png":
+                                newSrc += ".png";
+                                break;
+                            case "gif":
+                                newSrc += ".gif";
+
+                        }
+                    } else {
+                        newSrc += ".jpg";
+                    }
+
+                } else {
+                    newSrc = URL_Content + "ImageManager.ashx?id=" + src;
+                }
+
+                $(newNode).prop('src', newSrc);
+            } else {
+                // it's a video
+                src = element.attributes[i].value;
+                newSrc = "";
+
+                // running offline
+                if (applicationMode === "offline") {
+                    // TODO: catch other types of videos
+
+                    newSrc = "./Content/images/" + src;
+                    if (element.hasAttribute("type")) {
+                        switch (element.attributes["type"].value) {
+                            case "mp4":
+                                newSrc += ".mp4";
+                                break;
+                        }
+                    } else {
+                        newSrc += ".mp4";
+                    }
+                } else {
+                    newSrc = URL_Content + "ImageManager.ashx?id=" + src;
+                }
+
+
+
+                $(newNode).prop('src', newSrc);
+            }
+
+            $("#popup-content").append(newNode);
+        }
+
+        $("#popup").dialog('open');
+
+
+        //var dialogId = $(this).data('dialog');
+
+        //// find the matching dialog element
+        //var relevantDialog = $(".content-window").find(".dialog[data-dialogid=" + dialogId + "]").first();
+        //var clonedNode = $(relevantDialog).clone();
+
+        //// clone the element in to the definition window, and pop up
+        //$(clonedNode.contents()).each(function (k, v) {
+        //    var retElement = renderElement(this, true);
+        //    $("#dialog-content").append(retElement);
+        //});
+        //$("#dialog").dialog("open");
+
+        return false;
+    });
+
+    if (applicationMode !== "viewer") {
+        if ($("#page-content").find(".quiz-submit").length !== 0) {
             // it's a quiz page
             quizInit();
         }
 
-        if ($("#page-content").find(".survey-submit").length != 0) {
+        if ($("#page-content").find(".survey-submit").length !== 0) {
             // it's a survey page
             surveyInit();
         }
@@ -42,21 +150,23 @@ function renderInit() {
 }
 
 function okayToNavigateAway() {
-    if ($("#page-content").find(".quiz-submit").length != 0) {
+    var question;
+    var answer;
+    if ($("#page-content").find(".quiz-submit").length !== 0) {
         // it's a quiz page
-        var question = $(".quiz-question").first().text();
-        var answer = getQuizAnswer(question);
-        if (answer == "") {
+        question = $(".quiz-question").first().text();
+        answer = getQuizAnswer(question);
+        if (answer === "") {
             openDialog("Please answer the quiz question before navigating to a different page.", "Wait");
             return false;
         } else return true;
     }
 
-    else if ($("#page-content").find(".survey-submit").length != 0) {
+    else if ($("#page-content").find(".survey-submit").length !== 0) {
         // it's a survey page
-        var question = $(".survey-question").first().text();
-        var answer = getSurveyAnswer(question);
-        if (answer == "") {
+        question = $(".survey-question").first().text();
+        answer = getSurveyAnswer(question);
+        if (answer === "") {
             openDialog("Please answer the survey question before navigating to a different page.", "Wait");
             return false;
         } else return true;
@@ -70,7 +180,7 @@ function surveyInit() {
 
     var question = $(".survey-question").first().text();
     var answer = getSurveyAnswer(question);
-    if (answer == "") {
+    if (answer === "") {
         $(".survey-submit").on('click', function () {
             var valueAnswer = $('input[name=survey]:checked').val();
             if (typeof (valueAnswer) === "undefined") {
@@ -98,7 +208,7 @@ function surveyInit() {
 function quizInit() {
     var question = $(".quiz-question").first().text();
     var answer = getQuizAnswer(question);
-    if (answer == "") {
+    if (answer === "") {
         // load normal, no answer
         $(".post-quiz").hide();
         $(".quiz-submit").on('click', function () {
@@ -112,7 +222,7 @@ function quizInit() {
 
                 addQuizAnswer(question, userAnswer, answer);
 
-                if (userAnswer == answer) {
+                if (userAnswer === answer) {
                     openDialog("Your answer is correct!", "Correct!");
                     $(".post-quiz").addClass("correct");
                     $(".post-quiz").show();
@@ -131,13 +241,13 @@ function quizInit() {
         $('input[name=quiz][value="' + answer.UserAnswer + '"]').prop('checked', 'checked');
         $(".quiz-submit").hide();
 
-        if (answer.UserAnswer == answer.CorrectAnswer) $(".post-quiz").addClass("correct");
+        if (answer.UserAnswer === answer.CorrectAnswer) $(".post-quiz").addClass("correct");
         else $(".post-quiz").addClass('incorrect');
     }
 
 }
 
-function renderElement(element) {
+function renderElement(element, returnElement) {
     var newNode;
     switch (element.nodeName.toLowerCase()) {
         case "text":
@@ -152,6 +262,7 @@ function renderElement(element) {
             break;
         case "video":
             newNode = videoNode(element);
+            break;
     }
 
 
@@ -195,7 +306,11 @@ function renderElement(element) {
         }
     }
 
-    $("#page-content").append(newNode);
+    if (returnElement) {
+        return newNode;
+    } else {
+        $("#page-content").append(newNode);
+    }
 }
 
 function videoNode(element) {
@@ -251,7 +366,7 @@ function buttonNode(element) {
 
 
 
-    if (typeof (element.classList) === "undefined" || element.classList.length == 0) {
+    if (typeof (element.classList) === "undefined" || element.classList.length === 0) {
         $(newNode).on('click', function () {
             loadPage(element.id, "page", "button click (" + $(this).text() + ")");
         });
@@ -297,7 +412,7 @@ function imageNode(element) {
                 var newSrc = "";
 
                 // running offline
-                if (applicationMode == "offline") {
+                if (applicationMode === "offline") {
                     // TODO: catch other types of images
 
                     newSrc = "./Content/images/" + src;
@@ -312,7 +427,7 @@ function imageNode(element) {
                                 newSrc += ".png";
                                 break;
                             case "gif":
-                                newSrc += ".gif"
+                                newSrc += ".gif";
 
                         }
                     } else {
@@ -369,7 +484,7 @@ function textNode(element) {
 function textStyleMap(element, styles) {
     var styleArr = styles.split(';');
     for (var i = 0; i < styleArr.length; i++) {
-        if ($.trim(styleArr[i]) != "") {
+        if ($.trim(styleArr[i]) !== "") {
             var block = styleArr[i].split(':');
             $(element).css($.trim(block[0]), $.trim(block[1]));
         }
@@ -380,5 +495,6 @@ function textStyleMap(element, styles) {
 
 
 
+function getImageVideoSource() {
 
-
+}

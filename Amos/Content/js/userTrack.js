@@ -139,6 +139,10 @@ function checkOnlineTracking_success(data) {
             closeSubjectDialog();
             thirdInit();
         });
+    } else {
+        window.localStorage.clear();
+        closeSubjectDialog();
+        thirdInit();
     }
         
 }
@@ -150,6 +154,20 @@ function checkOnlineTracking_fail(data) {
 
 function UpdateCurrentLocation(loc) {
     UserTracker.CurrentLocation = loc;
+}
+
+function addUserActionLog(description) {
+
+    var pageDes = UserTracker.CurrentLocation.Module + ":" + UserTracker.CurrentLocation.Section + ":" + UserTracker.CurrentLocation.Chapter + ":" + UserTracker.CurrentLocation.Page;
+    
+    var navOb = {
+        to: "",
+        from: pageDes,
+        description: description,
+        time: new Date()
+    };
+    UserTracker.ActivityTracking.push(navOb);
+    saveTracker();
 }
 
 function addUserNavigation(from, to, how) {

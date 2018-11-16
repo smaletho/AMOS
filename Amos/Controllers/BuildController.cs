@@ -264,6 +264,7 @@ namespace Amos.Controllers
                                                                             {
                                                                                 case "jpg":
                                                                                 case "png":
+                                                                                case "gif":
                                                                                     f.ContentType = "image/" + type;
                                                                                     f.FileType = FileType.Photo;
                                                                                     break;
@@ -726,38 +727,44 @@ namespace Amos.Controllers
 
             try
             {
-                string[] mp4List = Directory.GetFiles(sourceDir, "*.mp4");
-                string[] pngList = Directory.GetFiles(sourceDir, "*.png");
-                string[] jpgList = Directory.GetFiles(sourceDir, "*.jpg");
-                string[] zipList = Directory.GetFiles(sourceDir, "*.zip");
-                string[] jsList = Directory.GetFiles(sourceDir, "*.js");
-                string[] htmlList = Directory.GetFiles(sourceDir, "*.html");
+                DirectoryInfo di = new DirectoryInfo(sourceDir);
+                foreach(FileInfo file in di.GetFiles())
+                {
+                    file.Delete();
+                }
 
-                // Delete source files
-                foreach (string f in zipList)
-                {
-                    System.IO.File.Delete(f);
-                }
-                foreach (string f in jsList)
-                {
-                    System.IO.File.Delete(f);
-                }
-                foreach (string f in htmlList)
-                {
-                    System.IO.File.Delete(f);
-                }
-                foreach (string f in jpgList)
-                {
-                    System.IO.File.Delete(f);
-                }
-                foreach (string f in pngList)
-                {
-                    System.IO.File.Delete(f);
-                }
-                foreach (string f in mp4List)
-                {
-                    System.IO.File.Delete(f);
-                }
+                //string[] mp4List = Directory.GetFiles(sourceDir, "*.mp4");
+                //string[] pngList = Directory.GetFiles(sourceDir, "*.png");
+                //string[] jpgList = Directory.GetFiles(sourceDir, "*.jpg");
+                //string[] zipList = Directory.GetFiles(sourceDir, "*.zip");
+                //string[] jsList = Directory.GetFiles(sourceDir, "*.js");
+                //string[] htmlList = Directory.GetFiles(sourceDir, "*.html");
+
+                //// Delete source files
+                //foreach (string f in zipList)
+                //{
+                //    System.IO.File.Delete(f);
+                //}
+                //foreach (string f in jsList)
+                //{
+                //    System.IO.File.Delete(f);
+                //}
+                //foreach (string f in htmlList)
+                //{
+                //    System.IO.File.Delete(f);
+                //}
+                //foreach (string f in jpgList)
+                //{
+                //    System.IO.File.Delete(f);
+                //}
+                //foreach (string f in pngList)
+                //{
+                //    System.IO.File.Delete(f);
+                //}
+                //foreach (string f in mp4List)
+                //{
+                //    System.IO.File.Delete(f);
+                //}
             }
             catch (DirectoryNotFoundException dirNotFound)
             {
@@ -1337,10 +1344,7 @@ namespace Amos.Controllers
 
             // Fix all the page buttons
             ManagePagesModel managePagesModel = new ManagePagesModel(newBook.BookId);
-            foreach (var button in managePagesModel.pageButtons)
-            {
-                AssignButton(button.ButtonId, button.PageId, PageIdPairs[button.NavPageId]);
-            }
+            
 
 
             foreach(var page in managePagesModel.PageListModel.PageList)
@@ -1349,26 +1353,48 @@ namespace Amos.Controllers
                 doc.LoadXml(page.PageContent);
                 foreach(XmlElement img in doc.SelectNodes("//image"))
                 {
-                    var oldSource = img.GetAttribute("source").Split('_');
-                    int oldSourceId = Convert.ToInt32(oldSource[1]);
+                    try
+                    {
+                        var oldSource = img.GetAttribute("source").Split('_');
+                        int oldSourceId = Convert.ToInt32(oldSource[1]);
 
-                    string newSource = "i_" + oldToNewFileIds[oldSourceId];
-                    img.SetAttribute("source", newSource);
+                        string newSource = "i_" + oldToNewFileIds[oldSourceId];
+                        img.SetAttribute("source", newSource);
+                    }
+                    catch { }
+                    
                 }
 
                 foreach(XmlElement vid in doc.SelectNodes("//video"))
                 {
-                    var oldSource = vid.GetAttribute("source").Split('_');
-                    int oldSourceId = Convert.ToInt32(oldSource[1]);
+                    try
+                    {
+                        var oldSource = vid.GetAttribute("source").Split('_');
+                        int oldSourceId = Convert.ToInt32(oldSource[1]);
 
-                    string newSource = "v_" + oldToNewFileIds[oldSourceId];
-                    vid.SetAttribute("source", newSource);
+                        string newSource = "v_" + oldToNewFileIds[oldSourceId];
+                        vid.SetAttribute("source", newSource);
+                    }
+                    catch { }
+                    
                 }
+                XmlElement p = (XmlElement)doc.SelectSingleNode("//page");
+                p.SetAttribute("id", "p_" + page.PageId);
 
-                page.PageContent = doc.OuterXml;
+                cdb.Pages.Where(x => x.PageId == page.PageId).FirstOrDefault().PageContent = doc.OuterXml;
+                
                 cdb.SaveChanges();
             }
 
+            foreach (var button in managePagesModel.pageButtons)
+            {
+                try
+                {
+                    AssignButton(button.ButtonId, button.PageId, PageIdPairs[button.NavPageId]);
+                }
+                catch { }
+
+            }
 
             return RedirectToAction("ListBooks");
         }

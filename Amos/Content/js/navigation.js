@@ -21,10 +21,10 @@
         loadPage(id, "page", "navigation dot click");
     });
     $(document).keydown(function (event) {
-        if (event.which == 39) {
+        if (event.which === 39) {
             // going forwards
             nextPage("arrow key navigation");
-        } else if (event.which == 37) {
+        } else if (event.which === 37) {
             // going backwards
             previousPage("arrow key navigation");
         }
@@ -193,7 +193,7 @@ function loadPage(id, type, navDescription) {
 
 
         // TODO will this work in all versions? (more testing)
-        if (UserTracker.CurrentLocation == null)
+        if (UserTracker.CurrentLocation === null)
             goToTheBeginning();
         else
             loadPage(UserTracker.CurrentLocation.Page, "page", "returning user");
@@ -407,7 +407,7 @@ function populateMenus() {
 
             // check visited pages
             if (typeof UserTracker.VisitedPages !== "undefined") {
-                if (UserTracker.VisitedPages.indexOf(this.attributes.id.value) != -1)
+                if (UserTracker.VisitedPages.indexOf(this.attributes.id.value) !== -1)
                     $(dot).addClass("visited");
             }
 

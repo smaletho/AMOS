@@ -78,3 +78,25 @@
         width: 300px !important;
         padding: 2px;
     }
+
+.preview-window .multiButton2 {
+    border: 1px solid gray;
+    background: lightgray;
+    color: purple;
+    padding: 5px;
+    font-size: 8pt;
+    font-weight: bold;
+}
+    .preview-window .multiButton2:active {
+        /*border: 4px inset black;
+        color: black;
+        background-color: gray;*/
+    }
+
+    .preview-window .multiButton2.active {
+        /*border: 4px inset black;
+        color: black;
+        background-color: gray;*/
+    }
+
+    .preview-window img {cursor:pointer;}

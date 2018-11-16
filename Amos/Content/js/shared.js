@@ -105,7 +105,7 @@ function openDialog(text, title) {
 
 function closeDialog() {
     $("#dialog").dialog("option", "title", '');
-    $("#dialog-content").text('');
+    $("#dialog-content").empty();
     $("#dialog").dialog('close');
 }
 
@@ -175,4 +175,10 @@ function exitBook(str) {
             window.location = URL_GoHome;
         }
     });
+}
+
+function openModalPopup() {
+    $("#full-modal-content").empty();
+    $("#full-modal-content").css('background-image', 'none');
+    $("#full-modal").show();
 }

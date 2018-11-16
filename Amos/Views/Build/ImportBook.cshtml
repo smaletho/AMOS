@@ -33,3 +33,16 @@
     </ul>
 
 @Html.ActionLink("return to book list", "ListBooks")
+
+@section scripts{
+<script>
+    $(function (){
+        $(".btn").button();
+        $(".btn").on('click', function () {
+            $(this).button("loading");
+        });
+    });
+</script>    
+    
+    
+}

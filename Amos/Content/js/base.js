@@ -69,6 +69,36 @@ function secondInit() {
         }]
     });
 
+    $("#popup").dialog({
+        position: { my: "center top", at: "center top+100", of: window },
+        autoOpen: false,
+        height: "auto",
+        width: "auto",
+        modal: true,
+        close: function () {
+            $("#popup-content").empty();
+            $("#popup-text").empty();
+        },
+        open: function () {
+            calculateAspectRatioFit();
+            $(".ui-dialog").css('transform-origin', 'top left');
+            $(".ui-dialog").css({
+                '-webkit-transform': 'scale(' + ScaleRatio + ')',
+                '-moz-transform': 'scale(' + ScaleRatio + ')',
+                '-ms-transform': 'scale(' + ScaleRatio + ')',
+                '-o-transform': 'scale(' + ScaleRatio + ')',
+                'transform': 'scale(' + ScaleRatio + ')'
+            });
+        },
+        closeText: "",
+        buttons: [{
+            text: "Okay",
+            click: function () {
+                $(this).dialog("close");
+            }
+        }]
+    });
+
     $("#subject-login").dialog({
         position: { my: "center top", at: "center top+100", of: window },
         autoOpen: false,
@@ -100,6 +130,8 @@ function secondInit() {
         },
         closeText: ""
     });
+
+
 
     initTracking();
     
@@ -135,6 +167,9 @@ function firstLoadInit() {
 
     $("#menu-close").on('click', closeNav);
     $("#menu-open").on('click', openNav);
+    $("#full-modal-close").on('click', function () {
+        $("#full-modal").hide();
+    });
     initNavigation();
 }
 

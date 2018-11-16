@@ -113,7 +113,7 @@ function buttonNode(element) {
 
 
 
-    if (typeof (element.classList) === "undefined" || element.classList.length == 0) {
+    if (typeof (element.classList) === "undefined" || element.classList.length === 0) {
         $(newNode).on('click', function () {
             loadPage(element.id, "page", "button click (" + $(this).text() + ")");
         });
@@ -155,7 +155,7 @@ function imageNode(element) {
                 var newSrc = "";
 
                 // running offline
-                if (applicationMode == "offline") {
+                if (applicationMode === "offline") {
                     // TODO: catch other types of images
 
                     newSrc = "./Content/images/" + src;
@@ -219,7 +219,7 @@ function textNode(element) {
 function textStyleMap(element, styles) {
     var styleArr = styles.split(';');
     for (var i = 0; i < styleArr.length; i++) {
-        if ($.trim(styleArr[i]) != "") {
+        if ($.trim(styleArr[i]) !== "") {
             var block = styleArr[i].split(':');
             $(element).css($.trim(block[0]), $.trim(block[1]));
         }
