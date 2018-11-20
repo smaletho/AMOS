@@ -9,6 +9,7 @@
 
     .content-window .item {
         position: absolute;
+        white-space:pre-wrap;
     }
 
     .content-window .inner-text {
@@ -16,13 +17,29 @@
     }
 
     .content-window .header {
-        font-size: 16pt;
+        font-size: 22pt;
         font-weight: bold;
     }
 
     .content-window .sub-header {
         font-weight:400;
         font-size:14pt;
+    }
+
+    .content-window .rlinks {
+        font-family: Fira Mono;
+        font-size: 10pt;
+        background-color: #e0e0eb;
+        padding: 2px;
+        color: gray;
+        border: 1px solid lightgray;
+    }
+
+    .content-window .notes {
+        font-family: Fira Mono;
+        font-size: 10pt;
+        background-color: #ffe0cc;
+        padding: 10px
     }
 
     .content-window button {

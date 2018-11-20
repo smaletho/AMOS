@@ -40,6 +40,7 @@ namespace Amos
                 context.Response.ContentType = image.ContentType;
                 Stream strm = new MemoryStream(image.Content);
                 byte[] buffer = new byte[4096];
+
                 int byteSeq = strm.Read(buffer, 0, 4096);
 
                 while (byteSeq > 0)

@@ -99,276 +99,277 @@ namespace Amos.Controllers
             try
             {
                 HttpPostedFileBase file = Request.Files[0];
-                using (ZipArchive zipArchive = new ZipArchive(file.InputStream))
-                {
+                model.ResponseList = Action_Import(file.InputStream, "");
+                //using (ZipArchive zipArchive = new ZipArchive(file.InputStream))
+                //{
 
-                    Dictionary<string, string> oldToNewPageNumbers = new Dictionary<string, string>();
+                //    Dictionary<string, string> oldToNewPageNumbers = new Dictionary<string, string>();
 
-                    // TODO timer
+                //    // TODO timer
 
-                    var config = zipArchive.Entries.Where(x => x.Name == "config.xml").FirstOrDefault();
-                    if (config == null)
-                    {
-                        model.ResponseList.Add("Could not find config.xml. Aborting.");
-                        return RedirectToAction("ImportBook", model);
-                    }
-                    else
-                    {
-                        model.ResponseList.Add("Found config.xml. Parsing in to book...");
-                        using (var stream = config.Open())
-                        {
-                            using (var reader = new StreamReader(stream))
-                            {
-                                try
-                                {
-                                    // turn it in to an XML Doc
-                                    XmlDocument xmlDoc = new XmlDocument();
-                                    xmlDoc.LoadXml(reader.ReadToEnd());
+                //    var config = zipArchive.Entries.Where(x => x.Name == "config.xml").FirstOrDefault();
+                //    if (config == null)
+                //    {
+                //        model.ResponseList.Add("Could not find config.xml. Aborting.");
+                //        return RedirectToAction("ImportBook", model);
+                //    }
+                //    else
+                //    {
+                //        model.ResponseList.Add("Found config.xml. Parsing in to book...");
+                //        using (var stream = config.Open())
+                //        {
+                //            using (var reader = new StreamReader(stream))
+                //            {
+                //                try
+                //                {
+                //                    // turn it in to an XML Doc
+                //                    XmlDocument xmlDoc = new XmlDocument();
+                //                    xmlDoc.LoadXml(reader.ReadToEnd());
 
-                                    // loop through the xml doc to build book
-                                    foreach (XmlElement bookNode in xmlDoc.ChildNodes)
-                                    {
-                                        // this is the book object
-                                        Book book = new Book();
-                                        book.CreatedBy = bookNode.Attributes["author"].Value;
-                                        book.ModifiedBy = bookNode.Attributes["author"].Value;
+                //                    // loop through the xml doc to build book
+                //                    foreach (XmlElement bookNode in xmlDoc.ChildNodes)
+                //                    {
+                //                        // this is the book object
+                //                        Book book = new Book();
+                //                        book.CreatedBy = bookNode.Attributes["author"].Value;
+                //                        book.ModifiedBy = bookNode.Attributes["author"].Value;
 
-                                        try { book.CreateDate = Convert.ToDateTime(bookNode.Attributes["createdate"].Value); }
-                                        catch { book.CreateDate = DateTime.Now; }
-                                        try { book.ModifyDate = Convert.ToDateTime(bookNode.Attributes["modifydate"].Value); }
-                                        catch { book.ModifyDate = DateTime.Now; }
+                //                        try { book.CreateDate = Convert.ToDateTime(bookNode.Attributes["createdate"].Value); }
+                //                        catch { book.CreateDate = DateTime.Now; }
+                //                        try { book.ModifyDate = Convert.ToDateTime(bookNode.Attributes["modifydate"].Value); }
+                //                        catch { book.ModifyDate = DateTime.Now; }
 
-                                        book.Published = true;
-                                        book.Version = bookNode.Attributes["version"].Value;
-                                        book.Name = bookNode.Attributes["name"].Value;
+                //                        book.Published = true;
+                //                        book.Version = bookNode.Attributes["version"].Value;
+                //                        book.Name = bookNode.Attributes["name"].Value;
 
-                                        cdb.Books.Add(book);
-                                        cdb.SaveChanges();
-                                        model.ResponseList.Add(string.Format("Added book. Name: {0} Id: {1}", book.Name, book.BookId));
+                //                        cdb.Books.Add(book);
+                //                        cdb.SaveChanges();
+                //                        model.ResponseList.Add(string.Format("Added book. Name: {0} Id: {1}", book.Name, book.BookId));
 
-                                        int moduleSort = 10;
+                //                        int moduleSort = 10;
 
-                                        foreach (XmlElement moduleNode in bookNode.ChildNodes)
-                                        {
-                                            // these are modules
-                                            Module module = new Module();
-                                            module.BookId = book.BookId;
-                                            module.Name = moduleNode.Attributes["name"].Value;
+                //                        foreach (XmlElement moduleNode in bookNode.ChildNodes)
+                //                        {
+                //                            // these are modules
+                //                            Module module = new Module();
+                //                            module.BookId = book.BookId;
+                //                            module.Name = moduleNode.Attributes["name"].Value;
 
-                                            module.SortOrder = moduleSort;
-                                            moduleSort += 10;
+                //                            module.SortOrder = moduleSort;
+                //                            moduleSort += 10;
 
-                                            module.Theme = moduleNode.Attributes["theme"].Value;
-                                            cdb.Modules.Add(module);
-                                            cdb.SaveChanges();
+                //                            module.Theme = moduleNode.Attributes["theme"].Value;
+                //                            cdb.Modules.Add(module);
+                //                            cdb.SaveChanges();
 
-                                            int sectionSort = 10;
+                //                            int sectionSort = 10;
 
-                                            foreach (XmlElement sectionNode in moduleNode.ChildNodes)
-                                            {
-                                                // these are sections
-                                                Section section = new Section();
-                                                section.ModuleId = module.ModuleId;
-                                                section.Name = sectionNode.Attributes["name"].Value;
+                //                            foreach (XmlElement sectionNode in moduleNode.ChildNodes)
+                //                            {
+                //                                // these are sections
+                //                                Section section = new Section();
+                //                                section.ModuleId = module.ModuleId;
+                //                                section.Name = sectionNode.Attributes["name"].Value;
 
-                                                section.SortOrder = sectionSort;
-                                                sectionSort += 10;
+                //                                section.SortOrder = sectionSort;
+                //                                sectionSort += 10;
 
-                                                cdb.Sections.Add(section);
-                                                cdb.SaveChanges();
+                //                                cdb.Sections.Add(section);
+                //                                cdb.SaveChanges();
 
-                                                int chapterSort = 10;
+                //                                int chapterSort = 10;
 
-                                                foreach (XmlElement chapterNode in sectionNode.ChildNodes)
-                                                {
-                                                    // these are chapters
-                                                    Chapter chapter = new Chapter();
-                                                    chapter.Name = chapterNode.Attributes["name"].Value;
+                //                                foreach (XmlElement chapterNode in sectionNode.ChildNodes)
+                //                                {
+                //                                    // these are chapters
+                //                                    Chapter chapter = new Chapter();
+                //                                    chapter.Name = chapterNode.Attributes["name"].Value;
 
-                                                    chapter.SortOrder = chapterSort;
-                                                    chapterSort += 10;
+                //                                    chapter.SortOrder = chapterSort;
+                //                                    chapterSort += 10;
 
-                                                    chapter.SectionId = section.SectionId;
-                                                    cdb.Chapters.Add(chapter);
-                                                    cdb.SaveChanges();
+                //                                    chapter.SectionId = section.SectionId;
+                //                                    cdb.Chapters.Add(chapter);
+                //                                    cdb.SaveChanges();
 
-                                                    int pageSort = 10;
+                //                                    int pageSort = 10;
 
-                                                    foreach (XmlElement pageNode in chapterNode.ChildNodes)
-                                                    {
-                                                        // these are pages
-                                                        Page page = new Page();
-                                                        page.BookId = book.BookId;
-                                                        page.ChapterId = chapter.ChapterId;
+                //                                    foreach (XmlElement pageNode in chapterNode.ChildNodes)
+                //                                    {
+                //                                        // these are pages
+                //                                        Page page = new Page();
+                //                                        page.BookId = book.BookId;
+                //                                        page.ChapterId = chapter.ChapterId;
 
-                                                        page.SortOrder = pageSort;
-                                                        pageSort += 10;
+                //                                        page.SortOrder = pageSort;
+                //                                        pageSort += 10;
 
-                                                        page.Type = pageNode.Attributes["type"].Value;
+                //                                        page.Type = pageNode.Attributes["type"].Value;
 
-                                                        page.Create("import");
-                                                        try
-                                                        {
-                                                            page.Title = pageNode.Attributes["title"].Value;
-                                                        }
-                                                        catch (NullReferenceException)
-                                                        {
-                                                            page.Title = "New Page";
-                                                        }
+                //                                        page.Create("import");
+                //                                        try
+                //                                        {
+                //                                            page.Title = pageNode.Attributes["title"].Value;
+                //                                        }
+                //                                        catch (NullReferenceException)
+                //                                        {
+                //                                            page.Title = "New Page";
+                //                                        }
 
-                                                        page.PageContent = "";
+                //                                        page.PageContent = "";
 
-                                                        cdb.Pages.Add(page);
-                                                        cdb.SaveChanges();
+                //                                        cdb.Pages.Add(page);
+                //                                        cdb.SaveChanges();
 
-                                                        oldToNewPageNumbers.Add(pageNode.Attributes["id"].Value, "p_" + page.PageId);
-                                                        pageNode.SetAttribute("id", "p_" + page.PageId);
+                //                                        oldToNewPageNumbers.Add(pageNode.Attributes["id"].Value, "p_" + page.PageId);
+                //                                        pageNode.SetAttribute("id", "p_" + page.PageId);
 
-                                                        foreach (XmlElement contentNode in pageNode.ChildNodes)
-                                                        {
-                                                            if (contentNode.Name.ToLower() == "image" || contentNode.Name.ToLower() == "video")
-                                                            {
-                                                                // find the image in the archive
-                                                                string id = contentNode.Attributes["source"].Value;
+                //                                        foreach (XmlElement contentNode in pageNode.ChildNodes)
+                //                                        {
+                //                                            if (contentNode.Name.ToLower() == "image" || contentNode.Name.ToLower() == "video")
+                //                                            {
+                //                                                // find the image in the archive
+                //                                                string id = contentNode.Attributes["source"].Value;
 
-                                                                string type = "";
-                                                                string matchFileName = "";
-                                                                try
-                                                                {
-                                                                    type = contentNode.Attributes["type"].Value;
-                                                                    matchFileName = id + "." + type;
-                                                                }
-                                                                catch (NullReferenceException)
-                                                                {
-                                                                    type = "jpg";
-                                                                    matchFileName = id + ".jpg";
-                                                                }
-
-
-                                                                var innerFile = zipArchive.Entries.Where(x => x.Name == matchFileName).FirstOrDefault();
-                                                                if (innerFile != null)
-                                                                {
-                                                                    using (var innerStream = innerFile.Open())
-                                                                    {
-                                                                        using (var innerReader = new StreamReader(innerStream))
-                                                                        {
-                                                                            AmosFile f = new AmosFile();
-
-                                                                            MemoryStream target = new MemoryStream();
-                                                                            innerReader.BaseStream.CopyTo(target);
-                                                                            f.Content = target.ToArray();
+                //                                                string type = "";
+                //                                                string matchFileName = "";
+                //                                                try
+                //                                                {
+                //                                                    type = contentNode.Attributes["type"].Value;
+                //                                                    matchFileName = id + "." + type;
+                //                                                }
+                //                                                catch (NullReferenceException)
+                //                                                {
+                //                                                    type = "jpg";
+                //                                                    matchFileName = id + ".jpg";
+                //                                                }
 
 
-                                                                            f.FileName = matchFileName;
-                                                                            switch (type)
-                                                                            {
-                                                                                case "jpg":
-                                                                                case "png":
-                                                                                case "gif":
-                                                                                    f.ContentType = "image/" + type;
-                                                                                    f.FileType = FileType.Photo;
-                                                                                    break;
-                                                                                case "mp4":
-                                                                                    f.ContentType = "video/" + type;
-                                                                                    f.FileType = FileType.Video;
-                                                                                    break;
-                                                                            }
+                //                                                var innerFile = zipArchive.Entries.Where(x => x.Name == matchFileName).FirstOrDefault();
+                //                                                if (innerFile != null)
+                //                                                {
+                //                                                    using (var innerStream = innerFile.Open())
+                //                                                    {
+                //                                                        using (var innerReader = new StreamReader(innerStream))
+                //                                                        {
+                //                                                            AmosFile f = new AmosFile();
 
-                                                                            f.PageId = page.PageId;
-                                                                            cdb.AmosFiles.Add(f);
-                                                                            cdb.SaveChanges();
-
-                                                                            // update ID in contentNode
-                                                                            switch (f.FileType)
-                                                                            {
-                                                                                case FileType.Photo:
-                                                                                    contentNode.SetAttribute("source", "i_" + f.FileId);
-                                                                                    break;
-                                                                                case FileType.Video:
-                                                                                    contentNode.SetAttribute("source", "v_" + f.FileId);
-                                                                                    break;
-                                                                            }
-
-                                                                        }
-                                                                    }
-                                                                }
-                                                                else
-                                                                {
-                                                                    model.ResponseList.Add(string.Format("File not found. Page: {0} FileId: {1}", pageNode.Attributes["id"].Value, matchFileName));
-                                                                }
-                                                            }
-                                                        }
-
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                    }
-
-                                    // go back through all the page nodes, and update the other IDs (buttons, links, etc)
-                                    ///book/module/section/chapter/
-                                    foreach (XmlElement p in xmlDoc.SelectNodes("//page"))
-                                    {
-                                        // update the buttons
-                                        foreach (XmlElement button in p.SelectNodes("./button"))
-                                        {
-                                            try
-                                            {
-                                                // change the id from the old one to the matching new one
-                                                button.SetAttribute("id", oldToNewPageNumbers[button.Attributes["id"].Value]);
-                                            }
-                                            catch (NullReferenceException) { }
-                                        }
-
-                                        // update the anchors
-                                        foreach (XmlElement a in p.SelectNodes("./text//a"))
-                                        {
-
-                                            try
-                                            {
-                                                if (a.Attributes["class"].Value == "navigateTo")
-                                                {
-                                                    // change the id from the old one to the matching new one
-                                                    a.SetAttribute("data-id", oldToNewPageNumbers[a.Attributes["data-id"].Value]);
-                                                }
-                                            }
-                                            catch (NullReferenceException)
-                                            {
-
-                                            }
-
-                                        }
-
-                                        // get the pageId from the node
-                                        string pageId = p.Attributes["id"].Value;
-                                        int newPageId = Convert.ToInt32(pageId.Split('_')[1]);
-
-                                        var pageLookup = cdb.Pages.Where(x => x.PageId == newPageId).FirstOrDefault();
-                                        if (pageLookup != null)
-                                        {
-                                            pageLookup.PageContent = p.OuterXml;
-                                        }
-                                    }
-
-                                    cdb.SaveChanges();
-
-                                }
-                                catch (XmlException e)
-                                {
-                                    model.ResponseList.Add("Bad xml in config.xml. Aborting. Exception: " + e.Message);
-                                }
-                                catch (ArgumentException e)
-                                {
-                                    model.ResponseList.Add("Attribute exception. Message: " + e.Message);
-                                }
-                            }
-                        }
-                    }
+                //                                                            MemoryStream target = new MemoryStream();
+                //                                                            innerReader.BaseStream.CopyTo(target);
+                //                                                            f.Content = target.ToArray();
 
 
+                //                                                            f.FileName = matchFileName;
+                //                                                            switch (type)
+                //                                                            {
+                //                                                                case "jpg":
+                //                                                                case "png":
+                //                                                                case "gif":
+                //                                                                    f.ContentType = "image/" + type;
+                //                                                                    f.FileType = FileType.Photo;
+                //                                                                    break;
+                //                                                                case "mp4":
+                //                                                                    f.ContentType = "video/" + type;
+                //                                                                    f.FileType = FileType.Video;
+                //                                                                    break;
+                //                                                            }
 
-                }
+                //                                                            f.PageId = page.PageId;
+                //                                                            cdb.AmosFiles.Add(f);
+                //                                                            cdb.SaveChanges();
+
+                //                                                            // update ID in contentNode
+                //                                                            switch (f.FileType)
+                //                                                            {
+                //                                                                case FileType.Photo:
+                //                                                                    contentNode.SetAttribute("source", "i_" + f.FileId);
+                //                                                                    break;
+                //                                                                case FileType.Video:
+                //                                                                    contentNode.SetAttribute("source", "v_" + f.FileId);
+                //                                                                    break;
+                //                                                            }
+
+                //                                                        }
+                //                                                    }
+                //                                                }
+                //                                                else
+                //                                                {
+                //                                                    model.ResponseList.Add(string.Format("File not found. Page: {0} FileId: {1}", pageNode.Attributes["id"].Value, matchFileName));
+                //                                                }
+                //                                            }
+                //                                        }
+
+                //                                    }
+                //                                }
+                //                            }
+                //                        }
+
+                //                    }
+
+                //                    // go back through all the page nodes, and update the other IDs (buttons, links, etc)
+                //                    ///book/module/section/chapter/
+                //                    foreach (XmlElement p in xmlDoc.SelectNodes("//page"))
+                //                    {
+                //                        // update the buttons
+                //                        foreach (XmlElement button in p.SelectNodes("./button"))
+                //                        {
+                //                            try
+                //                            {
+                //                                // change the id from the old one to the matching new one
+                //                                button.SetAttribute("id", oldToNewPageNumbers[button.Attributes["id"].Value]);
+                //                            }
+                //                            catch (NullReferenceException) { }
+                //                        }
+
+                //                        // update the anchors
+                //                        foreach (XmlElement a in p.SelectNodes("./text//a"))
+                //                        {
+
+                //                            try
+                //                            {
+                //                                if (a.Attributes["class"].Value == "navigateTo")
+                //                                {
+                //                                    // change the id from the old one to the matching new one
+                //                                    a.SetAttribute("data-id", oldToNewPageNumbers[a.Attributes["data-id"].Value]);
+                //                                }
+                //                            }
+                //                            catch (NullReferenceException)
+                //                            {
+
+                //                            }
+
+                //                        }
+
+                //                        // get the pageId from the node
+                //                        string pageId = p.Attributes["id"].Value;
+                //                        int newPageId = Convert.ToInt32(pageId.Split('_')[1]);
+
+                //                        var pageLookup = cdb.Pages.Where(x => x.PageId == newPageId).FirstOrDefault();
+                //                        if (pageLookup != null)
+                //                        {
+                //                            pageLookup.PageContent = p.OuterXml;
+                //                        }
+                //                    }
+
+                //                    cdb.SaveChanges();
+
+                //                }
+                //                catch (XmlException e)
+                //                {
+                //                    model.ResponseList.Add("Bad xml in config.xml. Aborting. Exception: " + e.Message);
+                //                }
+                //                catch (ArgumentException e)
+                //                {
+                //                    model.ResponseList.Add("Attribute exception. Message: " + e.Message);
+                //                }
+                //            }
+                //        }
+                //    }
+
+
+
+                //}
             }
             catch (NotImplementedException e)
             {
@@ -378,6 +379,286 @@ namespace Amos.Controllers
 
 
             return View("ImportBook", model);
+        }
+
+        public static List<string> Action_Import(Stream s, string fileName)
+        {
+            List<string> retLs = new List<string>();
+            ApplicationDbContext cdb = new ApplicationDbContext();
+            using (ZipArchive zipArchive = new ZipArchive(s))
+            {
+
+                Dictionary<string, string> oldToNewPageNumbers = new Dictionary<string, string>();
+
+                // TODO timer
+
+                var config = zipArchive.Entries.Where(x => x.Name == "config.xml").FirstOrDefault();
+                if (config == null)
+                {
+                    retLs.Add("Could not find config.xml. Aborting.");
+                    //return RedirectToAction("ImportBook", model);
+                    return retLs;
+                }
+                else
+                {
+                    retLs.Add("Found config.xml. Parsing in to book...");
+                    using (var stream = config.Open())
+                    {
+                        using (var reader = new StreamReader(stream))
+                        {
+                            try
+                            {
+                                // turn it in to an XML Doc
+                                XmlDocument xmlDoc = new XmlDocument();
+                                xmlDoc.LoadXml(reader.ReadToEnd());
+
+                                // loop through the xml doc to build book
+                                foreach (XmlElement bookNode in xmlDoc.ChildNodes)
+                                {
+                                    // this is the book object
+                                    Book book = new Book();
+                                    book.CreatedBy = bookNode.Attributes["author"].Value;
+                                    book.ModifiedBy = bookNode.Attributes["author"].Value;
+                                    book.FileName = fileName;
+
+                                    try { book.CreateDate = Convert.ToDateTime(bookNode.Attributes["createdate"].Value); }
+                                    catch { book.CreateDate = DateTime.Now; }
+                                    try { book.ModifyDate = Convert.ToDateTime(bookNode.Attributes["modifydate"].Value); }
+                                    catch { book.ModifyDate = DateTime.Now; }
+
+                                    book.Published = true;
+                                    book.Version = bookNode.Attributes["version"].Value;
+                                    book.Name = bookNode.Attributes["name"].Value;
+
+                                    cdb.Books.Add(book);
+                                    cdb.SaveChanges();
+                                    retLs.Add(string.Format("Added book. Name: {0} Id: {1}", book.Name, book.BookId));
+
+                                    int moduleSort = 10;
+
+                                    foreach (XmlElement moduleNode in bookNode.ChildNodes)
+                                    {
+                                        // these are modules
+                                        Module module = new Module();
+                                        module.BookId = book.BookId;
+                                        module.Name = moduleNode.Attributes["name"].Value;
+
+                                        module.SortOrder = moduleSort;
+                                        moduleSort += 10;
+
+                                        module.Theme = moduleNode.Attributes["theme"].Value;
+                                        cdb.Modules.Add(module);
+                                        cdb.SaveChanges();
+
+                                        int sectionSort = 10;
+
+                                        foreach (XmlElement sectionNode in moduleNode.ChildNodes)
+                                        {
+                                            // these are sections
+                                            Section section = new Section();
+                                            section.ModuleId = module.ModuleId;
+                                            section.Name = sectionNode.Attributes["name"].Value;
+
+                                            section.SortOrder = sectionSort;
+                                            sectionSort += 10;
+
+                                            cdb.Sections.Add(section);
+                                            cdb.SaveChanges();
+
+                                            int chapterSort = 10;
+
+                                            foreach (XmlElement chapterNode in sectionNode.ChildNodes)
+                                            {
+                                                // these are chapters
+                                                Chapter chapter = new Chapter();
+                                                chapter.Name = chapterNode.Attributes["name"].Value;
+
+                                                chapter.SortOrder = chapterSort;
+                                                chapterSort += 10;
+
+                                                chapter.SectionId = section.SectionId;
+                                                cdb.Chapters.Add(chapter);
+                                                cdb.SaveChanges();
+
+                                                int pageSort = 10;
+
+                                                foreach (XmlElement pageNode in chapterNode.ChildNodes)
+                                                {
+                                                    // these are pages
+                                                    Page page = new Page();
+                                                    page.BookId = book.BookId;
+                                                    page.ChapterId = chapter.ChapterId;
+
+                                                    page.SortOrder = pageSort;
+                                                    pageSort += 10;
+
+                                                    page.Type = pageNode.Attributes["type"].Value;
+
+                                                    page.Create("import");
+                                                    try
+                                                    {
+                                                        page.Title = pageNode.Attributes["title"].Value;
+                                                    }
+                                                    catch (NullReferenceException)
+                                                    {
+                                                        page.Title = "New Page";
+                                                    }
+
+                                                    page.PageContent = "";
+
+                                                    cdb.Pages.Add(page);
+                                                    cdb.SaveChanges();
+
+                                                    oldToNewPageNumbers.Add(pageNode.Attributes["id"].Value, "p_" + page.PageId);
+                                                    pageNode.SetAttribute("id", "p_" + page.PageId);
+
+                                                    foreach (XmlElement contentNode in pageNode.ChildNodes)
+                                                    {
+                                                        if (contentNode.Name.ToLower() == "image" || contentNode.Name.ToLower() == "video")
+                                                        {
+                                                            // find the image in the archive
+                                                            string id = contentNode.Attributes["source"].Value;
+
+                                                            string type = "";
+                                                            string matchFileName = "";
+                                                            try
+                                                            {
+                                                                type = contentNode.Attributes["type"].Value;
+                                                                matchFileName = id + "." + type;
+                                                            }
+                                                            catch (NullReferenceException)
+                                                            {
+                                                                type = "jpg";
+                                                                matchFileName = id + ".jpg";
+                                                            }
+
+
+                                                            var innerFile = zipArchive.Entries.Where(x => x.Name == matchFileName).FirstOrDefault();
+                                                            if (innerFile != null)
+                                                            {
+                                                                using (var innerStream = innerFile.Open())
+                                                                {
+                                                                    using (var innerReader = new StreamReader(innerStream))
+                                                                    {
+                                                                        AmosFile f = new AmosFile();
+
+                                                                        MemoryStream target = new MemoryStream();
+                                                                        innerReader.BaseStream.CopyTo(target);
+                                                                        f.Content = target.ToArray();
+
+
+                                                                        f.FileName = matchFileName;
+                                                                        switch (type)
+                                                                        {
+                                                                            case "jpg":
+                                                                            case "png":
+                                                                            case "gif":
+                                                                                f.ContentType = "image/" + type;
+                                                                                f.FileType = FileType.Photo;
+                                                                                break;
+                                                                            case "mp4":
+                                                                                f.ContentType = "video/" + type;
+                                                                                f.FileType = FileType.Video;
+                                                                                break;
+                                                                        }
+
+                                                                        f.PageId = page.PageId;
+                                                                        cdb.AmosFiles.Add(f);
+                                                                        cdb.SaveChanges();
+
+                                                                        // update ID in contentNode
+                                                                        switch (f.FileType)
+                                                                        {
+                                                                            case FileType.Photo:
+                                                                                contentNode.SetAttribute("source", "i_" + f.FileId);
+                                                                                break;
+                                                                            case FileType.Video:
+                                                                                contentNode.SetAttribute("source", "v_" + f.FileId);
+                                                                                break;
+                                                                        }
+
+                                                                    }
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                retLs.Add(string.Format("File not found. Page: {0} FileId: {1}", pageNode.Attributes["id"].Value, matchFileName));
+                                                            }
+                                                        }
+                                                    }
+
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                }
+
+                                // go back through all the page nodes, and update the other IDs (buttons, links, etc)
+                                ///book/module/section/chapter/
+                                foreach (XmlElement p in xmlDoc.SelectNodes("//page"))
+                                {
+                                    // update the buttons
+                                    foreach (XmlElement button in p.SelectNodes("./button"))
+                                    {
+                                        try
+                                        {
+                                            // change the id from the old one to the matching new one
+                                            button.SetAttribute("id", oldToNewPageNumbers[button.Attributes["id"].Value]);
+                                        }
+                                        catch (NullReferenceException) { }
+                                    }
+
+                                    // update the anchors
+                                    foreach (XmlElement a in p.SelectNodes("./text//a"))
+                                    {
+
+                                        try
+                                        {
+                                            if (a.Attributes["class"].Value == "navigateTo")
+                                            {
+                                                // change the id from the old one to the matching new one
+                                                a.SetAttribute("data-id", oldToNewPageNumbers[a.Attributes["data-id"].Value]);
+                                            }
+                                        }
+                                        catch (NullReferenceException)
+                                        {
+
+                                        }
+
+                                    }
+
+                                    // get the pageId from the node
+                                    string pageId = p.Attributes["id"].Value;
+                                    int newPageId = Convert.ToInt32(pageId.Split('_')[1]);
+
+                                    var pageLookup = cdb.Pages.Where(x => x.PageId == newPageId).FirstOrDefault();
+                                    if (pageLookup != null)
+                                    {
+                                        pageLookup.PageContent = p.OuterXml;
+                                    }
+                                }
+
+                                cdb.SaveChanges();
+
+                            }
+                            catch (XmlException e)
+                            {
+                                retLs.Add("Bad xml in config.xml. Aborting. Exception: " + e.Message);
+                            }
+                            catch (ArgumentException e)
+                            {
+                                retLs.Add("Attribute exception. Message: " + e.Message);
+                            }
+                        }
+                    }
+                }
+
+
+
+            }
+
+            return retLs;
         }
 
         public ActionResult Delete(int id)
@@ -2247,6 +2528,31 @@ namespace Amos.Controllers
         {
             // this one needs a model
             return View("Build_Page", new Build_PageModel(item, m, s, c, p));
+        }
+
+
+
+
+
+
+
+
+
+        public ActionResult ConvertXmlToHtml()
+        {
+            ApplicationDbContext db = new ApplicationDbContext();
+            
+            foreach (var page in db.Pages.ToList())
+            {
+                var oldContent = page.PageContent;
+                var xmlDoc = new XmlDocument();
+                try
+                {
+                    xmlDoc.Load(oldContent);
+                }catch{ }
+            }
+
+            return Content("success");
         }
     }
 

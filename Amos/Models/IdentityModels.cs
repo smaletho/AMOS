@@ -33,6 +33,7 @@ namespace Amos.Models
         //public virtual DbSet<BookPage> BookPages { get; set; }
         public virtual DbSet<AmosFile> AmosFiles { get; set; }
         public virtual DbSet<UserTracker> UserTrackers { get; set; }
+        public virtual DbSet<ScheduledJobTracker> ScheduledJobTrackers { get; set; }
 
         public static ApplicationDbContext Create()
         {

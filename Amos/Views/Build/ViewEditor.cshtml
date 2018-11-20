@@ -188,26 +188,26 @@
 
         var xt = "", h3OK = 1;
         function checkErrorXML(x) {
-            xt = ""
-            h3OK = 1
-            checkXML(x)
+            xt = "";
+            h3OK = 1;
+            checkXML(x);
         }
 
         function checkXML(n) {
-            var l, i, nam
-            nam = n.nodeName
+            var l, i, nam;
+            nam = n.nodeName;
             if (nam == "h3") {
                 if (h3OK == 0) {
                     return;
                 }
-                h3OK = 0
+                h3OK = 0;
             }
             if (nam == "#text") {
-                xt = xt + n.nodeValue + "\n"
+                xt = xt + n.nodeValue + "\n";
             }
             l = n.childNodes.length
             for (i = 0; i < l; i++) {
-                checkXML(n.childNodes[i])
+                checkXML(n.childNodes[i]);
             }
         }
 

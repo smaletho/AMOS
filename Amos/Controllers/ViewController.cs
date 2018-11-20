@@ -66,11 +66,13 @@ namespace Amos.Controllers
                 track.BookId = BookId;
                 track.Email = email;
                 track.TrackerContent = UserTracker;
+                track.Exported = false;
                 cdb.UserTrackers.Add(track);
             }
             else
             {
                 existingTracker.TrackerContent = UserTracker;
+                existingTracker.Exported = false;
             }
             cdb.SaveChanges();
             return Content("success");

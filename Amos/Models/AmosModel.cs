@@ -48,6 +48,8 @@ namespace Amos.Models
         [Display(Name = "Name")]
         public string Name { get; set; }
         public string Version { get; set; }
+
+        public string FileName { get; set; }
     }
 
     public class Module
@@ -144,6 +146,7 @@ namespace Amos.Models
         public int ChapterId { get; set; }
         public int BookId { get; set; }
 
+
         //public virtual Chapter Chapter { get; set; } // added by Ryan
     }
 
@@ -157,6 +160,8 @@ namespace Amos.Models
         public string Email { get; set; }
         public string BookId { get; set; }
         public string TrackerContent { get; set; }
+
+        public bool Exported { get; set; }
 
         //var UserTracker = {
         //    Email: null,
@@ -181,5 +186,14 @@ namespace Amos.Models
         //    VisitedPages: []
         //};
 
+    }
+
+    public class ScheduledJobTracker
+    {
+        [Key]
+        public int ScheduledJobTrackerId { get; set; }
+        public DateTime ExecutionTime { get; set; }
+        public string Action { get; set; }
+        public string ExtraData { get; set; }
     }
 }
