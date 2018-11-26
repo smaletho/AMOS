@@ -134,6 +134,33 @@ function renderInit() {
         return false;
     });
 
+    $(".popupPage").on('click', function () {
+        var pageId = "p_" + $(this).data("page");
+        var targetPage;
+        $(PageContent).each(function () {
+            if (this.Page === pageId) {
+                targetPage = this;
+                return false;
+            }
+        });
+
+        openModalPopup();
+
+        $(targetPage.content).contents().each(function () {
+            if (!blankTextNode(this)) {
+
+                var innerPage = $.trim(this.textContent);
+
+                if (innerPage.indexOf('<text>') === -1 && innerPage.indexOf('</text>') === -1) {
+                    // this is a normal, empty node
+                    $("#full-modal-content").append(renderElement(this, true));
+                } else {
+                    openDialog("There appears to be a formatting issue with this book. Please contact a system administrator.", "Error");
+                }
+            }
+        });
+    });
+
     if (applicationMode !== "viewer") {
         if ($("#page-content").find(".quiz-submit").length !== 0) {
             // it's a quiz page

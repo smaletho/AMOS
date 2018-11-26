@@ -19,6 +19,7 @@
     .content-window .header {
         font-size: 22pt;
         font-weight: bold;
+        line-height:24pt;
     }
 
     .content-window .sub-header {
@@ -94,15 +95,16 @@
 
     .content-window .multiButton2 {
         border: 1px solid gray;
-        background: lightgray;
+        background: lightgray !important;
         color: purple;
         padding: 5px;
         font-size: 8pt;
         font-weight: bold;
+        width:185px;
     }
 
     .content-window .multiButton2.active2{
-
+        background:gray !important;
     }
 
     .content-window img {
