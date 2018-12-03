@@ -43,6 +43,8 @@ function unbindNavigation() {
 
 function nextPage(type) {
     // CurrentLocation
+
+
     var allPages = $(ConfigXml).find('page');
 
     for (var i = 0; i < allPages.length; i++) {
@@ -51,8 +53,25 @@ function nextPage(type) {
             if (i + 1 >= allPages.length) {
                 exitBook("You have reached the end of the book. Would you like to exit?");
             } else {
-                loadPage($(allPages[i + 1])[0].attributes["id"].value, "page", type);
-            }
+                if ($(allPages[i+1]).hasClass("hide-page")) {
+                    // it's a hidden page
+
+                    var anotherPageExists = false;
+                    for (var ii = i + 1; ii < allPages.length; ii++) {
+                        // find next not hidden page
+                        if (!$(allPages[ii]).hasClass("hide-page")) {
+                            anotherPageExists = true;
+                            loadPage($(allPages[ii])[0].attributes["id"].value, "page", type);
+                            break;
+                        }
+                    } 
+
+                    if (!anotherPageExists)
+                        exitBook("You have reached the end of the book. Would you like to exit?");
+                } else {
+                    loadPage($(allPages[i + 1])[0].attributes["id"].value, "page", type);
+                }
+            } 
             break;
         }
     }
@@ -66,7 +85,16 @@ function previousPage(type) {
             if (i - 1 < 0) {
                 openDialog("You are currently at the beginning of the module.", "Warning");
             } else {
-                loadPage($(allPages[i - 1])[0].attributes["id"].value, "page", type);
+                if ($(allPages[i - 1]).hasClass("hide-page")) {
+                    // it's a hidden page, go to the last non-hidden page
+                    var lastNonHidden = $(allPages[i - 1]).prevAll("page").not(".hide-page").first();
+                    if (lastNonHidden.length !== 0)
+                        loadPage($(lastNonHidden)[0].attributes["id"].value, "page", type);
+                    else
+                        openDialog("You are currently at the beginning of the module.", "Warning");
+                } else {
+                    loadPage($(allPages[i - 1])[0].attributes["id"].value, "page", type);
+                }
             }
             break;
         }
@@ -88,8 +116,12 @@ function showInitialHelp() {
         storage: false,
         keyboard: false,
         delay: 0,
+        onStart: function () {
+            $("#main-window").css('pointer-events', 'none');
+        },
         onEnd: function () {
-            window.scrollTo(0,0);
+            window.scrollTo(0, 0);
+            $("#main-window").css('pointer-events', 'auto');
         },
         steps: [
             {
@@ -136,7 +168,7 @@ function showInitialHelp() {
             {
                 element: "#dot-container",
                 title: "Pages",
-                content: "This piece shows all the pages contained in each module.<br /><br />You can navigate directly to a specific page by clicking on it.<br /><br />Pages you've already visited will be lightly highlighted to track your progress.",
+                content: "This piece shows all the pages contained in each module.<br /><br />You can navigate directly to a specific page by clicking on it.<br /><br />Pages you've already visited will be lightly highlighted to track your progress.<br /><br />Dark lines in between pages denote the end of a section.",
                 placement: "top",
                 animation: false
             },
@@ -157,7 +189,7 @@ function showInitialHelp() {
             {
                 element: "#page-content",
                 title: "Content",
-                content: "Here is were you will view and interact with the page content.<br /><br />Pages may have buttons and/or links, which will give popup definitions, or navigate you directly to a specific page.",
+                content: "Here is were you will view and interact with the page content.<br /><br />Pages may have buttons and/or links, which will give popup definitions, or navigate you directly to a specific page.<br /><br />Click any image to enlarge.",
                 placement: "top",
                 animation: false
             },
@@ -330,7 +362,25 @@ function selectPageDots() {
     // set the current page to active
     $(".dot").removeClass("selected");
 
-    $(".dot[data-page='" + CurrentLocation.Page + "']").addClass("selected");
+    var currentPage = CurrentLocation.Page;
+
+    var page = $(ConfigXml).find("page#" + currentPage).first();
+    try {
+        console.log(page.classList);
+        if (page.hasClass("hide-page")) {
+            var newElement = $(page).prevAll("page").not(".hide-page").first();
+            $(".dot[data-page='" + $(newElement).prop('id') + "']").addClass("selected");
+        } else {
+            $(".dot[data-page='" + CurrentLocation.Page + "']").addClass("selected");
+        }
+    }
+    catch {
+        $(".dot[data-page='" + CurrentLocation.Page + "']").addClass("selected");
+    }
+
+    
+
+    
 }
 
 
@@ -399,24 +449,33 @@ function populateMenus() {
     if ($("#dot-container").is(':empty')) {
         // get all pages in this module
 
+        
+
 
         var currentSection = "";
         $(mod).find("page").each(function (k, v) {
+
+            // hide extra pages
+            var classList = this.classList;
+            if (classList.length < 1 || $.inArray("hide-page", classList)) {
+                var dot = $("<div data-page='" + this.attributes.id.value + "' class='dot'></div>");
+
+                // check visited pages
+                if (typeof UserTracker.VisitedPages !== "undefined") {
+                    if (UserTracker.VisitedPages.indexOf(this.attributes.id.value) !== -1)
+                        $(dot).addClass("visited");
+                }
+
+                $(dot).html(k + 1);
+                if ($(this).closest("section").prop("id") !== currentSection) {
+                    $(dot).addClass('leftborder');
+                    currentSection = $(this).closest("section").prop('id');
+                }
+                $("#dot-container").append(dot);
+            }
             
-            var dot = $("<div data-page='" + this.attributes.id.value + "' class='dot'></div>");
-
-            // check visited pages
-            if (typeof UserTracker.VisitedPages !== "undefined") {
-                if (UserTracker.VisitedPages.indexOf(this.attributes.id.value) !== -1)
-                    $(dot).addClass("visited");
-            }
-
-            $(dot).html(k + 1);
-            if ($(this).closest("section").prop("id") !== currentSection) {
-                $(dot).addClass('leftborder');
-                currentSection = $(this).closest("section").prop('id');
-            }
-            $("#dot-container").append(dot);
+            
+            
         });
 
         $("#dot-container").find('.dot').last().addClass('rightborder');

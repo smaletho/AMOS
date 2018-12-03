@@ -28,12 +28,14 @@ function renderInit() {
         $("#definitionWindow").empty();
 
         $("#popupWindow").empty();
+        $("#full-modal").hide();
     });
 
     $(".content-window img").on('click', function () {
         var clonedImg = $(this).clone();
         openModalPopup();
         $("#full-modal-content").css('background-image', 'url(' + $(clonedImg).prop('src') + ')');
+        return false;
     });
 
     $(".dialogLink").on('click', function () {

@@ -97,6 +97,18 @@ namespace Amos.Models
                             bpa.SetAttribute("type", p.Type);
                             bpa.SetAttribute("title", p.Title);
 
+                            XmlDocument doc = new XmlDocument();
+                            try
+                            {
+                                doc.LoadXml(p.PageContent);
+                                string classes = doc.ChildNodes[0].Attributes["class"].Value;
+                                if (classes.Contains("hide-page"))
+                                {
+                                    bpa.SetAttribute("class", "hide-page");
+                                }
+                            }
+                            catch { }
+
                             // these elements are pretty weird, and I can't edit the outerXML, so I'm parsing the string
                             string tempContent = p.PageContent;
                             int firstTagIndex = tempContent.IndexOf('>');
@@ -113,16 +125,17 @@ namespace Amos.Models
                             try
                             {
 
-                                PageContentItem newPage = new PageContentItem();
-                                newPage.Chapter = "c_" + chapterCount;
+                                PageContentItem newPage = new PageContentItem
+                                {
+                                    Chapter = "c_" + chapterCount,
 
-                                newPage.content = p.PageContent;
-
-
-                                newPage.Module = "m_" + moduleCount;
-                                newPage.Page = "p_" + p.PageId;
-                                newPage.Section = "s_" + sectionCount;
-                                newPage.Book = "b_" + book.BookId;
+                                    content = p.PageContent,
+                                    
+                                    Module = "m_" + moduleCount,
+                                    Page = "p_" + p.PageId,
+                                    Section = "s_" + sectionCount,
+                                    Book = "b_" + book.BookId
+                                };
 
                                 this.PageContent.Add(newPage);
                             }
