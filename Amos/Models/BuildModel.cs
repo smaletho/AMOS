@@ -241,7 +241,7 @@ namespace Amos.Models
                                     this.pageButtons.Add(new PageButton(buttonCount, contentNode, this.PageListModel.PageList, page.PageId, true));
                                     buttonCount++;
                                 }
-                                    
+
                             }
                             catch
                             {
@@ -257,10 +257,19 @@ namespace Amos.Models
                             {
                                 try
                                 {
-                                    if (textChild.LocalName == "a" && textChild.Attributes["class"].Value.Contains("navigateTo"))
+                                    if (textChild.LocalName == "a")
                                     {
-                                        this.pageButtons.Add(new PageButton(buttonCount, textChild, this.PageListModel.PageList, page.PageId, false));
-                                        buttonCount++;
+                                        var test = textChild.Attributes["class"].Value;
+                                        if (textChild.Attributes["class"].Value.Contains("navigateTo"))
+                                        {
+                                            this.pageButtons.Add(new PageButton(buttonCount, textChild, this.PageListModel.PageList, page.PageId, false));
+                                            buttonCount++;
+                                        }
+                                        else if (textChild.Attributes["class"].Value.Contains("popupPage"))
+                                        {
+                                            this.pageButtons.Add(new PageButton(buttonCount, textChild, this.PageListModel.PageList, page.PageId, false));
+                                            buttonCount++;
+                                        }
                                     }
                                 }
                                 catch { }
@@ -272,9 +281,9 @@ namespace Amos.Models
                 }
                 catch (ArgumentNullException) { }
                 catch (XmlException) { }
-                
 
-                
+
+
             }
         }
         public PageListModel PageListModel { get; set; }
@@ -297,24 +306,37 @@ namespace Amos.Models
                 this.PageId = 0;
             }
             this.ButtonText = xmlElement.InnerText;
-            try
+
+            if (xmlElement.Attributes["class"] != null && xmlElement.Attributes["class"].Value.Contains("popupPage"))
             {
-                string ogId = "";
-                if (isButton)
-                {
-                    ogId = xmlElement.Attributes["id"].Value;
-                }
-                else
-                {
-                    ogId = xmlElement.Attributes["data-id"].Value;
-                }
-                this.NavPageId = Convert.ToInt32(ogId.Split('_')[1]);
-                this.getNavPage = pages.Find(x => x.PageId == this.NavPageId);
+                string id = xmlElement.Attributes["data-page"].Value;
+                this.NavPageId = Convert.ToInt32(id);
             }
-            catch
+            else
             {
-                this.NavPageId = 0;
+                try
+                {
+                    string ogId = "";
+                    // check xmlElement class
+                    if (isButton)
+                    {
+                        ogId = xmlElement.Attributes["id"].Value;
+                    }
+                    else
+                    {
+                        ogId = xmlElement.Attributes["data-id"].Value;
+                    }
+                    this.NavPageId = Convert.ToInt32(ogId.Split('_')[1]);
+                }
+                catch
+                {
+                    this.NavPageId = 0;
+                }
+
             }
+            this.getNavPage = pages.Find(x => x.PageId == this.NavPageId);
+
+
             this.isButton = isButton;
         }
         public int ButtonId { get; set; }

@@ -3,6 +3,7 @@
 
 function renderInit() {
     $(".navigateTo").on('click', function () {
+        addUserActionLog("Navigate link clicked. Item text: " + $(this).text());
         loadPage($(this).data('id'), "page");
         return false;
     });
@@ -33,6 +34,7 @@ function renderInit() {
 
     $(".content-window img").on('click', function () {
         var clonedImg = $(this).clone();
+        addUserActionLog("Image magnified. Source: " + $(clonedImg).prop('src'));
         openModalPopup();
         $("#full-modal-content").css('background-image', 'url(' + $(clonedImg).prop('src') + ')');
         return false;
@@ -44,14 +46,16 @@ function renderInit() {
         var item = $(this).data('content');
 
         $("#popup-text").text(text);
+        addUserActionLog("Dialog link/button clicked. Text: " + text);
 
         if (item !== "undefined") {
             var src = "";
             var newSrc = "";
+            var newNode = "";
 
             if (item.indexOf("i") !== -1) {
                 // it's an image
-                var newNode = $("<img></img>");
+                newNode = $("<img></img>");
                 $(newNode).addClass("item");
                 $(newNode).width($(this).data('size'));
 
@@ -63,8 +67,8 @@ function renderInit() {
                     // TODO: catch other types of images
 
                     newSrc = "./Content/images/" + src;
-                    if (element.hasAttribute("type")) {
-                        switch (element.attributes["type"].value) {
+                    if (this.hasAttribute("data-type")) {
+                        switch (this.attributes["data-type"].value) {
                             default:
                             case "jpeg":
                             case "jpg":
@@ -75,6 +79,10 @@ function renderInit() {
                                 break;
                             case "gif":
                                 newSrc += ".gif";
+                                break;
+                            case "bmp":
+                                newSrc += ".bmp";
+                                break;
 
                         }
                     } else {
@@ -88,7 +96,11 @@ function renderInit() {
                 $(newNode).prop('src', newSrc);
             } else {
                 // it's a video
-                src = element.attributes[i].value;
+                newNode = $("<video></video>");
+                $(newNode).prop('controls', 'controls');
+                $(newNode).addClass("item");
+                $(newNode).width($(this).data('size'));
+                src = item;
                 newSrc = "";
 
                 // running offline
@@ -96,8 +108,8 @@ function renderInit() {
                     // TODO: catch other types of videos
 
                     newSrc = "./Content/images/" + src;
-                    if (element.hasAttribute("type")) {
-                        switch (element.attributes["type"].value) {
+                    if (this.hasAttribute("data-type")) {
+                        switch (this.attributes["data-type"].value) {
                             case "mp4":
                                 newSrc += ".mp4";
                                 break;
@@ -137,6 +149,8 @@ function renderInit() {
     });
 
     $(".popupPage").on('click', function () {
+        addUserActionLog("Clicked page popup. Text: " + $(this).text());
+
         var pageId = "p_" + $(this).data("page");
         var targetPage;
         $(PageContent).each(function () {
@@ -175,7 +189,10 @@ function renderInit() {
         }
     }
 
-
+    $("video").on("play pause seeked ended", function (e) {
+        var str = "(" + e.target.currentSrc + ") video-" + e.type;
+        addUserActionLog(str);
+    });
 }
 
 function okayToNavigateAway() {
@@ -393,15 +410,15 @@ function buttonNode(element) {
 
     $(newNode).html($.trim(element.textContent));
 
-
-
-    if (typeof (element.classList) === "undefined" || element.classList.length === 0) {
+   
+    if (typeof element.attributes["class"] === "undefined") {
         $(newNode).on('click', function () {
-            loadPage(element.id, "page", "button click (" + $(this).text() + ")");
+            loadPage(element.attributes["id"].value, "page", "button click (" + $(this).text() + ")");
         });
     } else {
-        for (var i = 0; i < element.classList.length; i++) {
-            switch (element.classList[i]) {
+        var splitClasses = element.attributes["class"].value.split(' ');
+        for (var i = 0; i < splitClasses.length; i++) {
+            switch (splitClasses[i]) {
                 case "quiz-submit": {
 
                     break;
@@ -416,7 +433,7 @@ function buttonNode(element) {
                     break;
                 default:
                     $(newNode).on('click', function () {
-                        loadPage(element.id, "page", "button click (" + $(this).text() + ")");
+                        loadPage(element.attributes["id"].value, "page", "button click (" + $(this).text() + ")");
                     });
                     break;
             }
@@ -457,6 +474,10 @@ function imageNode(element) {
                                 break;
                             case "gif":
                                 newSrc += ".gif";
+                                break;
+                            case "bmp":
+                                newSrc += ".bmp";
+                                break;
 
                         }
                     } else {

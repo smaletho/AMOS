@@ -182,7 +182,6 @@ html {
         position: relative;
         cursor: pointer;
         padding: 10px;
-        /*TODO: this isn't right*/
         overflow:hidden;
         background-color:white;
     }

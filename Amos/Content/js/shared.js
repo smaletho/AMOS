@@ -113,6 +113,7 @@ function openSubjectDialog() {
     $("#subject-login").keypress(function (e) {
         if (e.keyCode === $.ui.keyCode.ENTER) {
             subjectLogin();
+            return false;
         }
     });
     $("#subject-login").dialog('open');

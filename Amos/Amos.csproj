@@ -260,8 +260,6 @@
     <Content Include="Content\js\base.js" />
     <Content Include="Content\js\bootstrap-tour-standalone.min.js" />
     <Content Include="Content\js\Configure.js" />
-    <Content Include="Content\js\EditBook - Copy.js" />
-    <Content Include="Content\js\EditBook.js" />
     <Content Include="Content\js\jquery-3.3.1.min.js" />
     <Content Include="Content\js\jquery-ui-1.12.1.min.js" />
     <Content Include="Content\js\ManageButtons.js" />
@@ -407,6 +405,7 @@
     <Content Include="Scripts\esm\popper-utils.js.map" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <Content Include="RunJobs.bat" />
+    <Content Include="README.md" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <None Include="Scripts\jquery-3.3.1-vsdoc.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
@@ -484,10 +483,6 @@
     <Content Include="Scripts\jquery-3.3.1.min.map" />
     <Content Include="Views\Build\Manage.cshtml" />
     <Content Include="Views\Build\Edit.cshtml" />
-    <Content Include="Views\Build\Build_Chapter.cshtml" />
-    <Content Include="Views\Build\Build_Module.cshtml" />
-    <Content Include="Views\Build\Build_Page.cshtml" />
-    <Content Include="Views\Build\Build_Section.cshtml" />
     <Content Include="Views\Build\BuildList.cshtml" />
     <Content Include="Views\Build\ListPages.cshtml" />
     <Content Include="Views\Configure\Index.cshtml" />

@@ -171,6 +171,10 @@ function imageNode(element) {
                                 break;
                             case "gif":
                                 newSrc += ".gif";
+                                break;
+                            case "bmp":
+                                newSrc += ".bmp";
+                                break;
 
                         }
                     } else {

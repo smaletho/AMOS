@@ -20,7 +20,12 @@
         var id = $(this).data('page');
         loadPage(id, "page", "navigation dot click");
     });
+    bindKeyboard();
+}
+
+function bindKeyboard() {
     $(document).keydown(function (event) {
+        idleTime = 0;
         if (event.which === 39) {
             // going forwards
             nextPage("arrow key navigation");
@@ -114,14 +119,16 @@ function showInitialHelp() {
     var tour = new Tour({
         backdrop: true,
         storage: false,
-        keyboard: false,
+        keyboard: true,
         delay: 0,
         onStart: function () {
             $("#main-window").css('pointer-events', 'none');
+            $(document).unbind("keydown");
         },
         onEnd: function () {
             window.scrollTo(0, 0);
             $("#main-window").css('pointer-events', 'auto');
+            bindKeyboard();
         },
         steps: [
             {
@@ -366,7 +373,6 @@ function selectPageDots() {
 
     var page = $(ConfigXml).find("page#" + currentPage).first();
     try {
-        console.log(page.classList);
         if (page.hasClass("hide-page")) {
             var newElement = $(page).prevAll("page").not(".hide-page").first();
             $(".dot[data-page='" + $(newElement).prop('id') + "']").addClass("selected");
@@ -374,7 +380,7 @@ function selectPageDots() {
             $(".dot[data-page='" + CurrentLocation.Page + "']").addClass("selected");
         }
     }
-    catch {
+    catch (error) {
         $(".dot[data-page='" + CurrentLocation.Page + "']").addClass("selected");
     }
 
@@ -456,8 +462,8 @@ function populateMenus() {
         $(mod).find("page").each(function (k, v) {
 
             // hide extra pages
-            var classList = this.classList;
-            if (classList.length < 1 || $.inArray("hide-page", classList)) {
+            var classString = $(this).prop('class');
+            if (!classString || classString.indexOf('hide-page') === -1) {
                 var dot = $("<div data-page='" + this.attributes.id.value + "' class='dot'></div>");
 
                 // check visited pages
@@ -467,12 +473,30 @@ function populateMenus() {
                 }
 
                 $(dot).html(k + 1);
-                if ($(this).closest("section").prop("id") !== currentSection) {
+                if ($(this).closest("section")[0].attributes["id"] !== currentSection) {
                     $(dot).addClass('leftborder');
-                    currentSection = $(this).closest("section").prop('id');
+                    currentSection = $(this).closest("section")[0].attributes["id"];
                 }
                 $("#dot-container").append(dot);
-            }
+            } 
+            //var classList = $(this).prop('class').split(' ');
+            
+            //if (classList.length < 1 || $.inArray("hide-page", classList)) {
+            //    var dot = $("<div data-page='" + this.attributes.id.value + "' class='dot'></div>");
+
+            //    // check visited pages
+            //    if (typeof UserTracker.VisitedPages !== "undefined") {
+            //        if (UserTracker.VisitedPages.indexOf(this.attributes.id.value) !== -1)
+            //            $(dot).addClass("visited");
+            //    }
+
+            //    $(dot).html(k + 1);
+            //    if ($(this).closest("section").prop("id") !== currentSection) {
+            //        $(dot).addClass('leftborder');
+            //        currentSection = $(this).closest("section").prop('id');
+            //    }
+            //    $("#dot-container").append(dot);
+            //}
             
             
             
@@ -502,7 +526,7 @@ function populateMenus() {
         //var pageLen = ($(".dot").length * 30) + 2;
         //$("#arrow-content").width(pageLen);
         //$("#section-content").width(pageLen);
-        ////$("#arrow-bar").width(pageLen * 30);
+        //$("#arrow-bar").width(pageLen * 30);
     }
 
 

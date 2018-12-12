@@ -82,7 +82,7 @@ namespace Amos.Controllers
             db.Pages.Add(page);
             db.SaveChanges();
 
-            return RedirectToAction("Edit", new { id = book.BookId });
+            return RedirectToAction("Index", "Configure", new { id = book.BookId });
         }
 
 
@@ -552,6 +552,7 @@ namespace Amos.Controllers
                                                                         {
                                                                             case "jpg":
                                                                             case "png":
+                                                                            case "bmp":
                                                                             case "gif":
                                                                                 f.ContentType = "image/" + type;
                                                                                 f.FileType = FileType.Photo;
@@ -603,8 +604,16 @@ namespace Amos.Controllers
                                     {
                                         try
                                         {
-                                            // change the id from the old one to the matching new one
-                                            button.SetAttribute("id", oldToNewPageNumbers[button.Attributes["id"].Value]);
+                                            if (button.Attributes["class"] != null && button.Attributes["class"].Value == "popupPage")
+                                            {
+                                                // change the id from the old one to the matching new one
+                                                button.SetAttribute("data-page", oldToNewPageNumbers[button.Attributes["data-page"].Value]);
+                                            }
+                                            if (button.Attributes["class"] != null && button.Attributes["class"].Value == "navigateTo")
+                                            {
+                                                // change the id from the old one to the matching new one
+                                                button.SetAttribute("id", oldToNewPageNumbers[button.Attributes["id"].Value]);
+                                            }
                                         }
                                         catch (NullReferenceException) { }
                                     }
@@ -620,11 +629,13 @@ namespace Amos.Controllers
                                                 // change the id from the old one to the matching new one
                                                 a.SetAttribute("data-id", oldToNewPageNumbers[a.Attributes["data-id"].Value]);
                                             }
+                                            if (a.Attributes["class"].Value == "popupPage")
+                                            {
+                                                // change the id from the old one to the matching new one
+                                                a.SetAttribute("data-page", oldToNewPageNumbers[a.Attributes["data-page"].Value]);
+                                            }
                                         }
-                                        catch (NullReferenceException)
-                                        {
-
-                                        }
+                                        catch (NullReferenceException) { }
 
                                     }
 
@@ -736,6 +747,11 @@ namespace Amos.Controllers
                                             fName += ".gif";
                                             newFileName += "i_" + f.FileId.ToString() + ".gif";
                                             fileNameToExtension.Add("i_" + f.FileId.ToString(), "gif");
+                                            break;
+                                        case "image/bmp":
+                                            fName += ".bmp";
+                                            newFileName += "i_" + f.FileId.ToString() + ".bmp";
+                                            fileNameToExtension.Add("i_" + f.FileId.ToString(), "bmp");
                                             break;
                                     }
                                     break;
@@ -907,6 +923,11 @@ namespace Amos.Controllers
                                             newFileName += "images/i_" + f.FileId.ToString() + ".gif";
                                             fileNameToExtension.Add("i_" + f.FileId.ToString(), "gif");
                                             break;
+                                        case "image/bmp":
+                                            fName += ".bmp";
+                                            newFileName += "images/i_" + f.FileId.ToString() + ".bmp";
+                                            fileNameToExtension.Add("i_" + f.FileId.ToString(), "bmp");
+                                            break;
                                     }
                                     break;
                                 case FileType.Video:
@@ -1009,7 +1030,7 @@ namespace Amos.Controllers
             try
             {
                 DirectoryInfo di = new DirectoryInfo(sourceDir);
-                foreach(FileInfo file in di.GetFiles())
+                foreach (FileInfo file in di.GetFiles())
                 {
                     file.Delete();
                 }
@@ -1625,14 +1646,14 @@ namespace Amos.Controllers
 
             // Fix all the page buttons
             ManagePagesModel managePagesModel = new ManagePagesModel(newBook.BookId);
-            
 
 
-            foreach(var page in managePagesModel.PageListModel.PageList)
+
+            foreach (var page in managePagesModel.PageListModel.PageList)
             {
                 XmlDocument doc = new XmlDocument();
                 doc.LoadXml(page.PageContent);
-                foreach(XmlElement img in doc.SelectNodes("//image"))
+                foreach (XmlElement img in doc.SelectNodes("//image"))
                 {
                     try
                     {
@@ -1643,10 +1664,10 @@ namespace Amos.Controllers
                         img.SetAttribute("source", newSource);
                     }
                     catch { }
-                    
+
                 }
 
-                foreach(XmlElement vid in doc.SelectNodes("//video"))
+                foreach (XmlElement vid in doc.SelectNodes("//video"))
                 {
                     try
                     {
@@ -1657,13 +1678,13 @@ namespace Amos.Controllers
                         vid.SetAttribute("source", newSource);
                     }
                     catch { }
-                    
+
                 }
                 XmlElement p = (XmlElement)doc.SelectSingleNode("//page");
                 p.SetAttribute("id", "p_" + page.PageId);
 
                 cdb.Pages.Where(x => x.PageId == page.PageId).FirstOrDefault().PageContent = doc.OuterXml;
-                
+
                 cdb.SaveChanges();
             }
 
@@ -2426,7 +2447,14 @@ namespace Amos.Controllers
                                 if (buttonCount == buttonId)
                                 {
                                     // this is the item
-                                    contentNode.SetAttribute("id", "p_" + toPageId.ToString());
+                                    if (classList.Contains("popupPage"))
+                                    {
+                                        contentNode.SetAttribute("data-page", toPageId.ToString());
+                                    }
+                                    else
+                                    {
+                                        contentNode.SetAttribute("id", "p_" + toPageId.ToString());
+                                    }
                                     break;
                                 }
                                 buttonCount++;
@@ -2452,15 +2480,26 @@ namespace Amos.Controllers
                         {
                             try
                             {
-                                if (textChild.LocalName == "a" && textChild.Attributes["class"].Value.Contains("navigateTo"))
+                                if (textChild.LocalName == "a")
                                 {
-                                    if (buttonCount == buttonId)
+                                    if (textChild.Attributes["class"].Value.Contains("navigateTo") || textChild.Attributes["class"].Value.Contains("popupPage"))
                                     {
-                                        // this is the item
-                                        contentNode.SetAttribute("id", "p_" + toPageId.ToString());
-                                        break;
+                                        if (buttonCount == buttonId)
+                                        {
+                                            // this is the item
+                                            if (textChild.Attributes["class"].Value.Contains("popupPage"))
+                                            {
+                                                ((XmlElement)textChild).SetAttribute("data-page", toPageId.ToString());
+                                            }
+                                            else
+                                            {
+                                                ((XmlElement)textChild).SetAttribute("id", "p_" + toPageId.ToString());
+                                            }
+                                            break;
+                                        }
+                                        buttonCount++;
                                     }
-                                    buttonCount++;
+
                                 }
                             }
                             catch { }
@@ -2505,33 +2544,6 @@ namespace Amos.Controllers
         }
 
 
-        [HttpPost]
-        public ActionResult Build_Module(S_Module item, int m)
-        {
-            ViewBag.Count = m;
-            return View("Build_Module", item);
-        }
-        [HttpPost]
-        public ActionResult Build_Section(S_Section item, int s)
-        {
-            ViewBag.Count = s;
-            return View("Build_Section", item);
-        }
-        [HttpPost]
-        public ActionResult Build_Chapter(S_Chapter item, int c)
-        {
-            ViewBag.Count = c;
-            return View("Build_Chapter", item);
-        }
-        [HttpPost]
-        public ActionResult Build_Page(S_Page item, int m, int s, int c, int p)
-        {
-            // this one needs a model
-            return View("Build_Page", new Build_PageModel(item, m, s, c, p));
-        }
-
-
-
 
 
 
@@ -2541,7 +2553,7 @@ namespace Amos.Controllers
         public ActionResult ConvertXmlToHtml()
         {
             ApplicationDbContext db = new ApplicationDbContext();
-            
+
             foreach (var page in db.Pages.ToList())
             {
                 var oldContent = page.PageContent;
@@ -2549,7 +2561,8 @@ namespace Amos.Controllers
                 try
                 {
                     xmlDoc.Load(oldContent);
-                }catch{ }
+                }
+                catch { }
             }
 
             return Content("success");

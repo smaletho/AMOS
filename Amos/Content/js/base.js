@@ -1,10 +1,23 @@
 
 var resizeTimer;
+var idleTime = 0;
 var applicationMode = "online";
 
 $(function () {
     firstLoadInit();
 
+    //Increment the idle time counter every minute.
+    var idleInterval = setInterval(timerIncrement, 60000); // 1 minute
+
+    //Zero the idle timer on mouse movement.
+    $("body").mousemove(function (e) {
+        idleTime = 0;
+    });
+    // This part is in navigation.js
+    //$(document).keydown(function (e) {
+    //    idleTime = 0;
+    //    console.log('timer reset');
+    //});
 
     // If location.hostname == "", it means that the app is running as a "file" not on a server
     //  therefore, we're offline, so do that load instead
@@ -26,6 +39,15 @@ $(function () {
         transmitAction(URL_LoadBook, gotBookInfo, fail_BookInfo, "", null, true);
     }
 });
+
+function timerIncrement() {
+    idleTime = idleTime + 1;
+
+    if (idleTime > 9 && $(".ui-dialog").not(":visible")) { 
+        idleTime = 0;
+        exitBook("You have been inactive for 10 minutes. Would you like to exit?");
+    }
+}
 
 function gotBookInfo(data) {
 
