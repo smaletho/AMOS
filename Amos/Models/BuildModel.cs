@@ -229,55 +229,44 @@ namespace Amos.Models
                 try
                 {
                     xmlDoc.LoadXml(page.PageContent);
-                    foreach (XmlElement contentNode in xmlDoc.ChildNodes[0].ChildNodes)
-                    {
-                        if (contentNode.LocalName == "button")
-                        {
-                            try
-                            {
-                                string classList = contentNode.Attributes["class"].Value;
-                                if (!classList.Contains("quiz-submit") && !classList.Contains("survey-submit"))
-                                {
-                                    this.pageButtons.Add(new PageButton(buttonCount, contentNode, this.PageListModel.PageList, page.PageId, true));
-                                    buttonCount++;
-                                }
 
-                            }
-                            catch
+                    foreach (XmlElement contentNode in xmlDoc.SelectNodes("//button"))
+                    {
+                        try
+                        {
+                            string classList = contentNode.Attributes["class"].Value;
+                            if (!classList.Contains("quiz-submit") && !classList.Contains("survey-submit"))
                             {
-                                // This is here on purpose. Buttons don't always have an attribute "class" so failing is good, because it
-                                //  means it's not a quiz or survey button
                                 this.pageButtons.Add(new PageButton(buttonCount, contentNode, this.PageListModel.PageList, page.PageId, true));
                                 buttonCount++;
                             }
+
                         }
-                        else if (contentNode.LocalName == "text")
+                        catch
                         {
-                            foreach (XmlNode textChild in contentNode.ChildNodes)
-                            {
-                                try
-                                {
-                                    if (textChild.LocalName == "a")
-                                    {
-                                        var test = textChild.Attributes["class"].Value;
-                                        if (textChild.Attributes["class"].Value.Contains("navigateTo"))
-                                        {
-                                            this.pageButtons.Add(new PageButton(buttonCount, textChild, this.PageListModel.PageList, page.PageId, false));
-                                            buttonCount++;
-                                        }
-                                        else if (textChild.Attributes["class"].Value.Contains("popupPage"))
-                                        {
-                                            this.pageButtons.Add(new PageButton(buttonCount, textChild, this.PageListModel.PageList, page.PageId, false));
-                                            buttonCount++;
-                                        }
-                                    }
-                                }
-                                catch { }
-
-                            }
-
+                            // This is here on purpose. Buttons don't always have an attribute "class" so failing is good, because it
+                            //  means it's not a quiz or survey button
+                            this.pageButtons.Add(new PageButton(buttonCount, contentNode, this.PageListModel.PageList, page.PageId, true));
+                            buttonCount++;
                         }
                     }
+
+                    // find all anchor elements with class="navigateTo"
+                    foreach (XmlElement contentNode in xmlDoc.SelectNodes("//a[contains(concat(' ', @class, ' '), ' navigateTo ')]"))
+                    {
+                        var btn = new PageButton(buttonCount, contentNode, this.PageListModel.PageList, page.PageId, false);
+                        this.pageButtons.Add(btn);
+                        buttonCount++;
+                    }
+
+                    // find all anchor elements with class="popupPage"
+                    foreach (XmlElement contentNode in xmlDoc.SelectNodes("//a[contains(concat(' ', @class, ' '), ' popupPage ')]"))
+                    {
+                        var btn = new PageButton(buttonCount, contentNode, this.PageListModel.PageList, page.PageId, false);
+                        this.pageButtons.Add(btn);
+                        buttonCount++;
+                    }
+                    
                 }
                 catch (ArgumentNullException) { }
                 catch (XmlException) { }
@@ -310,7 +299,14 @@ namespace Amos.Models
             if (xmlElement.Attributes["class"] != null && xmlElement.Attributes["class"].Value.Contains("popupPage"))
             {
                 string id = xmlElement.Attributes["data-page"].Value;
-                this.NavPageId = Convert.ToInt32(id);
+                try
+                {
+                    this.NavPageId = Convert.ToInt32(id);
+                }
+                catch
+                {
+                    this.NavPageId = 0;
+                }
             }
             else
             {
@@ -326,7 +322,8 @@ namespace Amos.Models
                     {
                         ogId = xmlElement.Attributes["data-id"].Value;
                     }
-                    this.NavPageId = Convert.ToInt32(ogId.Split('_')[1]);
+                    string numId = ogId.Split('_')[1];
+                    this.NavPageId = Convert.ToInt32(numId);
                 }
                 catch
                 {

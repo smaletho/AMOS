@@ -100,276 +100,6 @@ namespace Amos.Controllers
             {
                 HttpPostedFileBase file = Request.Files[0];
                 model.ResponseList = Action_Import(file.InputStream, "");
-                //using (ZipArchive zipArchive = new ZipArchive(file.InputStream))
-                //{
-
-                //    Dictionary<string, string> oldToNewPageNumbers = new Dictionary<string, string>();
-
-                //    // TODO timer
-
-                //    var config = zipArchive.Entries.Where(x => x.Name == "config.xml").FirstOrDefault();
-                //    if (config == null)
-                //    {
-                //        model.ResponseList.Add("Could not find config.xml. Aborting.");
-                //        return RedirectToAction("ImportBook", model);
-                //    }
-                //    else
-                //    {
-                //        model.ResponseList.Add("Found config.xml. Parsing in to book...");
-                //        using (var stream = config.Open())
-                //        {
-                //            using (var reader = new StreamReader(stream))
-                //            {
-                //                try
-                //                {
-                //                    // turn it in to an XML Doc
-                //                    XmlDocument xmlDoc = new XmlDocument();
-                //                    xmlDoc.LoadXml(reader.ReadToEnd());
-
-                //                    // loop through the xml doc to build book
-                //                    foreach (XmlElement bookNode in xmlDoc.ChildNodes)
-                //                    {
-                //                        // this is the book object
-                //                        Book book = new Book();
-                //                        book.CreatedBy = bookNode.Attributes["author"].Value;
-                //                        book.ModifiedBy = bookNode.Attributes["author"].Value;
-
-                //                        try { book.CreateDate = Convert.ToDateTime(bookNode.Attributes["createdate"].Value); }
-                //                        catch { book.CreateDate = DateTime.Now; }
-                //                        try { book.ModifyDate = Convert.ToDateTime(bookNode.Attributes["modifydate"].Value); }
-                //                        catch { book.ModifyDate = DateTime.Now; }
-
-                //                        book.Published = true;
-                //                        book.Version = bookNode.Attributes["version"].Value;
-                //                        book.Name = bookNode.Attributes["name"].Value;
-
-                //                        cdb.Books.Add(book);
-                //                        cdb.SaveChanges();
-                //                        model.ResponseList.Add(string.Format("Added book. Name: {0} Id: {1}", book.Name, book.BookId));
-
-                //                        int moduleSort = 10;
-
-                //                        foreach (XmlElement moduleNode in bookNode.ChildNodes)
-                //                        {
-                //                            // these are modules
-                //                            Module module = new Module();
-                //                            module.BookId = book.BookId;
-                //                            module.Name = moduleNode.Attributes["name"].Value;
-
-                //                            module.SortOrder = moduleSort;
-                //                            moduleSort += 10;
-
-                //                            module.Theme = moduleNode.Attributes["theme"].Value;
-                //                            cdb.Modules.Add(module);
-                //                            cdb.SaveChanges();
-
-                //                            int sectionSort = 10;
-
-                //                            foreach (XmlElement sectionNode in moduleNode.ChildNodes)
-                //                            {
-                //                                // these are sections
-                //                                Section section = new Section();
-                //                                section.ModuleId = module.ModuleId;
-                //                                section.Name = sectionNode.Attributes["name"].Value;
-
-                //                                section.SortOrder = sectionSort;
-                //                                sectionSort += 10;
-
-                //                                cdb.Sections.Add(section);
-                //                                cdb.SaveChanges();
-
-                //                                int chapterSort = 10;
-
-                //                                foreach (XmlElement chapterNode in sectionNode.ChildNodes)
-                //                                {
-                //                                    // these are chapters
-                //                                    Chapter chapter = new Chapter();
-                //                                    chapter.Name = chapterNode.Attributes["name"].Value;
-
-                //                                    chapter.SortOrder = chapterSort;
-                //                                    chapterSort += 10;
-
-                //                                    chapter.SectionId = section.SectionId;
-                //                                    cdb.Chapters.Add(chapter);
-                //                                    cdb.SaveChanges();
-
-                //                                    int pageSort = 10;
-
-                //                                    foreach (XmlElement pageNode in chapterNode.ChildNodes)
-                //                                    {
-                //                                        // these are pages
-                //                                        Page page = new Page();
-                //                                        page.BookId = book.BookId;
-                //                                        page.ChapterId = chapter.ChapterId;
-
-                //                                        page.SortOrder = pageSort;
-                //                                        pageSort += 10;
-
-                //                                        page.Type = pageNode.Attributes["type"].Value;
-
-                //                                        page.Create("import");
-                //                                        try
-                //                                        {
-                //                                            page.Title = pageNode.Attributes["title"].Value;
-                //                                        }
-                //                                        catch (NullReferenceException)
-                //                                        {
-                //                                            page.Title = "New Page";
-                //                                        }
-
-                //                                        page.PageContent = "";
-
-                //                                        cdb.Pages.Add(page);
-                //                                        cdb.SaveChanges();
-
-                //                                        oldToNewPageNumbers.Add(pageNode.Attributes["id"].Value, "p_" + page.PageId);
-                //                                        pageNode.SetAttribute("id", "p_" + page.PageId);
-
-                //                                        foreach (XmlElement contentNode in pageNode.ChildNodes)
-                //                                        {
-                //                                            if (contentNode.Name.ToLower() == "image" || contentNode.Name.ToLower() == "video")
-                //                                            {
-                //                                                // find the image in the archive
-                //                                                string id = contentNode.Attributes["source"].Value;
-
-                //                                                string type = "";
-                //                                                string matchFileName = "";
-                //                                                try
-                //                                                {
-                //                                                    type = contentNode.Attributes["type"].Value;
-                //                                                    matchFileName = id + "." + type;
-                //                                                }
-                //                                                catch (NullReferenceException)
-                //                                                {
-                //                                                    type = "jpg";
-                //                                                    matchFileName = id + ".jpg";
-                //                                                }
-
-
-                //                                                var innerFile = zipArchive.Entries.Where(x => x.Name == matchFileName).FirstOrDefault();
-                //                                                if (innerFile != null)
-                //                                                {
-                //                                                    using (var innerStream = innerFile.Open())
-                //                                                    {
-                //                                                        using (var innerReader = new StreamReader(innerStream))
-                //                                                        {
-                //                                                            AmosFile f = new AmosFile();
-
-                //                                                            MemoryStream target = new MemoryStream();
-                //                                                            innerReader.BaseStream.CopyTo(target);
-                //                                                            f.Content = target.ToArray();
-
-
-                //                                                            f.FileName = matchFileName;
-                //                                                            switch (type)
-                //                                                            {
-                //                                                                case "jpg":
-                //                                                                case "png":
-                //                                                                case "gif":
-                //                                                                    f.ContentType = "image/" + type;
-                //                                                                    f.FileType = FileType.Photo;
-                //                                                                    break;
-                //                                                                case "mp4":
-                //                                                                    f.ContentType = "video/" + type;
-                //                                                                    f.FileType = FileType.Video;
-                //                                                                    break;
-                //                                                            }
-
-                //                                                            f.PageId = page.PageId;
-                //                                                            cdb.AmosFiles.Add(f);
-                //                                                            cdb.SaveChanges();
-
-                //                                                            // update ID in contentNode
-                //                                                            switch (f.FileType)
-                //                                                            {
-                //                                                                case FileType.Photo:
-                //                                                                    contentNode.SetAttribute("source", "i_" + f.FileId);
-                //                                                                    break;
-                //                                                                case FileType.Video:
-                //                                                                    contentNode.SetAttribute("source", "v_" + f.FileId);
-                //                                                                    break;
-                //                                                            }
-
-                //                                                        }
-                //                                                    }
-                //                                                }
-                //                                                else
-                //                                                {
-                //                                                    model.ResponseList.Add(string.Format("File not found. Page: {0} FileId: {1}", pageNode.Attributes["id"].Value, matchFileName));
-                //                                                }
-                //                                            }
-                //                                        }
-
-                //                                    }
-                //                                }
-                //                            }
-                //                        }
-
-                //                    }
-
-                //                    // go back through all the page nodes, and update the other IDs (buttons, links, etc)
-                //                    ///book/module/section/chapter/
-                //                    foreach (XmlElement p in xmlDoc.SelectNodes("//page"))
-                //                    {
-                //                        // update the buttons
-                //                        foreach (XmlElement button in p.SelectNodes("./button"))
-                //                        {
-                //                            try
-                //                            {
-                //                                // change the id from the old one to the matching new one
-                //                                button.SetAttribute("id", oldToNewPageNumbers[button.Attributes["id"].Value]);
-                //                            }
-                //                            catch (NullReferenceException) { }
-                //                        }
-
-                //                        // update the anchors
-                //                        foreach (XmlElement a in p.SelectNodes("./text//a"))
-                //                        {
-
-                //                            try
-                //                            {
-                //                                if (a.Attributes["class"].Value == "navigateTo")
-                //                                {
-                //                                    // change the id from the old one to the matching new one
-                //                                    a.SetAttribute("data-id", oldToNewPageNumbers[a.Attributes["data-id"].Value]);
-                //                                }
-                //                            }
-                //                            catch (NullReferenceException)
-                //                            {
-
-                //                            }
-
-                //                        }
-
-                //                        // get the pageId from the node
-                //                        string pageId = p.Attributes["id"].Value;
-                //                        int newPageId = Convert.ToInt32(pageId.Split('_')[1]);
-
-                //                        var pageLookup = cdb.Pages.Where(x => x.PageId == newPageId).FirstOrDefault();
-                //                        if (pageLookup != null)
-                //                        {
-                //                            pageLookup.PageContent = p.OuterXml;
-                //                        }
-                //                    }
-
-                //                    cdb.SaveChanges();
-
-                //                }
-                //                catch (XmlException e)
-                //                {
-                //                    model.ResponseList.Add("Bad xml in config.xml. Aborting. Exception: " + e.Message);
-                //                }
-                //                catch (ArgumentException e)
-                //                {
-                //                    model.ResponseList.Add("Attribute exception. Message: " + e.Message);
-                //                }
-                //            }
-                //        }
-                //    }
-
-
-
-                //}
             }
             catch (NotImplementedException e)
             {
@@ -586,6 +316,78 @@ namespace Amos.Controllers
                                                                 retLs.Add(string.Format("File not found. Page: {0} FileId: {1}", pageNode.Attributes["id"].Value, matchFileName));
                                                             }
                                                         }
+                                                        if (contentNode.HasAttribute("class") && contentNode.GetAttribute("class").Contains("dialogLink"))
+                                                        {
+                                                            // find the image in the archive
+                                                            string id = contentNode.Attributes["data-content"].Value;
+
+                                                            string type = "";
+                                                            string matchFileName = "";
+                                                            try
+                                                            {
+                                                                type = contentNode.Attributes["data-type"].Value;
+                                                                matchFileName = id + "." + type;
+                                                            }
+                                                            catch (NullReferenceException)
+                                                            {
+                                                                type = "jpg";
+                                                                matchFileName = id + ".jpg";
+                                                            }
+
+
+                                                            var innerFile = zipArchive.Entries.Where(x => x.Name == matchFileName).FirstOrDefault();
+                                                            if (innerFile != null)
+                                                            {
+                                                                using (var innerStream = innerFile.Open())
+                                                                {
+                                                                    using (var innerReader = new StreamReader(innerStream))
+                                                                    {
+                                                                        AmosFile f = new AmosFile();
+
+                                                                        MemoryStream target = new MemoryStream();
+                                                                        innerReader.BaseStream.CopyTo(target);
+                                                                        f.Content = target.ToArray();
+
+
+                                                                        f.FileName = matchFileName;
+                                                                        switch (type)
+                                                                        {
+                                                                            case "jpg":
+                                                                            case "png":
+                                                                            case "bmp":
+                                                                            case "gif":
+                                                                                f.ContentType = "image/" + type;
+                                                                                f.FileType = FileType.Photo;
+                                                                                break;
+                                                                            case "mp4":
+                                                                                f.ContentType = "video/" + type;
+                                                                                f.FileType = FileType.Video;
+                                                                                break;
+                                                                        }
+
+                                                                        f.PageId = page.PageId;
+                                                                        cdb.AmosFiles.Add(f);
+                                                                        cdb.SaveChanges();
+
+                                                                        // update ID in contentNode
+                                                                        switch (f.FileType)
+                                                                        {
+                                                                            case FileType.Photo:
+                                                                                contentNode.SetAttribute("data-content", "i_" + f.FileId);
+                                                                                break;
+                                                                            case FileType.Video:
+                                                                                contentNode.SetAttribute("data-content", "v_" + f.FileId);
+                                                                                break;
+                                                                        }
+
+                                                                    }
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                retLs.Add(string.Format("File not found. Page: {0} FileId: {1}", pageNode.Attributes["id"].Value, matchFileName));
+                                                            }
+                                                        }
                                                     }
 
                                                 }
@@ -604,15 +406,23 @@ namespace Amos.Controllers
                                     {
                                         try
                                         {
-                                            if (button.Attributes["class"] != null && button.Attributes["class"].Value == "popupPage")
+                                            if (button.HasAttribute("class") && button.GetAttribute("class").Contains("popupPage"))
                                             {
                                                 // change the id from the old one to the matching new one
-                                                button.SetAttribute("data-page", oldToNewPageNumbers[button.Attributes["data-page"].Value]);
+                                                //button.SetAttribute("data-page", oldToNewPageNumbers[button.Attributes["data-page"].Value]);
+                                                if (oldToNewPageNumbers.TryGetValue(button.Attributes["data-page"].Value, out string value))
+                                                {
+                                                    button.SetAttribute("data-page", value);
+                                                }
                                             }
-                                            if (button.Attributes["class"] != null && button.Attributes["class"].Value == "navigateTo")
+                                            else 
                                             {
                                                 // change the id from the old one to the matching new one
-                                                button.SetAttribute("id", oldToNewPageNumbers[button.Attributes["id"].Value]);
+                                                //button.SetAttribute("id", oldToNewPageNumbers[button.Attributes["id"].Value]);
+                                                if (oldToNewPageNumbers.TryGetValue(button.Attributes["id"].Value, out string value))
+                                                {
+                                                    button.SetAttribute("id", value);
+                                                }
                                             }
                                         }
                                         catch (NullReferenceException) { }
@@ -624,19 +434,26 @@ namespace Amos.Controllers
 
                                         try
                                         {
-                                            if (a.Attributes["class"].Value == "navigateTo")
+                                            if (a.HasAttribute("class") && a.GetAttribute("class") == "navigateTo")
                                             {
                                                 // change the id from the old one to the matching new one
-                                                a.SetAttribute("data-id", oldToNewPageNumbers[a.Attributes["data-id"].Value]);
+                                                //a.SetAttribute("data-id", oldToNewPageNumbers[a.Attributes["data-id"].Value]);
+                                                if (oldToNewPageNumbers.TryGetValue(a.GetAttribute("data-id"), out string value))
+                                                {
+                                                    a.SetAttribute("data-id", value);
+                                                }
                                             }
-                                            if (a.Attributes["class"].Value == "popupPage")
+                                            if(a.HasAttribute("class") && a.GetAttribute("class") == "popupPage")
                                             {
                                                 // change the id from the old one to the matching new one
-                                                a.SetAttribute("data-page", oldToNewPageNumbers[a.Attributes["data-page"].Value]);
+                                                //a.SetAttribute("data-page", oldToNewPageNumbers[a.Attributes["data-page"].Value]);
+                                                if (oldToNewPageNumbers.TryGetValue(a.GetAttribute("data-page"), out string value))
+                                                {
+                                                    a.SetAttribute("data-page", value);
+                                                }
                                             }
                                         }
                                         catch (NullReferenceException) { }
-
                                     }
 
                                     // get the pageId from the node
@@ -1383,14 +1200,14 @@ namespace Amos.Controllers
                     else
                     {
                         sb.AppendLine("Found radio button inputs, counting them...");
-                        if (inputNodes.Count != 8)
+                        if (inputNodes.Count != 5)
                         {
                             sb.AppendFormat("ERROR: Found {0} survey response elements, when there should be 8.", inputNodes.Count.ToString());
                             foundErrors = true;
                         }
                         else
                         {
-                            sb.AppendLine("Found 8 radio button inputs.");
+                            sb.AppendLine("Found 5 radio button inputs.");
                             // check for comments box
                             var commentsBox = doc.SelectNodes("//textarea[@id='survey-comment']");
                             if (commentsBox == null)
@@ -1680,6 +1497,20 @@ namespace Amos.Controllers
                     catch { }
 
                 }
+
+                foreach (XmlElement dialogLink in doc.SelectNodes("//a[contains(concat(' ', @class, ' '), ' dialogLink ')]"))
+                {
+                    try
+                    {
+                        var oldSource = dialogLink.GetAttribute("data-content").Split('_');
+                        int oldSourceId = Convert.ToInt32(oldSource[1]);
+
+                        string newSource = oldSource[0] + "_" + oldToNewFileIds[oldSourceId];
+                        dialogLink.SetAttribute("data-content", newSource);
+                    }
+                    catch { }
+                }
+
                 XmlElement p = (XmlElement)doc.SelectSingleNode("//page");
                 p.SetAttribute("id", "p_" + page.PageId);
 
@@ -1697,6 +1528,8 @@ namespace Amos.Controllers
                 catch { }
 
             }
+
+            // copy over .dialogLink as well
 
             return RedirectToAction("ListBooks");
         }
@@ -2385,9 +2218,40 @@ namespace Amos.Controllers
                     else if (!currentPageIds.Contains(btn.NavPageId))
                     {
                         foundErrors = true;
-                        sb.AppendLine("Button links to a page not included in the book. Current Page #" + btn.PageId);
+                        sb.AppendLine("Button links to a page not included in the book. Current Page #" + btn.getPage.Title);
                     }
                 }
+
+                foreach (var page in model.PageListModel.PageList)
+                {
+                    XmlDocument xmlDoc = new XmlDocument();
+                    try
+                    {
+                        xmlDoc.LoadXml(page.PageContent);
+                    }
+                    catch
+                    {
+                        foundErrors = true;
+                        sb.AppendLine("Unable to parse page XML. (PageId: " + page.Title + ")");
+                    }
+                    foreach (XmlElement contentNode in xmlDoc.SelectNodes("//image"))
+                    {
+                        if (!contentNode.HasAttribute("type"))
+                        {
+                            foundErrors = true;
+                            sb.AppendLine("Image found without attribute 'type'. (PageId: " + page.Title + ", ImageId: " + contentNode.GetAttribute("source") + ")");
+                        }
+                    }
+                    foreach (XmlElement contentNode in xmlDoc.SelectNodes("//video"))
+                    {
+                        if (!contentNode.HasAttribute("type"))
+                        {
+                            foundErrors = true;
+                            sb.AppendLine("Video found without attribute 'type'. (PageId: " + page.Title + ", VideoId: " + contentNode.GetAttribute("source") + ")");
+                        }
+                    }
+                }
+
 
                 if (!foundErrors)
                 {
@@ -2424,7 +2288,7 @@ namespace Amos.Controllers
             ApplicationDbContext db = new ApplicationDbContext();
             var onPage = db.Pages.Where(x => x.PageId == onPageId).FirstOrDefault();
             var toPage = db.Pages.Where(x => x.PageId == toPageId).FirstOrDefault();
-
+            
             // buttonId is the count of numbers on one page. works with indexes
             //  ex: find the 4th button on pageId == onPageId
 
@@ -2435,78 +2299,43 @@ namespace Amos.Controllers
             try
             {
                 xmlDoc.LoadXml(onPage.PageContent);
-                foreach (XmlElement contentNode in xmlDoc.ChildNodes[0].ChildNodes)
+
+                foreach (XmlElement contentNode in xmlDoc.SelectNodes("//button"))
                 {
-                    if (contentNode.LocalName == "button")
+                    try
                     {
-                        try
+                        string classList = contentNode.Attributes["class"].Value;
+                        if (!classList.Contains("quiz-submit") && !classList.Contains("survey-submit"))
                         {
-                            string classList = contentNode.Attributes["class"].Value;
-                            if (!classList.Contains("quiz-submit") && !classList.Contains("survey-submit"))
-                            {
-                                if (buttonCount == buttonId)
-                                {
-                                    // this is the item
-                                    if (classList.Contains("popupPage"))
-                                    {
-                                        contentNode.SetAttribute("data-page", toPageId.ToString());
-                                    }
-                                    else
-                                    {
-                                        contentNode.SetAttribute("id", "p_" + toPageId.ToString());
-                                    }
-                                    break;
-                                }
-                                buttonCount++;
-                            }
-
-                        }
-                        catch
-                        {
-                            // This is here on purpose. Buttons don't always have an attribute "class" so failing is good, because it
-                            //  means it's not a quiz or survey button
                             if (buttonCount == buttonId)
-                            {
-                                // this is the item
                                 contentNode.SetAttribute("id", "p_" + toPageId.ToString());
-                                break;
-                            }
-                            buttonCount++;
                         }
+
                     }
-                    else if (contentNode.LocalName == "text")
+                    catch
                     {
-                        foreach (XmlNode textChild in contentNode.ChildNodes)
-                        {
-                            try
-                            {
-                                if (textChild.LocalName == "a")
-                                {
-                                    if (textChild.Attributes["class"].Value.Contains("navigateTo") || textChild.Attributes["class"].Value.Contains("popupPage"))
-                                    {
-                                        if (buttonCount == buttonId)
-                                        {
-                                            // this is the item
-                                            if (textChild.Attributes["class"].Value.Contains("popupPage"))
-                                            {
-                                                ((XmlElement)textChild).SetAttribute("data-page", toPageId.ToString());
-                                            }
-                                            else
-                                            {
-                                                ((XmlElement)textChild).SetAttribute("id", "p_" + toPageId.ToString());
-                                            }
-                                            break;
-                                        }
-                                        buttonCount++;
-                                    }
-
-                                }
-                            }
-                            catch { }
-
-                        }
-
+                        // This is here on purpose. Buttons don't always have an attribute "class" so failing is good, because it
+                        //  means it's not a quiz or survey button
+                        if (buttonCount == buttonId)
+                            contentNode.SetAttribute("id", "p_" + toPageId.ToString());
                     }
+                    buttonCount++;
+                }
+
+                // find all anchor elements with class="navigateTo"
+                foreach (XmlElement contentNode in xmlDoc.SelectNodes("//a[contains(concat(' ', @class, ' '), ' navigateTo ')]"))
+                {
+                    if (buttonCount == buttonId)
+                        contentNode.SetAttribute("data-id", "p_" + toPageId.ToString());
+                    buttonCount++;
+                }
+
+                // find all anchor elements with class="popupPage"
+                foreach (XmlElement contentNode in xmlDoc.SelectNodes("//a[contains(concat(' ', @class, ' '), ' popupPage ')]"))
+                {
+                    if (buttonCount == buttonId)
+                        contentNode.SetAttribute("data-page", toPageId.ToString());
+                    buttonCount++;
                 }
 
                 onPage.PageContent = xmlDoc.OuterXml;
@@ -2515,7 +2344,7 @@ namespace Amos.Controllers
             }
             catch { }
 
-            return View("BuildButtonList", new ManagePagesModel(onPage.BookId));
+            return Content(toPage.Title);
         }
 
 

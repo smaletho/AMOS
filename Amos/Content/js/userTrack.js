@@ -9,6 +9,7 @@
     VisitedPages: []
 };
 
+var modulesVisited = [];
 
 function initTracking() {
 
@@ -158,7 +159,7 @@ function UpdateCurrentLocation(loc) {
 
 function addUserActionLog(description) {
 
-    var pageDes = UserTracker.CurrentLocation.Module + ":" + UserTracker.CurrentLocation.Section + ":" + UserTracker.CurrentLocation.Chapter + ":" + UserTracker.CurrentLocation.Page;
+    var pageDes = getPageTitleFromId(UserTracker.CurrentLocation.Page);
     
     var navOb = {
         to: "",
@@ -171,16 +172,20 @@ function addUserActionLog(description) {
 }
 
 function addUserNavigation(from, to, how) {
+    
     var f = "";
     if (typeof from === "undefined") {
         f = "start";
         how = "first load";
     } else {
-        f = from.Module + ":" + from.Section + ":" + from.Chapter + ":" + from.Page;
+        f = getPageTitleFromId(from.Page);
     }
 
-    var t = to.Module + ":" + to.Section + ":" + to.Chapter + ":" + to.Page;
+    var t = getPageTitleFromId(to.Page);
     var dt;
+
+    if (modulesVisited.indexOf(to.Module) === -1)
+        modulesVisited.push(to.Module);
 
     var navOb = {
         to: t,
@@ -214,4 +219,9 @@ function saveUserTracking() {
             email: UserTracker.Email,
             UserTracker: JSON.stringify(UserTracker)
         }, true);
+}
+
+function getPageTitleFromId(id) {
+    var item = $(ConfigXml).find("#" + id).first();
+    return item[0].getAttribute("title");
 }

@@ -44,7 +44,7 @@ function buildTableOfContents() {
         // if it's the main book, render different
         if (this.nodeName.toLowerCase() === "module") {
 
-            var id = $(this).prop('id');
+            var id = this.getAttribute('id');
             var type = this.nodeName.toLowerCase();
 
 

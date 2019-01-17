@@ -56,8 +56,8 @@
                                     <li class="dropdown-header" style="margin-left:20px;">@cha.Name</li>
                                     foreach (var page in Model.PageListModel.PageList.Where(x => x.ChapterId == cha.ChapterId).OrderBy(x => x.SortOrder))
                                     {
-                                        <li style="margin-left:30px;">
-                                            <a onclick="assignButton(@item.ButtonId, @item.PageId, @page.PageId, this) " class="dropdown-item @if(page.PageId == item.NavPageId) { WriteLiteral(" active"); } " data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Saving...">@page.PageId - @page.Title</a>
+                                        <li style="margin-left:30px;" class="@if(page.PageId == item.NavPageId) { WriteLiteral("active"); } ">
+                                            <a style="cursor:pointer" onclick="assignButton(@item.ButtonId, @item.PageId, @page.PageId, this) " class="dropdown-item" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Saving...">@page.PageId - @page.Title</a>
                                         </li>
                                     }
                                 }

@@ -19,28 +19,50 @@
     .content-window .header {
         font-size: 22pt;
         font-weight: 600;
-        line-height:24pt;
+        line-height: 22pt;
     }
+
+
 
     .content-window .sub-header {
-        font-weight:400;
-        font-size:14pt;
+        font-weight: 500;
+        font-size: 14pt;
     }
 
-    .content-window .rlinks {
-        font-family: Fira Mono;
-        font-size: 10pt;
-        background-color: #e0e0eb;
-        padding: 2px;
-        color: gray;
-        border: 1px solid lightgray;
-    }
+
 
     .content-window .notes {
-        font-family: Fira Mono;
+        font-family: 'Fira Sans Condensed';
+        font-size: 11pt;
+        background-color: #ffe0b3;
+        padding: 10px;
+        border: 5px solid #ffcc80;
+        line-height: 17pt;
+    }
+
+
+
+    .content-window .tips {
+        font-family: 'Fira Sans Condensed';
+        font-size: 11pt;
+        background-color: #cce5ff;
+        padding: 10px;
+        border: 5px solid #99caff;
+        line-height:17pt;
+    }
+
+
+
+    .content-window .caption {
+        font-family: 'Fira Sans';
         font-size: 10pt;
-        background-color: #ffe0cc;
-        padding: 10px
+        color:#4d4d4d;
+    }
+
+
+
+    .content-window .PicBoard {
+        border: 2px solid black;
     }
 
     .content-window button {
@@ -60,7 +82,7 @@
             color: black;
             background-color: gray;
         }
-        .content-window button.active {
+        .content-window .active {
             border: 4px inset black;
             color: black;
             background-color: gray;

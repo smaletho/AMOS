@@ -26,6 +26,7 @@
 function bindKeyboard() {
     $(document).keydown(function (event) {
         idleTime = 0;
+        secondIdleTime = 0;
         if (event.which === 39) {
             // going forwards
             nextPage("arrow key navigation");
@@ -134,7 +135,7 @@ function showInitialHelp() {
             {
                 element: "#module-head",
                 title: "Welcome!",
-                content: "Welcome to the AMOS training application!<br /><br />The following tour will provide a brief explanation of this application's features. Feel free to end the tour at any time.",
+                content: "Welcome to the AMOS training and guidance application!<br /><br />The following tour will provide a brief explanation of this application's features. Feel free to end the tour at any time.",
                 placement: "bottom",
                 animation: false
             },
@@ -161,6 +162,9 @@ function showInitialHelp() {
             {
                 element: "#sections",
                 title: "Sections",
+                onPrev: function () {
+                    openNav();
+                },
                 content: "This bar shows the second level of navigation, known as sections.<br /><br />You can click on these to navigate directly to the specified location.",
                 placement: "bottom",
                 animation: false
@@ -196,7 +200,7 @@ function showInitialHelp() {
             {
                 element: "#page-content",
                 title: "Content",
-                content: "Here is were you will view and interact with the page content.<br /><br />Pages may have buttons and/or links, which will give popup definitions, or navigate you directly to a specific page.<br /><br />Click any image to enlarge.",
+                content: "Here is where you will view and interact with the page content.<br /><br />Pages may have buttons and/or links, which will give popup definitions, or navigate you directly to a specific page.<br /><br />Click any image to enlarge.",
                 placement: "top",
                 animation: false
             },
@@ -462,7 +466,7 @@ function populateMenus() {
         $(mod).find("page").each(function (k, v) {
 
             // hide extra pages
-            var classString = $(this).prop('class');
+            var classString = this.getAttribute("class");
             if (!classString || classString.indexOf('hide-page') === -1) {
                 var dot = $("<div data-page='" + this.attributes.id.value + "' class='dot'></div>");
 

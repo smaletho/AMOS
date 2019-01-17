@@ -36,8 +36,8 @@
 @if (Model.PageListModel.GetBook.Published)
 {
     <div class="row">
-        <div class="col-md-6 col-md-offset-3 alert alert-warning btn" role="alert">
-            <a href="#" class="alert-link" data-toggle="modal" data-target="#lockedBookModal">
+        <div class="col-md-6 col-md-offset-3 alert alert-warning text-center" role="alert">
+            <a style="cursor:pointer" href="#" class="alert-link" data-toggle="modal" data-target="#lockedBookModal">
                 <i class="fa fa-lock"></i>
                 This book is published, and cannot be edited. Click for more information.
             </a>
@@ -67,8 +67,8 @@ else
 {
 
     <div class="row">
-        <div class="col-md-6 col-md-offset-3 alert alert-info btn" role="alert">
-            <a class="alert-link" data-toggle="modal" data-target="#unlockedBookModal">
+        <div class="col-md-6 col-md-offset-3 alert alert-info text-center" role="alert">
+            <a style="cursor:pointer" class="alert-link" data-toggle="modal" data-target="#unlockedBookModal">
                 <i class="fa fa-unlock"></i>
                 This book is NOT published, and can be edited. Click to publish.
             </a>
@@ -105,8 +105,10 @@ else
         </div>
     </div>
 
-    <div class="col-md-8 col-md-offset-2" id="error-list">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2" id="error-list">
 
+        </div>
     </div>
 
     @*<div class="col-md-8 col-md-offset-2">
@@ -183,7 +185,12 @@ else
         function enableDisable(isPublish) {
             $("#load").button('loading');
 
-            transmitAction('@Url.Action("ChangePublishStatus")', enableDisable_success, enableDisable_fail, "", { BookId: @Model.PageListModel.GetBook.BookId, IsPublish: isPublish }, true);
+            transmitAction('@Url.Action("ChangePublishStatus")',
+                enableDisable_success,
+                enableDisable_fail,
+                "",
+                { BookId: @Model.PageListModel.GetBook.BookId, IsPublish: isPublish },
+                true);
         }
 
         function assignButton(buttonId, onPageId, toPageId, element) {

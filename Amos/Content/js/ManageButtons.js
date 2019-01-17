@@ -2,10 +2,14 @@
     $(element).closest("ul").prev("button").button("loading");
     $("a.dropdown-item").prop('disabled', true);
     transmitAction(URL_AssignButton, function (data) {
-        $("#button-table").empty();
-        $("#button-table").append(data);
+        //$("#button-table").empty();
+        //$("#button-table").append(data);
         $(element).closest("ul").prev("button").button("reset");
-        $("a.dropdown-item").prop('disabled', false);
+        setTimeout(function () {
+            $(element).closest("ul").prev("button").text(data);
+            $("a.dropdown-item").prop('disabled', false);
+        }, 100);
+        
     }, enableDisable_fail, "", { buttonId: buttonId, onPageId: onPageId, toPageId: toPageId }, true);
 }
 

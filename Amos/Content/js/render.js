@@ -4,7 +4,10 @@
 function renderInit() {
     $(".navigateTo").on('click', function () {
         addUserActionLog("Navigate link clicked. Item text: " + $(this).text());
-        loadPage($(this).data('id'), "page");
+        if (this.nodeName.toLowerCase() === "button")
+            loadPage(this.getAttribute("id"), "page");
+        else
+            loadPage($(this).data('id'), "page");
         return false;
     });
 
@@ -30,7 +33,10 @@ function renderInit() {
 
         $("#popupWindow").empty();
         $("#full-modal").hide();
+        
     });
+
+
 
     $(".content-window img").on('click', function () {
         var clonedImg = $(this).clone();
@@ -47,6 +53,9 @@ function renderInit() {
 
         $("#popup-text").text(text);
         addUserActionLog("Dialog link/button clicked. Text: " + text);
+
+
+        $("#popup").dialog('open');
 
         if (item !== "undefined") {
             var src = "";
@@ -129,26 +138,12 @@ function renderInit() {
             $("#popup-content").append(newNode);
         }
 
-        $("#popup").dialog('open');
-
-
-        //var dialogId = $(this).data('dialog');
-
-        //// find the matching dialog element
-        //var relevantDialog = $(".content-window").find(".dialog[data-dialogid=" + dialogId + "]").first();
-        //var clonedNode = $(relevantDialog).clone();
-
-        //// clone the element in to the definition window, and pop up
-        //$(clonedNode.contents()).each(function (k, v) {
-        //    var retElement = renderElement(this, true);
-        //    $("#dialog-content").append(retElement);
-        //});
-        //$("#dialog").dialog("open");
-
+        
+        $("#popup").dialog("option", "position", { my: "center top", at: "center top+100", of: window });
         return false;
     });
 
-    $(".popupPage").on('click', function () {
+    $(".popupPage").on('click', function (e) {
         addUserActionLog("Clicked page popup. Text: " + $(this).text());
 
         var pageId = "p_" + $(this).data("page");
@@ -175,6 +170,8 @@ function renderInit() {
                 }
             }
         });
+        e.preventDefault();
+        return false;
     });
 
     if (applicationMode !== "viewer") {
@@ -229,8 +226,8 @@ function surveyInit() {
     if (answer === "") {
         $(".survey-submit").on('click', function () {
             var valueAnswer = $('input[name=survey]:checked').val();
-            if (typeof (valueAnswer) === "undefined") {
-                openDialog("Please answer the survey question before navigating to a different page.", "Survey");
+            if (typeof valueAnswer === "undefined") {
+                openDialog("Please answer the survey question before navigating to a different page.", "Wait");
             } else {
                 addSurveyAnswer(question, {
                     value: valueAnswer,
@@ -263,17 +260,17 @@ function quizInit() {
             var answer = $(".quiz-question").first().prop('answer');
 
             if (typeof (userAnswer) === "undefined") {
-                openDialog("Please answer the quiz question before navigating to a different page.", "Quiz");
+                openDialog("Please answer the quiz question before navigating to a different page.", "Wait");
             } else {
 
                 addQuizAnswer(question, userAnswer, answer);
 
                 if (userAnswer === answer) {
-                    openDialog("Your answer is correct!", "Correct!");
+                    //openDialog("Your answer is correct!", "Correct!");
                     $(".post-quiz").addClass("correct");
                     $(".post-quiz").show();
                 } else {
-                    openDialog("Your answer is incorrect.", "Incorrect");
+                    //openDialog("Your answer is incorrect.", "Incorrect");
                     $(".post-quiz").addClass("incorrect");
                     $(".post-quiz").show();
                 }
@@ -281,6 +278,12 @@ function quizInit() {
                 $(".quiz-submit").hide();
             }
         });
+        //openConfirmationDialog("You are about to enter the QUIZ portion of this module. You will not be able to leave this page until the question is submitted.\n\nClick 'Okay' to continue, or 'Cancel' to return to the last page.",
+        //    function () { },
+        //    function () {
+        //        // "cancel" find last page + navigate to it
+        //    }
+        //);
     } else {
         // already answered, 
         $(".post-quiz").show();
@@ -403,7 +406,11 @@ function videoNode(element) {
 }
 
 function buttonNode(element) {
-    var newNode = $("<button></button>");
+    var newNode;
+    if (element.getAttribute('id') === null)
+        newNode = $("<button></button>");
+    else
+        newNode = $("<button id='" + element.getAttribute("id") + "'></button>");
     $(newNode).addClass("item");
 
     //var html = new XMLSerializer().serializeToString($(element)[0]);
@@ -431,11 +438,12 @@ function buttonNode(element) {
                     $(element).addClass("active");
                     }
                     break;
-                default:
-                    $(newNode).on('click', function () {
-                        loadPage(element.attributes["id"].value, "page", "button click (" + $(this).text() + ")");
-                    });
-                    break;
+                //default:
+                //    $(newNode).on('click', function () {
+                //        loadPage(element.attributes["id"].value, "page", "navigation button click (" + $(this).text() + ")");
+                //        return false;
+                //    });
+                //    break;
             }
         }
     }

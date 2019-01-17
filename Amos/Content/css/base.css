@@ -8,7 +8,7 @@
 
 
 
-#confirm-dialog-content {padding:10px;}
+#confirm-dialog-content {padding:10px;white-space:pre-wrap;}
 
 #subject-login div {
     text-align: center;

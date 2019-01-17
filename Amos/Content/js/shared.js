@@ -169,12 +169,67 @@ function exitBook(str) {
         UserTracker.ExitTime = new Date();
         saveTracker();
 
-        if (applicationMode === "offline") {
-            displayUserData();
-        } else {
-            window.localStorage.clear();
-            window.location = URL_GoHome;
+        // check for surveys and quiz questions
+        // loop through all pages
+        var completedAllParts = true;
+        var firstIncompletePage = "";
+        var q;
+        var a;
+
+        for (var i = 0; i < modulesVisited.length; i++) {
+            var item = modulesVisited[i];
+
+            $(ConfigXml).find("#" + item).first().find("page").each(function () {
+                if (this.getAttribute("type") === "quiz") {
+                    q = $(this).find(".quiz-question").first().text();
+                    a = getQuizAnswer(q);
+                    if (a === "") {
+                        completedAllParts = false;
+                        if (firstIncompletePage === "") {
+                            firstIncompletePage = this.getAttribute('id');
+                        }
+                    }
+                }
+                if (this.getAttribute("type") === "survey") {
+                    q = $(this).find(".survey-question").first().text();
+                    a = getSurveyAnswer(q);
+                    if (a === "") {
+                        completedAllParts = false;
+                        if (firstIncompletePage === "") {
+                            firstIncompletePage = this.getAttribute('id');
+                        }
+                    }
+                }
+            });
         }
+
+
+        if (!completedAllParts) {
+            openConfirmationDialog("You have not yet completed all survey and quiz questions in this training.\n\nClick 'Okay' to exit anyways, or click 'Cancel' to return to the training.",
+                function () {
+                    // clicked "okay"
+                    if (applicationMode === "offline") {
+                        displayUserData();
+                    } else {
+                        window.localStorage.clear();
+                        window.location = URL_GoHome;
+                    }
+                },
+                function () {
+                    // clicked "cancel" return to book
+                    loadPage(firstIncompletePage, "page", "Exit button clicked, not yet finished. Return to incomplete page.");
+                }
+            );
+        } else {
+            if (applicationMode === "offline") {
+                displayUserData();
+            } else {
+                window.localStorage.clear();
+                window.location = URL_GoHome;
+            }
+        }
+
+        
     });
 }
 
