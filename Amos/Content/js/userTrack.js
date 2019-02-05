@@ -54,7 +54,7 @@ function subjectLogin() {
             if (tempTracker.CurrentLocation !== null) {
                 if (getBookId() === tempTracker.CurrentLocation.Book) {
                     // same book. 
-                    openConfirmationDialog("I found a matching user on this machine. Would you like to pick up where you left off, or start a new session? Click 'okay' to continue, or 'cancel' to start over.", function () {
+                    openConfirmationDialog("I found a matching user on this machine. Would you like to pick up where you left off, or start a new session? Click 'Yes' to continue, or 'No' to start over.", function () {
                         UserTracker = JSON.parse(existingData);
                         closeSubjectDialog();
                         thirdInit();
@@ -131,7 +131,7 @@ function checkOnlineTracking(email) {
 
 function checkOnlineTracking_success(data) {
     if (data !== "none") {
-        openConfirmationDialog("I found a matching user on this machine. Would you like to pick up where you left off, or start a new session? Click 'okay' to continue, or 'cancel' to start over.", function () {
+        openConfirmationDialog("I found a matching user on this machine. Would you like to pick up where you left off, or start a new session? Click 'Yes' to continue, or 'No' to start over.", function () {
             UserTracker = JSON.parse(data);
             closeSubjectDialog();
             thirdInit();

@@ -234,7 +234,6 @@ function surveyInit() {
                     comments: $("#survey-comment").val()
                 });
                 $(".survey-submit").hide();
-                openDialog("Your response has been submitted.", "Submitted");
                 nextPage();
             }
         });

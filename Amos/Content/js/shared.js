@@ -126,20 +126,21 @@ function closeSubjectDialog() {
 
 function openConfirmationDialog(text, callback, cancelCallback) {
     $("#confirm-dialog").dialog("option", "buttons", [
+        
         {
-            text: "Okay",
-            click: function () {
-                $(this).dialog("close");
-                callback();
-            }
-        },
-        {
-            text: "Cancel",
+            text: "No",
             click: function () {
                 $(this).dialog("close");
                 if (cancelCallback && typeof cancelCallback === "function") {
                     cancelCallback();
                 }
+            }
+        },
+        {
+            text: "Yes",
+            click: function () {
+                $(this).dialog("close");
+                callback();
             }
         }
     ]);
@@ -205,7 +206,7 @@ function exitBook(str) {
 
 
         if (!completedAllParts) {
-            openConfirmationDialog("You have not yet completed all survey and quiz questions in this training.\n\nClick 'Okay' to exit anyways, or click 'Cancel' to return to the training.",
+            openConfirmationDialog("You have not yet completed all survey and quiz questions in this training.\n\nClick 'Yes' to exit anyways, or click 'No' to return to the training.",
                 function () {
                     // clicked "okay"
                     if (applicationMode === "offline") {

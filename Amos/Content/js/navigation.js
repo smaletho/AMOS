@@ -26,13 +26,14 @@
 function bindKeyboard() {
     $(document).keydown(function (event) {
         idleTime = 0;
-        secondIdleTime = 0;
         if (event.which === 39) {
             // going forwards
             nextPage("arrow key navigation");
         } else if (event.which === 37) {
             // going backwards
             previousPage("arrow key navigation");
+        } else if (event.which === 32) {
+            nextPage("spacebar navigation");
         }
     });
 }
@@ -121,7 +122,8 @@ function showInitialHelp() {
         backdrop: true,
         storage: false,
         keyboard: true,
-        delay: 0,
+        autoscroll: false,
+        delay: 200,
         onStart: function () {
             $("#main-window").css('pointer-events', 'none');
             $(document).unbind("keydown");
@@ -156,6 +158,9 @@ function showInitialHelp() {
                 onNext: function () {
                     closeNav();
                 },
+                onPrev: function () {
+                    closeNav();
+                },
                 placement: "right",
                 animation: false
             },
@@ -186,7 +191,7 @@ function showInitialHelp() {
             {
                 element: "#next-button",
                 title: "Next Page",
-                content: "Click here to view the next page, or use the RIGHT arrow key on your keyboard.",
+                content: "Click here to view the next page, use the RIGHT arrow key on your keyboard, or press the SPACEBAR.",
                 placement: "left",
                 animation: false
             },
@@ -200,7 +205,7 @@ function showInitialHelp() {
             {
                 element: "#page-content",
                 title: "Content",
-                content: "Here is where you will view and interact with the page content.<br /><br />Pages may have buttons and/or links, which will give popup definitions, or navigate you directly to a specific page.<br /><br />Click any image to enlarge.",
+                content: "Here is where you will view and interact with the page content.<br /><br />Pages may have buttons and/or links, which will give popup definitions, or navigate you directly to a specific page.<br /><br />Click any image or video to enlarge, click anywhere on screen to close.",
                 placement: "top",
                 animation: false
             },

@@ -1,7 +1,6 @@
 
 var resizeTimer;
 var idleTime = 0;
-var secondIdleTime = 0;
 var applicationMode = "online";
 
 $(function () {
@@ -13,7 +12,6 @@ $(function () {
     //Zero the idle timer on mouse movement.
     $("body").mousemove(function (e) {
         idleTime = 0;
-        secondIdleTime = 0;
     });
     // This part is in navigation.js
     //$(document).keydown(function (e) {
@@ -44,27 +42,22 @@ $(function () {
 
 function timerIncrement() {
     idleTime = idleTime + 1;
+    console.log("timer 1: " + idleTime);
 
     if (idleTime > 9 && $(".ui-dialog").not(":visible")) { 
-        idleTime = 0;
         exitBook("You have been inactive for 10 minutes. Would you like to exit?");
-        secondIdleTime = 0;
-        var secondIdleInterval = setInterval(function () {
-            secondIdleTime = secondIdleTime + 1;
+    }
 
-            if (secondIdleTime > 5 && $(".ui-dialog").not(":visible")) {
-                UserTracker.ExitTime = new Date();
-                saveTracker();
+    if (idleTime > 14) {
+        UserTracker.ExitTime = new Date();
+        saveTracker();
 
-                if (applicationMode === "offline") {
-                    displayUserData();
-                } else {
-                    window.localStorage.clear();
-                    window.location = URL_GoHome;
-                }
-            }
-
-        }, 60000);
+        if (applicationMode === "offline") {
+            displayUserData();
+        } else {
+            window.localStorage.clear();
+            window.location = URL_GoHome;
+        }
     }
 }
 
