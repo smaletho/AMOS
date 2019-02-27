@@ -490,6 +490,7 @@
     <Content Include="Views\Build\BuildButtonList.cshtml" />
     <Content Include="Views\PageSelect\AddPage.cshtml" />
     <Content Include="Views\Build\ManageButtons.cshtml" />
+    <Content Include="Views\Build\NoAccess.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

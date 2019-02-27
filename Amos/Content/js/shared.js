@@ -183,7 +183,7 @@ function exitBook(str) {
             $(ConfigXml).find("#" + item).first().find("page").each(function () {
                 if (this.getAttribute("type") === "quiz") {
                     q = $(this).find(".quiz-question").first().text();
-                    a = getQuizAnswer(q);
+                    a = getQuizAnswer(q, item);
                     if (a === "") {
                         completedAllParts = false;
                         if (firstIncompletePage === "") {
@@ -193,7 +193,7 @@ function exitBook(str) {
                 }
                 if (this.getAttribute("type") === "survey") {
                     q = $(this).find(".survey-question").first().text();
-                    a = getSurveyAnswer(q);
+                    a = getSurveyAnswer(q, item);
                     if (a === "") {
                         completedAllParts = false;
                         if (firstIncompletePage === "") {

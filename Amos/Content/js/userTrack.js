@@ -82,10 +82,10 @@ function subjectLogin() {
 }
 
 
-function getSurveyAnswer(question) {
+function getSurveyAnswer(question, module) {
     if (UserTracker.SurveyResponses === null) UserTracker.SurveyResponses = [];
     for (var i = 0; i < UserTracker.SurveyResponses.length; i++) {
-        if (UserTracker.SurveyResponses[i].Question === question) {
+        if (UserTracker.SurveyResponses[i].Question === question && UserTracker.SurveyResponses[i].Module === getModuleNameFromId(module)) {
             return UserTracker.SurveyResponses[i].UserAnswer;
         }
     }
@@ -97,15 +97,16 @@ function addSurveyAnswer(question, userAnswer) {
     UserTracker.SurveyResponses.push({
         Question: question,
         UserAnswer: userAnswer,
-        Time: new Date()
+        Time: new Date(),
+        Module: getModuleNameFromId(UserTracker.CurrentLocation.Module)
     });
     saveTracker();
 }
 
-function getQuizAnswer(question) {
+function getQuizAnswer(question, module) {
     if (UserTracker.QuizResponses === null) UserTracker.QuizResponses = [];
     for (var i = 0; i < UserTracker.QuizResponses.length; i++) {
-        if (UserTracker.QuizResponses[i].Question === question) {
+        if (UserTracker.QuizResponses[i].Question === question && UserTracker.QuizResponses[i].Module === getModuleNameFromId(module)) {
             return UserTracker.QuizResponses[i];
         }
     }
@@ -118,7 +119,8 @@ function addQuizAnswer(question, userAnswer, correctAnswer) {
         Question: question,
         UserAnswer: userAnswer,
         CorrectAnswer: correctAnswer,
-        Time: new Date()
+        Time: new Date(),
+        Module: getModuleNameFromId(UserTracker.CurrentLocation.Module)
     });
     saveTracker();
 }
@@ -224,4 +226,11 @@ function saveUserTracking() {
 function getPageTitleFromId(id) {
     var item = $(ConfigXml).find("#" + id).first();
     return item[0].getAttribute("title");
+}
+
+function getModuleNameFromId(id) {
+    try {
+        var item = $(ConfigXml).find("#" + id).first();
+        return item[0].getAttribute("name");
+    } catch (e) { return ""; }
 }

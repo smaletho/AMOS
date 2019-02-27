@@ -16,13 +16,19 @@
         /*position:relative;*/
     }
 
+    .content-window .survey-question{
+        font-weight:bold;font-size:14pt;
+    }
+
     .content-window .header {
         font-size: 22pt;
         font-weight: 600;
         line-height: 22pt;
     }
 
-
+    .content-window label{
+        font-weight:400;
+    }
 
     .content-window .sub-header {
         font-weight: 500;

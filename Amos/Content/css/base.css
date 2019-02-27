@@ -513,6 +513,7 @@ html {
     margin-top: 15px;
     font-size: 10pt;
     font-family: 'Fira Sans Compressed';
+    font-weight:bold;
 }
     .dot.leftborder {
         border-left: 3px solid gray;

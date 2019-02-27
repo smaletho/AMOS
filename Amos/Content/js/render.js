@@ -198,7 +198,7 @@ function okayToNavigateAway() {
     if ($("#page-content").find(".quiz-submit").length !== 0) {
         // it's a quiz page
         question = $(".quiz-question").first().text();
-        answer = getQuizAnswer(question);
+        answer = getQuizAnswer(question, UserTracker.CurrentLocation.Module);
         if (answer === "") {
             openDialog("Please answer the quiz question before navigating to a different page.", "Wait");
             return false;
@@ -208,7 +208,7 @@ function okayToNavigateAway() {
     else if ($("#page-content").find(".survey-submit").length !== 0) {
         // it's a survey page
         question = $(".survey-question").first().text();
-        answer = getSurveyAnswer(question);
+        answer = getSurveyAnswer(question, UserTracker.CurrentLocation.Module);
         if (answer === "") {
             openDialog("Please answer the survey question before navigating to a different page.", "Wait");
             return false;
@@ -222,7 +222,7 @@ function surveyInit() {
 
 
     var question = $(".survey-question").first().text();
-    var answer = getSurveyAnswer(question);
+    var answer = getSurveyAnswer(question, UserTracker.CurrentLocation.Module);
     if (answer === "") {
         $(".survey-submit").on('click', function () {
             var valueAnswer = $('input[name=survey]:checked').val();
@@ -249,7 +249,7 @@ function surveyInit() {
 
 function quizInit() {
     var question = $(".quiz-question").first().text();
-    var answer = getQuizAnswer(question);
+    var answer = getQuizAnswer(question, UserTracker.CurrentLocation.Module);
     if (answer === "") {
         // load normal, no answer
         $(".post-quiz").hide();

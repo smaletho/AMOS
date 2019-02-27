@@ -33,7 +33,9 @@ function bindKeyboard() {
             // going backwards
             previousPage("arrow key navigation");
         } else if (event.which === 32) {
-            nextPage("spacebar navigation");
+            // make sure the focused element isn't an input or textarea
+            if (!$("input[type=text]").is(":focus") && !$("textarea").is(":focus"))
+                nextPage("spacebar navigation");
         }
     });
 }
@@ -205,7 +207,7 @@ function showInitialHelp() {
             {
                 element: "#page-content",
                 title: "Content",
-                content: "Here is where you will view and interact with the page content.<br /><br />Pages may have buttons and/or links, which will give popup definitions, or navigate you directly to a specific page.<br /><br />Click any image or video to enlarge, click anywhere on screen to close.",
+                content: "Here is where you will view and interact with the page content.<br /><br />Pages may have buttons and/or links, which will give popup definitions, or navigate you directly to a specific page.<br /><br />Click any image to enlarge, click anywhere on screen to close.<br /><br />Use on-screen video buttons to control video screen size and playback.",
                 placement: "top",
                 animation: false
             },

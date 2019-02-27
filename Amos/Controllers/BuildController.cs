@@ -242,80 +242,156 @@ namespace Amos.Controllers
                                                     oldToNewPageNumbers.Add(pageNode.Attributes["id"].Value, "p_" + page.PageId);
                                                     pageNode.SetAttribute("id", "p_" + page.PageId);
 
-                                                    foreach (XmlElement contentNode in pageNode.ChildNodes)
+                                                    var ls = pageNode.SelectNodes("text//a");
+                                                    var ls2 = pageNode.SelectNodes("image");
+                                                    var ls3 = pageNode.SelectNodes("button");
+
+                                                    foreach (XmlElement contentNode in pageNode.SelectNodes("image"))
                                                     {
-                                                        if (contentNode.Name.ToLower() == "image" || contentNode.Name.ToLower() == "video")
+                                                        // find the image in the archive
+                                                        string id = contentNode.Attributes["source"].Value;
+
+                                                        string type = "";
+                                                        string matchFileName = "";
+                                                        try
                                                         {
-                                                            // find the image in the archive
-                                                            string id = contentNode.Attributes["source"].Value;
-
-                                                            string type = "";
-                                                            string matchFileName = "";
-                                                            try
-                                                            {
-                                                                type = contentNode.Attributes["type"].Value;
-                                                                matchFileName = id + "." + type;
-                                                            }
-                                                            catch (NullReferenceException)
-                                                            {
-                                                                type = "jpg";
-                                                                matchFileName = id + ".jpg";
-                                                            }
+                                                            type = contentNode.Attributes["type"].Value;
+                                                            matchFileName = id + "." + type;
+                                                        }
+                                                        catch (NullReferenceException)
+                                                        {
+                                                            type = "jpg";
+                                                            matchFileName = id + ".jpg";
+                                                        }
 
 
-                                                            var innerFile = zipArchive.Entries.Where(x => x.Name == matchFileName).FirstOrDefault();
-                                                            if (innerFile != null)
+                                                        var innerFile = zipArchive.Entries.Where(x => x.Name == matchFileName).FirstOrDefault();
+                                                        if (innerFile != null)
+                                                        {
+                                                            using (var innerStream = innerFile.Open())
                                                             {
-                                                                using (var innerStream = innerFile.Open())
+                                                                using (var innerReader = new StreamReader(innerStream))
                                                                 {
-                                                                    using (var innerReader = new StreamReader(innerStream))
+                                                                    AmosFile f = new AmosFile();
+
+                                                                    MemoryStream target = new MemoryStream();
+                                                                    innerReader.BaseStream.CopyTo(target);
+                                                                    f.Content = target.ToArray();
+
+
+                                                                    f.FileName = matchFileName;
+                                                                    switch (type)
                                                                     {
-                                                                        AmosFile f = new AmosFile();
-
-                                                                        MemoryStream target = new MemoryStream();
-                                                                        innerReader.BaseStream.CopyTo(target);
-                                                                        f.Content = target.ToArray();
-
-
-                                                                        f.FileName = matchFileName;
-                                                                        switch (type)
-                                                                        {
-                                                                            case "jpg":
-                                                                            case "png":
-                                                                            case "bmp":
-                                                                            case "gif":
-                                                                                f.ContentType = "image/" + type;
-                                                                                f.FileType = FileType.Photo;
-                                                                                break;
-                                                                            case "mp4":
-                                                                                f.ContentType = "video/" + type;
-                                                                                f.FileType = FileType.Video;
-                                                                                break;
-                                                                        }
-
-                                                                        f.PageId = page.PageId;
-                                                                        cdb.AmosFiles.Add(f);
-                                                                        cdb.SaveChanges();
-
-                                                                        // update ID in contentNode
-                                                                        switch (f.FileType)
-                                                                        {
-                                                                            case FileType.Photo:
-                                                                                contentNode.SetAttribute("source", "i_" + f.FileId);
-                                                                                break;
-                                                                            case FileType.Video:
-                                                                                contentNode.SetAttribute("source", "v_" + f.FileId);
-                                                                                break;
-                                                                        }
-
+                                                                        case "jpg":
+                                                                        case "png":
+                                                                        case "bmp":
+                                                                        case "gif":
+                                                                            f.ContentType = "image/" + type;
+                                                                            f.FileType = FileType.Photo;
+                                                                            break;
+                                                                        case "mp4":
+                                                                            f.ContentType = "video/" + type;
+                                                                            f.FileType = FileType.Video;
+                                                                            break;
                                                                     }
+
+                                                                    f.PageId = page.PageId;
+                                                                    cdb.AmosFiles.Add(f);
+                                                                    cdb.SaveChanges();
+
+                                                                    // update ID in contentNode
+                                                                    switch (f.FileType)
+                                                                    {
+                                                                        case FileType.Photo:
+                                                                            contentNode.SetAttribute("source", "i_" + f.FileId);
+                                                                            break;
+                                                                        case FileType.Video:
+                                                                            contentNode.SetAttribute("source", "v_" + f.FileId);
+                                                                            break;
+                                                                    }
+
                                                                 }
                                                             }
-                                                            else
+                                                        }
+                                                        else
+                                                        {
+                                                            retLs.Add(string.Format("File not found. Page: {0} FileId: {1}", pageNode.GetAttribute("id"), matchFileName));
+                                                        }
+                                                    }
+                                                    foreach (XmlElement contentNode in pageNode.SelectNodes("video"))
+                                                    {
+                                                        // find the image in the archive
+                                                        string id = contentNode.Attributes["source"].Value;
+
+                                                        string type = "";
+                                                        string matchFileName = "";
+                                                        try
+                                                        {
+                                                            type = contentNode.Attributes["type"].Value;
+                                                            matchFileName = id + "." + type;
+                                                        }
+                                                        catch (NullReferenceException)
+                                                        {
+                                                            type = "jpg";
+                                                            matchFileName = id + ".jpg";
+                                                        }
+
+
+                                                        var innerFile = zipArchive.Entries.Where(x => x.Name == matchFileName).FirstOrDefault();
+                                                        if (innerFile != null)
+                                                        {
+                                                            using (var innerStream = innerFile.Open())
                                                             {
-                                                                retLs.Add(string.Format("File not found. Page: {0} FileId: {1}", pageNode.Attributes["id"].Value, matchFileName));
+                                                                using (var innerReader = new StreamReader(innerStream))
+                                                                {
+                                                                    AmosFile f = new AmosFile();
+
+                                                                    MemoryStream target = new MemoryStream();
+                                                                    innerReader.BaseStream.CopyTo(target);
+                                                                    f.Content = target.ToArray();
+
+
+                                                                    f.FileName = matchFileName;
+                                                                    switch (type)
+                                                                    {
+                                                                        case "jpg":
+                                                                        case "png":
+                                                                        case "bmp":
+                                                                        case "gif":
+                                                                            f.ContentType = "image/" + type;
+                                                                            f.FileType = FileType.Photo;
+                                                                            break;
+                                                                        case "mp4":
+                                                                            f.ContentType = "video/" + type;
+                                                                            f.FileType = FileType.Video;
+                                                                            break;
+                                                                    }
+
+                                                                    f.PageId = page.PageId;
+                                                                    cdb.AmosFiles.Add(f);
+                                                                    cdb.SaveChanges();
+
+                                                                    // update ID in contentNode
+                                                                    switch (f.FileType)
+                                                                    {
+                                                                        case FileType.Photo:
+                                                                            contentNode.SetAttribute("source", "i_" + f.FileId);
+                                                                            break;
+                                                                        case FileType.Video:
+                                                                            contentNode.SetAttribute("source", "v_" + f.FileId);
+                                                                            break;
+                                                                    }
+
+                                                                }
                                                             }
                                                         }
+                                                        else
+                                                        {
+                                                            retLs.Add(string.Format("File not found. Page: {0} FileId: {1}", pageNode.GetAttribute("id"), matchFileName));
+                                                        }
+                                                    }
+                                                    foreach (XmlElement contentNode in pageNode.SelectNodes("text//a"))
+                                                    {
                                                         if (contentNode.HasAttribute("class") && contentNode.GetAttribute("class").Contains("dialogLink"))
                                                         {
                                                             // find the image in the archive
@@ -385,10 +461,233 @@ namespace Amos.Controllers
                                                             }
                                                             else
                                                             {
-                                                                retLs.Add(string.Format("File not found. Page: {0} FileId: {1}", pageNode.Attributes["id"].Value, matchFileName));
+                                                                retLs.Add(string.Format("File not found. Page: {0} FileId: {1}", pageNode.GetAttribute("id"), matchFileName));
                                                             }
                                                         }
                                                     }
+                                                    foreach (XmlElement contentNode in pageNode.SelectNodes("button"))
+                                                    {
+                                                        if (contentNode.HasAttribute("class") && contentNode.GetAttribute("class").Contains("dialogLink"))
+                                                        {
+                                                            // find the image in the archive
+                                                            string id = contentNode.Attributes["data-content"].Value;
+
+                                                            string type = "";
+                                                            string matchFileName = "";
+                                                            try
+                                                            {
+                                                                type = contentNode.Attributes["data-type"].Value;
+                                                                matchFileName = id + "." + type;
+                                                            }
+                                                            catch (NullReferenceException)
+                                                            {
+                                                                type = "jpg";
+                                                                matchFileName = id + ".jpg";
+                                                            }
+
+
+                                                            var innerFile = zipArchive.Entries.Where(x => x.Name == matchFileName).FirstOrDefault();
+                                                            if (innerFile != null)
+                                                            {
+                                                                using (var innerStream = innerFile.Open())
+                                                                {
+                                                                    using (var innerReader = new StreamReader(innerStream))
+                                                                    {
+                                                                        AmosFile f = new AmosFile();
+
+                                                                        MemoryStream target = new MemoryStream();
+                                                                        innerReader.BaseStream.CopyTo(target);
+                                                                        f.Content = target.ToArray();
+
+
+                                                                        f.FileName = matchFileName;
+                                                                        switch (type)
+                                                                        {
+                                                                            case "jpg":
+                                                                            case "png":
+                                                                            case "bmp":
+                                                                            case "gif":
+                                                                                f.ContentType = "image/" + type;
+                                                                                f.FileType = FileType.Photo;
+                                                                                break;
+                                                                            case "mp4":
+                                                                                f.ContentType = "video/" + type;
+                                                                                f.FileType = FileType.Video;
+                                                                                break;
+                                                                        }
+
+                                                                        f.PageId = page.PageId;
+                                                                        cdb.AmosFiles.Add(f);
+                                                                        cdb.SaveChanges();
+
+                                                                        // update ID in contentNode
+                                                                        switch (f.FileType)
+                                                                        {
+                                                                            case FileType.Photo:
+                                                                                contentNode.SetAttribute("data-content", "i_" + f.FileId);
+                                                                                break;
+                                                                            case FileType.Video:
+                                                                                contentNode.SetAttribute("data-content", "v_" + f.FileId);
+                                                                                break;
+                                                                        }
+
+                                                                    }
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                retLs.Add(string.Format("File not found. Page: {0} FileId: {1}", pageNode.GetAttribute("id"), matchFileName));
+                                                            }
+                                                        }
+                                                    }
+
+                                                    //foreach (XmlElement contentNode in pageNode.ChildNodes)
+                                                    //{
+                                                    //    if (contentNode.Name.ToLower() == "image" || contentNode.Name.ToLower() == "video")
+                                                    //    {
+                                                    //        // find the image in the archive
+                                                    //        string id = contentNode.Attributes["source"].Value;
+
+                                                    //        string type = "";
+                                                    //        string matchFileName = "";
+                                                    //        try
+                                                    //        {
+                                                    //            type = contentNode.Attributes["type"].Value;
+                                                    //            matchFileName = id + "." + type;
+                                                    //        }
+                                                    //        catch (NullReferenceException)
+                                                    //        {
+                                                    //            type = "jpg";
+                                                    //            matchFileName = id + ".jpg";
+                                                    //        }
+
+
+                                                    //        var innerFile = zipArchive.Entries.Where(x => x.Name == matchFileName).FirstOrDefault();
+                                                    //        if (innerFile != null)
+                                                    //        {
+                                                    //            using (var innerStream = innerFile.Open())
+                                                    //            {
+                                                    //                using (var innerReader = new StreamReader(innerStream))
+                                                    //                {
+                                                    //                    AmosFile f = new AmosFile();
+
+                                                    //                    MemoryStream target = new MemoryStream();
+                                                    //                    innerReader.BaseStream.CopyTo(target);
+                                                    //                    f.Content = target.ToArray();
+
+
+                                                    //                    f.FileName = matchFileName;
+                                                    //                    switch (type)
+                                                    //                    {
+                                                    //                        case "jpg":
+                                                    //                        case "png":
+                                                    //                        case "bmp":
+                                                    //                        case "gif":
+                                                    //                            f.ContentType = "image/" + type;
+                                                    //                            f.FileType = FileType.Photo;
+                                                    //                            break;
+                                                    //                        case "mp4":
+                                                    //                            f.ContentType = "video/" + type;
+                                                    //                            f.FileType = FileType.Video;
+                                                    //                            break;
+                                                    //                    }
+
+                                                    //                    f.PageId = page.PageId;
+                                                    //                    cdb.AmosFiles.Add(f);
+                                                    //                    cdb.SaveChanges();
+
+                                                    //                    // update ID in contentNode
+                                                    //                    switch (f.FileType)
+                                                    //                    {
+                                                    //                        case FileType.Photo:
+                                                    //                            contentNode.SetAttribute("source", "i_" + f.FileId);
+                                                    //                            break;
+                                                    //                        case FileType.Video:
+                                                    //                            contentNode.SetAttribute("source", "v_" + f.FileId);
+                                                    //                            break;
+                                                    //                    }
+
+                                                    //                }
+                                                    //            }
+                                                    //        }
+                                                    //        else
+                                                    //        {
+                                                    //            retLs.Add(string.Format("File not found. Page: {0} FileId: {1}", pageNode.Attributes["id"].Value, matchFileName));
+                                                    //        }
+                                                    //    }
+                                                    //    if (contentNode.HasAttribute("class") && contentNode.GetAttribute("class").Contains("dialogLink"))
+                                                    //    {
+                                                    //        // find the image in the archive
+                                                    //        string id = contentNode.Attributes["data-content"].Value;
+
+                                                    //        string type = "";
+                                                    //        string matchFileName = "";
+                                                    //        try
+                                                    //        {
+                                                    //            type = contentNode.Attributes["data-type"].Value;
+                                                    //            matchFileName = id + "." + type;
+                                                    //        }
+                                                    //        catch (NullReferenceException)
+                                                    //        {
+                                                    //            type = "jpg";
+                                                    //            matchFileName = id + ".jpg";
+                                                    //        }
+
+
+                                                    //        var innerFile = zipArchive.Entries.Where(x => x.Name == matchFileName).FirstOrDefault();
+                                                    //        if (innerFile != null)
+                                                    //        {
+                                                    //            using (var innerStream = innerFile.Open())
+                                                    //            {
+                                                    //                using (var innerReader = new StreamReader(innerStream))
+                                                    //                {
+                                                    //                    AmosFile f = new AmosFile();
+
+                                                    //                    MemoryStream target = new MemoryStream();
+                                                    //                    innerReader.BaseStream.CopyTo(target);
+                                                    //                    f.Content = target.ToArray();
+
+
+                                                    //                    f.FileName = matchFileName;
+                                                    //                    switch (type)
+                                                    //                    {
+                                                    //                        case "jpg":
+                                                    //                        case "png":
+                                                    //                        case "bmp":
+                                                    //                        case "gif":
+                                                    //                            f.ContentType = "image/" + type;
+                                                    //                            f.FileType = FileType.Photo;
+                                                    //                            break;
+                                                    //                        case "mp4":
+                                                    //                            f.ContentType = "video/" + type;
+                                                    //                            f.FileType = FileType.Video;
+                                                    //                            break;
+                                                    //                    }
+
+                                                    //                    f.PageId = page.PageId;
+                                                    //                    cdb.AmosFiles.Add(f);
+                                                    //                    cdb.SaveChanges();
+
+                                                    //                    // update ID in contentNode
+                                                    //                    switch (f.FileType)
+                                                    //                    {
+                                                    //                        case FileType.Photo:
+                                                    //                            contentNode.SetAttribute("data-content", "i_" + f.FileId);
+                                                    //                            break;
+                                                    //                        case FileType.Video:
+                                                    //                            contentNode.SetAttribute("data-content", "v_" + f.FileId);
+                                                    //                            break;
+                                                    //                    }
+
+                                                    //                }
+                                                    //            }
+                                                    //        }
+                                                    //        else
+                                                    //        {
+                                                    //            retLs.Add(string.Format("File not found. Page: {0} FileId: {1}", pageNode.Attributes["id"].Value, matchFileName));
+                                                    //        }
+                                                    //    }
+                                                    //}
 
                                                 }
                                             }
@@ -410,9 +709,9 @@ namespace Amos.Controllers
                                             {
                                                 // change the id from the old one to the matching new one
                                                 //button.SetAttribute("data-page", oldToNewPageNumbers[button.Attributes["data-page"].Value]);
-                                                if (oldToNewPageNumbers.TryGetValue(button.Attributes["data-page"].Value, out string value))
+                                                if (oldToNewPageNumbers.TryGetValue("p_" + button.GetAttribute("data-page"), out string value))
                                                 {
-                                                    button.SetAttribute("data-page", value);
+                                                    button.SetAttribute("data-page", value.Split('_')[1]);
                                                 }
                                             }
                                             else 
@@ -447,9 +746,9 @@ namespace Amos.Controllers
                                             {
                                                 // change the id from the old one to the matching new one
                                                 //a.SetAttribute("data-page", oldToNewPageNumbers[a.Attributes["data-page"].Value]);
-                                                if (oldToNewPageNumbers.TryGetValue(a.GetAttribute("data-page"), out string value))
+                                                if (oldToNewPageNumbers.TryGetValue("p_" + a.GetAttribute("data-page"), out string value))
                                                 {
-                                                    a.SetAttribute("data-page", value);
+                                                    a.SetAttribute("data-page", value.Split('_')[1]);
                                                 }
                                             }
                                         }
@@ -506,7 +805,8 @@ namespace Amos.Controllers
         public ActionResult Export(int id)
         {
 
-            CreateFolderIfNotThere();
+            CreateFolderIfNotThere();// delete all the old stuff
+            DeleteOldFiles();
 
 
             ApplicationDbContext cdb = new ApplicationDbContext();
@@ -913,6 +1213,7 @@ namespace Amos.Controllers
 
         public ActionResult ViewPage(int id)
         {
+
             Session["LastPageIdVisited"] = id;
             PageViewModel model = new PageViewModel();
             ApplicationDbContext cdb = new ApplicationDbContext();
@@ -931,6 +1232,8 @@ namespace Amos.Controllers
                 model.XmlContent = page.PageContent;
                 model.PageName = page.Title;
                 model.BookId = page.BookId;
+
+                if (IsBookPublished(page.BookId)) return RedirectToAction("NoAccess", new { id = 1 });
             }
 
 
@@ -976,6 +1279,8 @@ namespace Amos.Controllers
 
         public ActionResult ViewEditor(int id)
         {
+            
+
             Session["LastPageIdVisited"] = id;
             ApplicationDbContext cdb = new ApplicationDbContext();
             if (id == 0)
@@ -1039,6 +1344,8 @@ namespace Amos.Controllers
                     model.BookId = 0;
                 }
 
+                if (IsBookPublished(model.BookId)) return RedirectToAction("NoAccess", new { id = 1 });
+
                 return View(model);
             }
         }
@@ -1046,7 +1353,14 @@ namespace Amos.Controllers
         public ActionResult ViewAssets(int id)
         {
             Session["LastPageIdVisited"] = id;
-            return View("ViewAssets", new AssetModel(id));
+            var model = new AssetModel(id);
+
+            ApplicationDbContext db = new ApplicationDbContext();
+
+            var bookId = db.Pages.Find(model.PageId).BookId;
+            if (IsBookPublished(bookId)) return RedirectToAction("NoAccess", new { id = 1 });
+
+            return View("ViewAssets", model);
         }
 
         [HttpPost]
@@ -2369,6 +2683,7 @@ namespace Amos.Controllers
 
         public ActionResult ManageButtons(int id)
         {
+            if (IsBookPublished(id)) return RedirectToAction("NoAccess", new { id=1 });
             return View(new ManagePagesModel(id));
         }
 
@@ -2395,6 +2710,26 @@ namespace Amos.Controllers
             }
 
             return Content("success");
+        }
+
+
+
+
+        public static bool IsBookPublished(int id)
+        {
+            ApplicationDbContext db = new ApplicationDbContext();
+            var book = db.Books.Find(id);
+            return book.Published;
+        }
+        public ActionResult NoAccess(int id)
+        {
+            // id == 0 --> unpublished book. (Used for when hitting "View" controller)
+            // id == 1 --> published book. (used for not editing published)
+
+            if (id == 0) ViewBag.Message = "This book has been removed, and cannot be accessed. Please contact the system administrator.";
+            else ViewBag.Message = "This book is currently published, and cannot be edited. Please unpublish the book before making any changes.";
+
+            return View();
         }
     }
 

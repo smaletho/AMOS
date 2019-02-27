@@ -15,6 +15,8 @@ namespace Amos.Controllers.Configuration
 
         public ActionResult Index(int id)
         {
+            if (BuildController.IsBookPublished(id)) return RedirectToAction("NoAccess", "Build", new { id = 1 });
+            
             int bookId = id;
 
             var pageInitModel = new PageInitModel();

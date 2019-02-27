@@ -43,13 +43,17 @@ namespace Amos.Controllers
 
 
             sb.AppendLine("Quiz Responses");
-            sb.AppendLine("User, Question, User Answer, Correct Answer, Time Answered");
+            sb.AppendLine("User, Module, Question, User Answer, Correct Answer, Is Correct?, Date Answered, Time Answered");
             foreach (var user in trackerList)
             {
                 dynamic ob = JsonConvert.DeserializeObject(user.TrackerContent);
                 foreach (var quiz in ob.QuizResponses)
                 {
-                    sb.AppendFormat("\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\"" + Environment.NewLine, user.Email, quiz.Question, quiz.UserAnswer, quiz.CorrectAnswer, quiz.Time);
+                    DateTime dt = Convert.ToDateTime(quiz.Time);
+                    string isCorrect = "";
+                    if (quiz.UserAnswer == quiz.CorrectAnswer) isCorrect = "Correct";
+                    else isCorrect = "Incorrect";
+                    sb.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}" + Environment.NewLine, user.Email, quiz.Module, quiz.Question.Replace(",", ""), quiz.UserAnswer.Replace(",", ""), quiz.CorrectAnswer, isCorrect, dt.ToShortDateString(), dt.ToString("HH:mm"));
                 }
             }
 
@@ -57,13 +61,14 @@ namespace Amos.Controllers
 
 
             sb.AppendLine("Survey Responses");
-            sb.AppendLine("User, Question, User Answer, Comments, Time Answered");
+            sb.AppendLine("User, Module, Question, User Answer, Comments, Date Answered, Time Answered");
             foreach (var user in trackerList)
             {
                 dynamic ob = JsonConvert.DeserializeObject(user.TrackerContent);
                 foreach (var survey in ob.SurveyResponses)
                 {
-                    sb.AppendFormat("\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\"" + Environment.NewLine, user.Email, survey.Question, survey.UserAnswer.value, survey.UserAnswer.comments, survey.Time);
+                    DateTime dt = Convert.ToDateTime(survey.Time);
+                    sb.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}, {6}" + Environment.NewLine, user.Email, survey.Module, survey.Question.Replace(",", ""), GetTextFromSurveyValue(survey.UserAnswer.value), survey.UserAnswer.comments.Replace(",", ""), dt.ToShortDateString(), dt.ToString("HH:mm"));
                 }
             }
 
@@ -71,18 +76,32 @@ namespace Amos.Controllers
 
 
             sb.AppendLine("Activity Tracker");
-            sb.AppendLine("User, To, From, Description, Time");
+            sb.AppendLine("User, To, From, Description, Date, Time");
             foreach (var user in trackerList)
             {
                 dynamic ob = JsonConvert.DeserializeObject(user.TrackerContent);
                 foreach (var activity in ob.ActivityTracking)
                 {
-                    sb.AppendFormat("\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\"" + Environment.NewLine, user.Email, activity.to, activity.from, activity.description, activity.time);
+                    DateTime dt = Convert.ToDateTime(activity.Time);
+                    sb.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}" + Environment.NewLine, user.Email, activity.to, activity.from, activity.description, dt.ToShortDateString(), dt.ToString("HH:mm"));
                 }
             }
 
 
-            return File(new System.Text.UTF8Encoding().GetBytes(sb.ToString()), "text/csv", "export.csv");
+            return File(new UTF8Encoding().GetBytes(sb.ToString()), "text/csv", "export.csv");
+        }
+
+        public static string GetTextFromSurveyValue(int value)
+        {
+            switch (value)
+            {
+                case 1: return "Strongly Disagree";
+                case 2: return "Disagree";
+                case 3: return "Neither Agree or Disagree";
+                case 4: return "Agree";
+                case 5: return "Strongly Agree";
+                default: return "";
+            }
         }
     }
 }

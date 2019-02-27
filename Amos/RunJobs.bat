@@ -1,1 +1,1 @@
-﻿curl http://comfort2.eastus.cloudapp.azure.com/Present/ProcessScheduledJobs7
+﻿curl http://comfort2.eastus.cloudapp.azure.com/Present/ProcessScheduledJobs
