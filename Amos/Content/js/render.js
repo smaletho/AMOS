@@ -3,11 +3,11 @@
 
 function renderInit() {
     $(".navigateTo").on('click', function () {
-        addUserActionLog("Navigate link clicked. Item text: " + $(this).text());
+        //addUserActionLog("Navigate link clicked. Item text: " + $(this).text());
         if (this.nodeName.toLowerCase() === "button")
-            loadPage(this.getAttribute("id"), "page");
+            loadPage(this.getAttribute("id"), "page", "Navigate link clicked. Item text: " + $(this).text());
         else
-            loadPage($(this).data('id'), "page");
+            loadPage($(this).data('id'), "page", "Navigate link clicked. Item text: " + $(this).text());
         return false;
     });
 
@@ -55,7 +55,7 @@ function renderInit() {
         addUserActionLog("Dialog link/button clicked. Text: " + text);
 
 
-        $("#popup").dialog('open');
+       
 
         if (item !== "undefined") {
             var src = "";
@@ -139,7 +139,10 @@ function renderInit() {
         }
 
         
-        $("#popup").dialog("option", "position", { my: "center top", at: "center top+100", of: window });
+        $("#popup").dialog('open');
+        setTimeout(function () {
+            $("#popup").dialog("option", "position", { my: "center top", at: "center top+100", of: "#main-window" });
+        }, 100);
         return false;
     });
 
@@ -266,11 +269,13 @@ function quizInit() {
 
                 if (userAnswer === answer) {
                     //openDialog("Your answer is correct!", "Correct!");
-                    $(".post-quiz").addClass("correct");
+                    //$(".post-quiz").addClass("correct");
+                    $(".post-quiz").prepend("<p style='font-weight:bold;margin-top:0'>Correct!</p>");
                     $(".post-quiz").show();
                 } else {
                     //openDialog("Your answer is incorrect.", "Incorrect");
-                    $(".post-quiz").addClass("incorrect");
+                    //$(".post-quiz").addClass("incorrect");
+                    $(".post-quiz").prepend("<p style='font-weight:bold;margin-top:0'>Incorrect.</p>");
                     $(".post-quiz").show();
                 }
 
@@ -289,8 +294,14 @@ function quizInit() {
         $('input[name=quiz][value="' + answer.UserAnswer + '"]').prop('checked', 'checked');
         $(".quiz-submit").hide();
 
-        if (answer.UserAnswer === answer.CorrectAnswer) $(".post-quiz").addClass("correct");
-        else $(".post-quiz").addClass('incorrect');
+        if (answer.UserAnswer === answer.CorrectAnswer) {
+            $(".post-quiz").prepend("<p style='font-weight:bold;margin-top:0'>Correct!</p>");
+            //$(".post-quiz").addClass("correct");
+        }
+        else {
+            $(".post-quiz").prepend("<p style='font-weight:bold;margin-top:0'>Incorrect.</p>");
+            //$(".post-quiz").addClass('incorrect');
+        }
     }
 
 }

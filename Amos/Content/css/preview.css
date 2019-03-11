@@ -66,13 +66,13 @@
         padding: 20px;
     }
 
-        .preview-window .post-quiz.correct {
+        /*.preview-window .post-quiz.correct {
             border-color: green;
         }
 
         .preview-window .post-quiz.incorrect {
             border-color: red;
-        }
+        }*/
 
     .preview-window .multiButton {
         width: 300px !important;

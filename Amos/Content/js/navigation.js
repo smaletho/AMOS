@@ -146,7 +146,7 @@ function showInitialHelp() {
             {
                 element: "#menu-open",
                 title: "Menu",
-                content: "Click here to view all the modules contained in this book.",
+                content: "Click this menu to view all the modules contained in this book.",
                 onNext: function () {
                     openNav();
                 },
@@ -193,7 +193,7 @@ function showInitialHelp() {
             {
                 element: "#next-button",
                 title: "Next Page",
-                content: "Click here to view the next page, use the RIGHT arrow key on your keyboard, or press the SPACEBAR.",
+                content: "Click here to view the next page, use the RIGHT arrow key on your keyboard, or press the SPACEBAR.<br /><br />There are multiple pages per chapter; modules are designed to page through like a book.",
                 placement: "left",
                 animation: false
             },
@@ -470,6 +470,7 @@ function populateMenus() {
 
 
         var currentSection = "";
+        var pageCount = 1;
         $(mod).find("page").each(function (k, v) {
 
             // hide extra pages
@@ -483,33 +484,14 @@ function populateMenus() {
                         $(dot).addClass("visited");
                 }
 
-                $(dot).html(k + 1);
+                $(dot).html(pageCount);
                 if ($(this).closest("section")[0].attributes["id"] !== currentSection) {
                     $(dot).addClass('leftborder');
                     currentSection = $(this).closest("section")[0].attributes["id"];
                 }
                 $("#dot-container").append(dot);
+                pageCount++;
             } 
-            //var classList = $(this).prop('class').split(' ');
-            
-            //if (classList.length < 1 || $.inArray("hide-page", classList)) {
-            //    var dot = $("<div data-page='" + this.attributes.id.value + "' class='dot'></div>");
-
-            //    // check visited pages
-            //    if (typeof UserTracker.VisitedPages !== "undefined") {
-            //        if (UserTracker.VisitedPages.indexOf(this.attributes.id.value) !== -1)
-            //            $(dot).addClass("visited");
-            //    }
-
-            //    $(dot).html(k + 1);
-            //    if ($(this).closest("section").prop("id") !== currentSection) {
-            //        $(dot).addClass('leftborder');
-            //        currentSection = $(this).closest("section").prop('id');
-            //    }
-            //    $("#dot-container").append(dot);
-            //}
-            
-            
             
         });
 
@@ -521,25 +503,8 @@ function populateMenus() {
             $(".dot").css('font-size', '12pt');
             $(".dot").css('width', '20px');
         }
-
-        //$("#section-content").empty();
-        //$(mod).find("section").each(function (k, v) {
-        //    var sec = $("<div data-id='" + this.attributes.id.value + "' class='dot-sect'></div>");
-        //    $(sec).html("section " + (k + 1));
-
-        //    var numChild = $(this).find("page").length;
-        //    var wid = (numChild * 30) - 1;
-
-        //    $(sec).width(wid);
-        //    $("#section-content").append(sec);
-        //});
         
-        //var pageLen = ($(".dot").length * 30) + 2;
-        //$("#arrow-content").width(pageLen);
-        //$("#section-content").width(pageLen);
-        //$("#arrow-bar").width(pageLen * 30);
     }
-
-
+    
 }
 

@@ -108,13 +108,13 @@
         padding:20px;
     }
 
-        .content-window .post-quiz.correct {
+        /*.content-window .post-quiz.correct {
             border-color:green;
         }
 
         .content-window .post-quiz.incorrect {
             border-color:red;
-        }
+        }*/
 
     .content-window .multiButton {
         width:300px !important;
@@ -148,18 +148,18 @@
     #full-modal{
         display:none;
         position:absolute;
-        top:20px;
-        left:20px;
-        width:1520px;
-        height:820px;
+        top:100px;
+        left:100px;
+        width:1320px;
+        height:620px;
         background:white;
         border: 2px outset black;
         border-radius:5px;
         padding:20px;
     }
     #full-modal-content{
-        width:95%;
-        height:95%;
+        width:90%;
+        height:90%;
         background-size:contain;
         background-repeat:no-repeat;
     }

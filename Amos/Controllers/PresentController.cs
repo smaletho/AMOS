@@ -121,7 +121,13 @@ namespace Amos.Controllers
                             string isCorrect = "";
                             if (quiz.UserAnswer == quiz.CorrectAnswer) isCorrect = "Correct";
                             else isCorrect = "Incorrect";
-                            sb.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}" + Environment.NewLine, tracker.Email, quiz.Module, quiz.Question.Replace(",", ""), quiz.UserAnswer.Replace(",", ""), quiz.CorrectAnswer, isCorrect, dt.ToShortDateString(), dt.ToString("HH:mm"));
+                            string q = quiz.Question;
+                            q = q.Replace(",", "");
+
+                            string a = quiz.UserAnswer;
+                            a = a.Replace(",", "");
+
+                            sb.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}" + Environment.NewLine, tracker.Email, quiz.Module, q, a, quiz.CorrectAnswer, isCorrect, dt.ToShortDateString(), dt.ToString("HH:mm"));
                         }
                     }
                     catch { }
@@ -135,7 +141,25 @@ namespace Amos.Controllers
                         foreach (var survey in ob.SurveyResponses)
                         {
                             DateTime dt = Convert.ToDateTime(survey.Time);
-                            sb.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}, {6}" + Environment.NewLine, tracker.Email, survey.Module, survey.Question.Replace(",", ""), SubjectController.GetTextFromSurveyValue(survey.UserAnswer.value), survey.UserAnswer.comments.Replace(",", ""), dt.ToShortDateString(), dt.ToString("HH:mm"));
+                            string q = survey.Question;
+                            q = q.Replace(",", "");
+
+                            string a = "";
+                            if (survey.UserAnswer.comments != null)
+                            {
+                                a = survey.UserAnswer.comments;
+                                a = a.Replace(",", "");
+                            }
+
+                            string a2 = "";
+                            try
+                            {
+                                a2 = SubjectController.GetTextFromSurveyValue((int)survey.UserAnswer.value);
+                            }
+                            catch { }
+
+
+                            sb.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}, {6}" + Environment.NewLine, tracker.Email, survey.Module, q, a2, a, dt.ToShortDateString(), dt.ToString("HH:mm"));
                         }
 
                     }
@@ -150,7 +174,28 @@ namespace Amos.Controllers
                         foreach (var activity in ob.ActivityTracking)
                         {
                             DateTime dt = Convert.ToDateTime(activity.Time);
-                            sb.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}" + Environment.NewLine, tracker.Email, activity.to, activity.from, activity.description, dt.ToShortDateString(), dt.ToString("HH:mm"));
+                            string desc = "";
+                            if (activity.description != null)
+                            {
+                                desc = activity.description;
+                                desc = desc.Replace(",", " ");
+                            }
+
+                            string to = "";
+                            if (activity.to != null)
+                            {
+                                to = activity.to;
+                                to = to.Replace(",", " ");
+                            }
+
+                            string from = "";
+                            if (activity.from != null)
+                            {
+                                from = activity.from;
+                                from = from.Replace(",", "");
+                            }
+
+                            sb.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}" + Environment.NewLine, tracker.Email, to, from, desc, dt.ToShortDateString(), dt.ToString("HH:mm"));
                         }
                     }
                     catch { }

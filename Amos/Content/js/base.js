@@ -104,7 +104,7 @@ function secondInit() {
     });
 
     $("#popup").dialog({
-        position: { my: "center top", at: "center top+100", of: window },
+        position: { my: "center top", at: "center top+100", of: "#main-window" },
         autoOpen: false,
         height: "auto",
         width: "auto",
