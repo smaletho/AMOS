@@ -60,7 +60,7 @@ namespace Amos.Controllers
                     string a = quiz.UserAnswer;
                     a = a.Replace(",", "");
 
-                    sb.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}" + Environment.NewLine, user.Email, quiz.Module, q, a, quiz.CorrectAnswer, isCorrect, dt.ToShortDateString(), dt.ToString("HH:mm"));
+                    sb.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}" + Environment.NewLine, user.Email, quiz.Module, q, a, quiz.CorrectAnswer, isCorrect, dt.ToShortDateString(), dt.ToString("HH:mm:ss"));
                 }
             }
 
@@ -93,7 +93,7 @@ namespace Amos.Controllers
                     catch { }
                     
 
-                    sb.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}, {6}" + Environment.NewLine, user.Email, survey.Module, q, a2, a, dt.ToShortDateString(), dt.ToString("HH:mm"));
+                    sb.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}, {6}" + Environment.NewLine, user.Email, survey.Module, q, a2, a, dt.ToShortDateString(), dt.ToString("HH:mm:ss"));
                 }
             }
 
@@ -130,7 +130,7 @@ namespace Amos.Controllers
                         from = from.Replace(",", "");
                     }
 
-                    sb.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}" + Environment.NewLine, user.Email, to, from, desc, dt.ToShortDateString(), dt.ToString("HH:mm"));
+                    sb.AppendFormat("{0}, {1}, {2}, {3}, {4}, {5}" + Environment.NewLine, user.Email, to, from, desc, dt.ToShortDateString(), dt.ToString("HH:mm:ss"));
                 }
             }
 

@@ -51,6 +51,11 @@ function renderInit() {
         var text = $(this).data('text');
         var item = $(this).data('content');
 
+        try {
+            var size = parseInt($(this).data('size')) + 32;
+            $("#popup").dialog("option", "width", size);
+        } catch (err) { console.log("Error with dialog size: "); }
+
         $("#popup-text").text(text);
         addUserActionLog("Dialog link/button clicked. Text: " + text);
 

@@ -2718,8 +2718,19 @@ namespace Amos.Controllers
         public static bool IsBookPublished(int id)
         {
             ApplicationDbContext db = new ApplicationDbContext();
-            var book = db.Books.Find(id);
-            return book.Published;
+            if (id == 0) return false;
+            else
+            {
+                try
+                {
+                    var book = db.Books.Find(id);
+                    return book.Published;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
         }
         public ActionResult NoAccess(int id)
         {
