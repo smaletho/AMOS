@@ -406,6 +406,7 @@
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <Content Include="RunJobs.bat" />
     <Content Include="README.md" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <None Include="Scripts\jquery-3.3.1-vsdoc.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
@@ -491,10 +492,12 @@
     <Content Include="Views\PageSelect\AddPage.cshtml" />
     <Content Include="Views\Build\ManageButtons.cshtml" />
     <Content Include="Views\Build\NoAccess.cshtml" />
+    <Content Include="_FileTransfer\Import\export_Ultrasound Imaging_2019-09-2--16-32-50.zip" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="ZipDump\" />
+    <Folder Include="_FileTransfer\SubjectData\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -541,6 +544,10 @@
     <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.2.9.0\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.2.9.0\build\Microsoft.Net.Compilers.props'))" />
   </Target>
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

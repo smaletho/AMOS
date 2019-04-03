@@ -28,8 +28,10 @@ namespace Amos.Controllers
 
         public ActionResult ProcessScheduledJobs()
         {
-            string ImportBookDirectory = "C:/Users/rktcreative/Desktop/AMOS_Content/Import";
-            string ExportSubjectDataDirectory = "C:/Users/rktcreative/Desktop/AMOS_Content/SubjectData/";
+            string ImportBookDirectory = Server.MapPath("~/_FileTransfer/Import");
+            //string ImportBookDirectory = "C:/Users/rktcreative/Desktop/AMOS_Content/Import";
+            string ExportSubjectDataDirectory = Server.MapPath("~/_FileTransfer/SubjectData");
+            //string ExportSubjectDataDirectory = "C:/Users/rktcreative/Desktop/AMOS_Content/SubjectData/";
 
             var db = new ApplicationDbContext();
 

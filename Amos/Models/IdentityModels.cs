@@ -21,7 +21,7 @@ namespace Amos.Models
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext()
-            : base("DefaultConnection", throwIfV1Schema: false)
+            : base("AMOS", throwIfV1Schema: false)
         {
         }
 
