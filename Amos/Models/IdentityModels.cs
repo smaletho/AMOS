@@ -1,4 +1,5 @@
 ﻿using System.Data.Entity;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
@@ -21,8 +22,9 @@ namespace Amos.Models
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext()
-            : base("AMOS", throwIfV1Schema: false)
+            : base("DefaultConnection", throwIfV1Schema: false)
         {
+            
         }
 
         public virtual DbSet<Book> Books { get; set; }

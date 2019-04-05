@@ -95,8 +95,8 @@
                             <li><a href="javascript:void(0)" onclick="confirmDelete(@item.BookId)">Delete</a></li>
                             <li class="disabled"><a class="load-spin" href="@Url.Action("Duplicate", new { id = item.BookId })">Duplicate</a></li>
                             <li role="separator" class="divider"></li>
-                            <li class="disabled"><a href="@Url.Action("Export", new { id = item.BookId })">Export Configuration</a></li>
-                            <li class="disabled"><a href="@Url.Action("Download", new { id = item.BookId })">Download (for offline use)</a></li>
+                            <li class="disabled"><a class="load-spin" href="@Url.Action("Export", new { id = item.BookId })">Export Configuration</a></li>
+                            <li class="disabled"><a class="load-spin" href="@Url.Action("Download", new { id = item.BookId })">Download (for offline use)</a></li>
                         }
 
 

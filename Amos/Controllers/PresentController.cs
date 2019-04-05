@@ -4,8 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Text;
 using System.Web;
+using System.Web.Hosting;
 using System.Web.Mvc;
 
 namespace Amos.Controllers
@@ -26,11 +29,82 @@ namespace Amos.Controllers
             return View(adb.Books.Where(x => x.Published).ToList());
         }
 
+        public static void InitialImport()
+        {
+            string ImportBookDirectory = HostingEnvironment.MapPath("~/_FileTransfer/Import");
+            string ExportSubjectDataDirectory = HostingEnvironment.MapPath("~/_FileTransfer/SubjectData/");
+
+            var db = new ApplicationDbContext();
+
+
+            // Check for books waiting to be imported
+            var existingBooks = db.Books.Select(x => x.FileName).ToList();
+
+            string sourceDir = ImportBookDirectory;
+
+            string curlReturn = "";
+
+            try
+            {
+                DirectoryInfo di = new DirectoryInfo(sourceDir);
+                foreach (FileInfo file in di.GetFiles())
+                {
+                    if (!existingBooks.Contains(file.Name))
+                    {
+                        ScheduledJobTracker log = new ScheduledJobTracker();
+                        try
+                        {
+                            // import this book
+                            FileStream fs = file.OpenRead();
+
+                            log.Action = "Found new book for import (" + file.Name + ")";
+                            log.ExecutionTime = DateTime.Now;
+                            List<string> results = Controllers.BuildController.Action_Import(fs, file.Name);
+                            log.ExtraData = string.Join("\n", results);
+                        }
+                        catch (IOException e)
+                        {
+                            // Trouble reading the file
+                            log.Action = "Found new book for import (" + file.Name + ")";
+                            log.ExecutionTime = DateTime.Now;
+                            log.ExtraData = "ERROR! IOException. " + e.InnerException;
+                        }
+                        catch (UnauthorizedAccessException e)
+                        {
+                            // Does not have read access to the file
+                            log.Action = "Found new book for import (" + file.Name + ")";
+                            log.ExecutionTime = DateTime.Now;
+                            log.ExtraData = "ERROR! UnauthorizedAccessException. " + e.InnerException;
+                        }
+                        curlReturn += log.ExtraData + Environment.NewLine;
+                        db.ScheduledJobTrackers.Add(log);
+                    }
+                }
+            }
+            catch (DirectoryNotFoundException e)
+            {
+                // Could not find directory
+                ScheduledJobTracker log = new ScheduledJobTracker();
+                log.Action = "Found new book for import (n/a)";
+                log.ExecutionTime = DateTime.Now;
+                log.ExtraData = "ERROR! DirectoryNotFoundException. " + e.InnerException;
+                curlReturn += log.ExtraData + Environment.NewLine;
+                db.ScheduledJobTrackers.Add(log);
+            }
+
+            db.SaveChanges();
+
+        }
+
         public ActionResult ProcessScheduledJobs()
         {
             string ImportBookDirectory = Server.MapPath("~/_FileTransfer/Import");
             //string ImportBookDirectory = "C:/Users/rktcreative/Desktop/AMOS_Content/Import";
-            string ExportSubjectDataDirectory = Server.MapPath("~/_FileTransfer/SubjectData");
+
+            string ExportSubjectDataDirectory = Server.MapPath("~/_FileTransfer/SubjectData/");
+
+
+
             //string ExportSubjectDataDirectory = "C:/Users/rktcreative/Desktop/AMOS_Content/SubjectData/";
 
             var db = new ApplicationDbContext();
@@ -214,19 +288,19 @@ namespace Amos.Controllers
                         log.ExtraData = "File: " + ExportSubjectDataDirectory + DateTime.Now.Ticks + "_export.csv";
                         curlReturn += log.ExtraData + Environment.NewLine;
                         db.ScheduledJobTrackers.Add(log);
+                        tracker.Exported = true;
                     }
                     catch (Exception e)
                     {
                         ScheduledJobTracker log = new ScheduledJobTracker();
                         log.Action = "UNABLE to export data";
                         log.ExecutionTime = DateTime.Now;
-                        log.ExtraData = "File: " + ExportSubjectDataDirectory + DateTime.Now.Ticks + "_export.csv. " + e.InnerException;
+                        log.ExtraData = "File: " + ExportSubjectDataDirectory + DateTime.Now.Ticks + "_export.csv. " + e.InnerException + " | " + e.Message;
                         curlReturn += log.ExtraData + Environment.NewLine;
                         db.ScheduledJobTrackers.Add(log);
                     }
 
                     // set the "exported" bit to true
-                    tracker.Exported = true;
                     db.SaveChanges();
 
                     // sleeping here prevents files from having identical names

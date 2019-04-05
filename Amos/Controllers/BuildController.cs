@@ -101,10 +101,11 @@ namespace Amos.Controllers
                 HttpPostedFileBase file = Request.Files[0];
                 model.ResponseList = Action_Import(file.InputStream, "");
             }
-            catch (NotImplementedException e)
+            catch (Exception e)
             {
-                model.ResponseList.Add("Couldn't open file. Exception: " + e.Message);
+                model.ResponseList.Add("Couldn't open file, or none specified. Exception: " + e.Message);
             }
+            
 
 
 
