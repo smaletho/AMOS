@@ -506,7 +506,7 @@
     <Content Include="Views\PageSelect\AddPage.cshtml" />
     <Content Include="Views\Build\ManageButtons.cshtml" />
     <Content Include="Views\Build\NoAccess.cshtml" />
-    <Content Include="_FileTransfer\Import\export_Ultrasound Imaging_2019-09-2--16-32-50.zip" />
+    <Content Include="_FileTransfer\Import\export_Ultrasound Imaging_2019-05-4--19-16-42.zip" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
