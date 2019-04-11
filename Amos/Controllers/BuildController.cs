@@ -824,7 +824,7 @@ namespace Amos.Controllers
             }
 
             string dt = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
-            string fullFileName = Server.MapPath("~/ZipDump/export_" + bookName + "_" + dt + ".zip");
+            string fullFileName = Server.MapPath("~/_FileTransfer/ZipDump/export_" + bookName + "_" + dt + ".zip");
             string fileName = "export_" + bookName + "_" + dt + ".zip";
 
             Dictionary<string, string> fileNameToExtension = new Dictionary<string, string>();
@@ -841,7 +841,7 @@ namespace Amos.Controllers
                     {
                         if (f.Content != null)
                         {
-                            string fName = Server.MapPath("~/ZipDump/f_" + f.FileId.ToString() + "_" + dt);
+                            string fName = Server.MapPath("~/_FileTransfer/ZipDump/f_" + f.FileId.ToString() + "_" + dt);
                             string newFileName = "/Content/";
                             switch (f.FileType)
                             {
@@ -898,7 +898,7 @@ namespace Amos.Controllers
                 }
 
                 // write the XML to a file too
-                string configFileName = Server.MapPath("~/ZipDump/config.xml");
+                string configFileName = Server.MapPath("~/_FileTransfer/ZipDump/config.xml");
                 using (var tw = new StreamWriter(configFileName, true))
                 {
                     // Images need to have the right file type associated with them. It's not always explicitly specified
@@ -934,8 +934,8 @@ namespace Amos.Controllers
 
         public void CreateFolderIfNotThere()
         {
-            if (!Directory.Exists(Server.MapPath("~/ZipDump")))
-                Directory.CreateDirectory(Server.MapPath("~/ZipDump"));
+            if (!Directory.Exists(Server.MapPath("~/_FileTransfer/ZipDump")))
+                Directory.CreateDirectory(Server.MapPath("~/_FileTransfer/ZipDump"));
         }
 
 
@@ -974,12 +974,12 @@ namespace Amos.Controllers
             }
 
 
-            string fullFileName = Server.MapPath("~/ZipDump/" + bookName + "_" + dt + ".zip");
+            string fullFileName = Server.MapPath("~/_FileTransfer/ZipDump/" + bookName + "_" + dt + ".zip");
             string fileName = bookName + "_" + dt + ".zip";
 
-            string configFile1 = Server.MapPath("~/ZipDump/1config_" + dt + ".js");
-            string configFile2 = Server.MapPath("~/ZipDump/2config_" + dt + ".js");
-            string homeFile = Server.MapPath("~/ZipDump/index.html");
+            string configFile1 = Server.MapPath("~/_FileTransfer/ZipDump/1config_" + dt + ".js");
+            string configFile2 = Server.MapPath("~/_FileTransfer/ZipDump/2config_" + dt + ".js");
+            string homeFile = Server.MapPath("~/_FileTransfer/ZipDump/index.html");
 
             using (ZipFile zip = new ZipFile())
             {
@@ -1018,7 +1018,7 @@ namespace Amos.Controllers
                     {
                         if (f.Content != null)
                         {
-                            string fName = Server.MapPath("~/ZipDump/f_" + f.FileId.ToString() + "_" + dt);
+                            string fName = Server.MapPath("~/_FileTransfer/ZipDump/f_" + f.FileId.ToString() + "_" + dt);
                             string newFileName = "/Content/";
                             switch (f.FileType)
                             {
@@ -1143,7 +1143,7 @@ namespace Amos.Controllers
         }
         public void DeleteOldFiles()
         {
-            string sourceDir = Server.MapPath("~/ZipDump/");
+            string sourceDir = Server.MapPath("~/_FileTransfer/ZipDump/");
 
             try
             {

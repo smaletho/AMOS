@@ -243,7 +243,7 @@ function loadPage(id, type, navDescription) {
 
 
         // TODO will this work in all versions? (more testing)
-        if (UserTracker.CurrentLocation === null)
+        if (UserTracker.CurrentLocation === null || typeof UserTracker.CurrentLocation === "undefined")
             goToTheBeginning();
         else
             loadPage(UserTracker.CurrentLocation.Page, "page", "returning user");

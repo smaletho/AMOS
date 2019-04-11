@@ -405,6 +405,8 @@
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Initialize_Amos.bat" />
+    <Content Include="_FileTransfer\SubjectData\empty.txt" />
+    <Content Include="_FileTransfer\ZipDump\empty.txt" />
     <None Include="Properties\PublishProfiles\COMfORT2vm - Web Deploy.pubxml" />
     <Content Include="PermissionChange.exe" />
     <Content Include="Scripts\bootstrap.js" />
@@ -445,7 +447,9 @@
     <Content Include="Scripts\umd\popper-utils.min.js" />
     <Content Include="Scripts\umd\popper.js" />
     <Content Include="Scripts\umd\popper.min.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -506,12 +510,10 @@
     <Content Include="Views\PageSelect\AddPage.cshtml" />
     <Content Include="Views\Build\ManageButtons.cshtml" />
     <Content Include="Views\Build\NoAccess.cshtml" />
-    <Content Include="_FileTransfer\Import\export_Ultrasound Imaging_2019-05-4--19-16-42.zip" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="ZipDump\" />
-    <Folder Include="_FileTransfer\SubjectData\" />
+    <Folder Include="_FileTransfer\Import\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -50,33 +50,53 @@ function displayUserData() {
 
     // Quiz responses
     csv += "Quiz Responses\n";
-    csv += "User, Question, User Answer, Correct Answer, Time Answered\n";
+    csv += "User\tModule\tQuestion\tUser Answer\tCorrect Answer\tIs Correct?\tDate Answered\tTime Answered\n";
     for (i = 0; i < UserTracker.QuizResponses.length; i++) {
-        csv += "\"" + UserTracker.Email + "\", " +
-            "\"" + UserTracker.QuizResponses[i].Question + "\", " +
-            "\"" + UserTracker.QuizResponses[i].UserAnswer + "\", " +
-            "\"" + UserTracker.QuizResponses[i].CorrectAnswer + "\", " +
-            "\"" + UserTracker.QuizResponses[i].Time + "\"\n";
+        csv += "\"" + UserTracker.Email + "\"\t" +
+            "\"" + UserTracker.QuizResponses[i].Module + "\"\t" +
+            "\"" + UserTracker.QuizResponses[i].Question + "\"\t" +
+            "\"" + UserTracker.QuizResponses[i].UserAnswer + "\"\t" +
+            "\"" + UserTracker.QuizResponses[i].CorrectAnswer + "\"\t";
+        if (UserTracker.QuizResponses[i].UserAnswer === UserTracker.QuizResponses[i].CorrectAnswer) {
+            csv += "True\t";
+        } else {
+            csv += "False\t";
+        }
+
+        // date
+        csv += UserTracker.QuizResponses[i].Time.getMonth() + "/" + UserTracker.QuizResponses[i].Time.getDate() + "/" + UserTracker.QuizResponses[i].Time.getFullYear() + "\t";
+        //time
+        csv += UserTracker.QuizResponses[i].Time.getUTCHours() + ":" + UserTracker.QuizResponses[i].Time.getUTCMinutes() + ":" + UserTracker.QuizResponses[i].Time.getUTCSeconds() + "\n";
     }
 
     csv += "\nSurvey Responses\n";
-    csv += "User, Question, Time Answered, User Answer, Comments\n";
+    csv += "User\tModule\tQuestion\tUser Answer\tComments\tDate Answered\tTime Answered\n";
     for (i = 0; i < UserTracker.SurveyResponses.length; i++) {
-        csv += UserTracker.Email + ", " +
-            "\"" + UserTracker.SurveyResponses[i].Question + "\", " +
-            "\"" + UserTracker.SurveyResponses[i].Time + "\", " +
-            "\"" + UserTracker.SurveyResponses[i].UserAnswer.value + "\", " +
-            "\"" + UserTracker.SurveyResponses[i].UserAnswer.comments + "\"\n";
+        csv += "\"" + UserTracker.Email + "\"\t" +
+            "\"" + UserTracker.SurveyResponses[i].Module + "\"\t" +
+            "\"" + UserTracker.SurveyResponses[i].Question + "\"\t" +
+            "\"" + UserTracker.SurveyResponses[i].UserAnswer.value + "\"\t" +
+            "\"" + UserTracker.SurveyResponses[i].UserAnswer.comments + "\"\t";
+
+        // date
+        csv += UserTracker.SurveyResponses[i].Time.getMonth() + "/" + UserTracker.SurveyResponses[i].Time.getDate() + "/" + UserTracker.SurveyResponses[i].Time.getFullYear() + "\t";
+        //time
+        csv += UserTracker.SurveyResponses[i].Time.getUTCHours() + ":" + UserTracker.SurveyResponses[i].Time.getUTCMinutes() + ":" + UserTracker.SurveyResponses[i].Time.getUTCSeconds() + "\n";
     }
 
     csv += "\nActivity Tracker\n";
-    csv += "User, To, From, Description, Time\n";
+    csv += "User\tTo\tFrom\tDescription\Date\tTime\n";
     for (i = 0; i < UserTracker.ActivityTracking.length; i++) {
-        csv += UserTracker.Email + ", " +
-            "\"" + UserTracker.ActivityTracking[i].to + "\", " +
-            "\"" + UserTracker.ActivityTracking[i].from + "\", " +
-            "\"" + UserTracker.ActivityTracking[i].description + "\", " +
-            "\"" + UserTracker.ActivityTracking[i].time + "\"\n";
+        csv += "\"" + UserTracker.Email + "\"\t" +
+            "\"" + UserTracker.ActivityTracking[i].to + "\"\t" +
+            "\"" + UserTracker.ActivityTracking[i].from + "\"\t" +
+            "\"" + UserTracker.ActivityTracking[i].description + "\"\t";
+
+        // date
+        csv += UserTracker.ActivityTracking[i].time.getMonth() + "/" + UserTracker.ActivityTracking[i].time.getDate() + "/" + UserTracker.ActivityTracking[i].time.getFullYear() + "\t";
+        //time
+        csv += UserTracker.ActivityTracking[i].time.getUTCHours() + ":" + UserTracker.ActivityTracking[i].time.getUTCMinutes() + ":" + UserTracker.ActivityTracking[i].time.getUTCSeconds() + "\n";
+
     }
 
     var hiddenElement = document.createElement('a');
@@ -84,4 +104,6 @@ function displayUserData() {
     hiddenElement.target = '_blank';
     hiddenElement.download = 'export.csv';
     hiddenElement.click();
+
+    openDialog("A file containing the user data has been exported. Feel free to close the browser window to complete the training.", "Thank you!");
 }

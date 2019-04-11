@@ -52,7 +52,15 @@ function buildTableOfContents() {
 
 
             tocHtmlString += "<div data-id='" + id + "' class='nav-link " + type + " theme" + this.attributes.theme.value + "'>";
-            tocHtmlString += '<div class="color-block"><div class="dark-box"><img src="' + URL_Content + 'Content/images/left-mask.png" width="20" height="40" /></div><div class="light-box"><img src="' + URL_Content + 'Content/images/right-mask.png" width="20" height="40" /></div></div>';
+
+            var newContent = "";
+            if (applicationMode !== "offline") {
+                newContent = URL_Content;
+            } else {
+                newContent = "./";
+            }
+
+            tocHtmlString += '<div class="color-block"><div class="dark-box"><img src="' + newContent + 'Content/images/left-mask.png" width="20" height="40" /></div><div class="light-box"><img src="' + newContent + 'Content/images/right-mask.png" width="20" height="40" /></div></div>';
             tocHtmlString += "<div class='text'>" + name + "</div>";
             tocHtmlString += "</div>";
         }

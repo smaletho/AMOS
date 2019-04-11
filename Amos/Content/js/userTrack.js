@@ -15,7 +15,7 @@ function initTracking() {
 
     if (applicationMode !== "viewer") {
         
-        setInterval(saveUserTracking, 30000);
+        setInterval(saveTracker, 30000);
 
         openSubjectDialog();
     } else {

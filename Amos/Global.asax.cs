@@ -22,23 +22,23 @@ namespace Amos
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            // Create initial folders
-            if (!Directory.Exists(Server.MapPath("~/ZipDump")))
-                Directory.CreateDirectory(Server.MapPath("~/ZipDump"));
-            if (Directory.Exists(Server.MapPath("~/_FileTransfer")))
-            {
-                Directory.CreateDirectory(Server.MapPath("~/_FileTransfer"));
-                var subjectDataFolder = Directory.CreateDirectory(Server.MapPath("~/_FileTransfer/SubjectData"));
+            //// Create initial folders
+            //if (!Directory.Exists(Server.MapPath("~/_FileTransfer/ZipDump")))
+            //    Directory.CreateDirectory(Server.MapPath("~/_FileTransfer/ZipDump"));
+            //if (Directory.Exists(Server.MapPath("~/_FileTransfer")))
+            //{
+            //    Directory.CreateDirectory(Server.MapPath("~/_FileTransfer"));
+            //    var subjectDataFolder = Directory.CreateDirectory(Server.MapPath("~/_FileTransfer/SubjectData"));
 
-                DirectorySecurity security = subjectDataFolder.GetAccessControl();
+            //    DirectorySecurity security = subjectDataFolder.GetAccessControl();
 
-                SecurityIdentifier everyone = new SecurityIdentifier(WellKnownSidType.WorldSid, null);
-                security.AddAccessRule(new FileSystemAccessRule(everyone,
-                                        FileSystemRights.Write,
-                                        AccessControlType.Allow));
+            //    SecurityIdentifier everyone = new SecurityIdentifier(WellKnownSidType.WorldSid, null);
+            //    security.AddAccessRule(new FileSystemAccessRule(everyone,
+            //                            FileSystemRights.Write,
+            //                            AccessControlType.Allow));
 
-                subjectDataFolder.SetAccessControl(security);
-            }
+            //    subjectDataFolder.SetAccessControl(security);
+            //}
 
             PresentController.InitialImport();
 
