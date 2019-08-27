@@ -65,12 +65,19 @@
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; @DateTime.Now.Year - AMOS</p>
+            <p>
+                &copy; @DateTime.Now.Year - AMOS - Version: @Amos.Version.VersionNumber
+            </p>
         </footer>
     </div>
     @RenderSection("footer", required: false)
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+    <script>
+        $(function () {
+            $('[data-toggle="popover"]').popover();
+        });
+    </script>
     @RenderSection("scripts", required: false)
 </body>
 </html>

@@ -98,14 +98,13 @@ namespace Amos.Controllers
 
         public ActionResult ProcessScheduledJobs()
         {
-            string ImportBookDirectory = Server.MapPath("~/_FileTransfer/Import");
+            //string ImportBookDirectory = Server.MapPath("~/_FileTransfer/Import");
             //string ImportBookDirectory = "C:/Users/rktcreative/Desktop/AMOS_Content/Import";
+            string ImportBookDirectory = "E:/AMOS/Import";
 
-            string ExportSubjectDataDirectory = Server.MapPath("~/_FileTransfer/SubjectData/");
-
-
-
+            //string ExportSubjectDataDirectory = Server.MapPath("~/_FileTransfer/SubjectData/");
             //string ExportSubjectDataDirectory = "C:/Users/rktcreative/Desktop/AMOS_Content/SubjectData/";
+            string ExportSubjectDataDirectory = "E:/AMOS/Data";
 
             var db = new ApplicationDbContext();
 
@@ -249,7 +248,7 @@ namespace Amos.Controllers
 
                         foreach (var activity in ob.ActivityTracking)
                         {
-                            DateTime dt = Convert.ToDateTime(activity.Time);
+                            DateTime dt = Convert.ToDateTime(activity.time);
                             string desc = "";
                             if (activity.description != null)
                             {

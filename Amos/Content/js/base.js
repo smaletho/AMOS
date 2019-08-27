@@ -13,11 +13,6 @@ $(function () {
     $("body").mousemove(function (e) {
         idleTime = 0;
     });
-    // This part is in navigation.js
-    //$(document).keydown(function (e) {
-    //    idleTime = 0;
-    //    console.log('timer reset');
-    //});
 
     // If location.hostname == "", it means that the app is running as a "file" not on a server
     //  therefore, we're offline, so do that load instead
@@ -104,7 +99,7 @@ function secondInit() {
     });
 
     $("#popup").dialog({
-        position: { my: "center top", at: "center top+100", of: "#main-window" },
+        position: { my: "center top", at: "center top+100", of: window },
         autoOpen: false,
         height: "auto",
         width: "auto",

@@ -64,7 +64,7 @@ function displayUserData() {
         }
 
         // date
-        csv += UserTracker.QuizResponses[i].Time.getMonth() + "/" + UserTracker.QuizResponses[i].Time.getDate() + "/" + UserTracker.QuizResponses[i].Time.getFullYear() + "\t";
+        csv += (UserTracker.QuizResponses[i].Time.getMonth() + 1) + "/" + UserTracker.QuizResponses[i].Time.getDate() + "/" + UserTracker.QuizResponses[i].Time.getFullYear() + "\t";
         //time
         csv += UserTracker.QuizResponses[i].Time.getUTCHours() + ":" + UserTracker.QuizResponses[i].Time.getUTCMinutes() + ":" + UserTracker.QuizResponses[i].Time.getUTCSeconds() + "\n";
     }
@@ -79,7 +79,7 @@ function displayUserData() {
             "\"" + UserTracker.SurveyResponses[i].UserAnswer.comments + "\"\t";
 
         // date
-        csv += UserTracker.SurveyResponses[i].Time.getMonth() + "/" + UserTracker.SurveyResponses[i].Time.getDate() + "/" + UserTracker.SurveyResponses[i].Time.getFullYear() + "\t";
+        csv += (UserTracker.SurveyResponses[i].Time.getMonth() + 1) + "/" + UserTracker.SurveyResponses[i].Time.getDate() + "/" + UserTracker.SurveyResponses[i].Time.getFullYear() + "\t";
         //time
         csv += UserTracker.SurveyResponses[i].Time.getUTCHours() + ":" + UserTracker.SurveyResponses[i].Time.getUTCMinutes() + ":" + UserTracker.SurveyResponses[i].Time.getUTCSeconds() + "\n";
     }
@@ -93,7 +93,7 @@ function displayUserData() {
             "\"" + UserTracker.ActivityTracking[i].description + "\"\t";
 
         // date
-        csv += UserTracker.ActivityTracking[i].time.getMonth() + "/" + UserTracker.ActivityTracking[i].time.getDate() + "/" + UserTracker.ActivityTracking[i].time.getFullYear() + "\t";
+        csv += (UserTracker.ActivityTracking[i].time.getMonth() + 1) + "/" + UserTracker.ActivityTracking[i].time.getDate() + "/" + UserTracker.ActivityTracking[i].time.getFullYear() + "\t";
         //time
         csv += UserTracker.ActivityTracking[i].time.getUTCHours() + ":" + UserTracker.ActivityTracking[i].time.getUTCMinutes() + ":" + UserTracker.ActivityTracking[i].time.getUTCSeconds() + "\n";
 

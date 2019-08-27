@@ -29,13 +29,18 @@ function bindKeyboard() {
         if (event.which === 39) {
             // going forwards
             nextPage("arrow key navigation");
+            event.preventDefault();
         } else if (event.which === 37) {
             // going backwards
             previousPage("arrow key navigation");
+            event.preventDefault();
         } else if (event.which === 32) {
             // make sure the focused element isn't an input or textarea
-            if (!$("input[type=text]").is(":focus") && !$("textarea").is(":focus"))
+            if (!$("input[type=text]").is(":focus") && !$("textarea").is(":focus")) {
                 nextPage("spacebar navigation");
+                event.preventDefault();
+            }
+                
         }
     });
 }
@@ -52,7 +57,7 @@ function unbindNavigation() {
 
 function nextPage(type) {
     // CurrentLocation
-
+    window.scrollTo(0, 0);
 
     var allPages = $(ConfigXml).find('page');
 
@@ -86,6 +91,7 @@ function nextPage(type) {
     }
 }
 function previousPage(type) {
+    window.scrollTo(0, 0);
     var allPages = $(ConfigXml).find('page');
 
     for (var i = 0; i < allPages.length; i++) {

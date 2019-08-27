@@ -12,11 +12,13 @@ function renderInit() {
     });
 
     $(".definitionPopup").on('click', function () {
-        var pos = $(this).offset();
+        
+        var rect = $(this)[0].getBoundingClientRect();
 
-
-        $("#definitionWindow").css('top', (pos.top - 125) + "px");
-        $("#definitionWindow").css('left', pos.left + "px");
+        var top = (rect.bottom / ScaleRatio) - 125;
+        
+        $("#definitionWindow").css('top', top + "px");
+        $("#definitionWindow").css('left', rect.left / ScaleRatio + "px");
 
         $("#definitionWindow").show();
         $("#definitionWindow").text($(this).data('text'));
@@ -146,7 +148,7 @@ function renderInit() {
         
         $("#popup").dialog('open');
         setTimeout(function () {
-            $("#popup").dialog("option", "position", { my: "center top", at: "center top+100", of: "#main-window" });
+            $("#popup").dialog("option", "position", { my: "center top", at: "center top+100", of: window });
         }, 100);
         return false;
     });

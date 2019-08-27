@@ -710,7 +710,8 @@ namespace Amos.Controllers
                                             {
                                                 // change the id from the old one to the matching new one
                                                 //button.SetAttribute("data-page", oldToNewPageNumbers[button.Attributes["data-page"].Value]);
-                                                if (oldToNewPageNumbers.TryGetValue("p_" + button.GetAttribute("data-page"), out string value))
+                                                string value;
+                                                if (oldToNewPageNumbers.TryGetValue("p_" + button.GetAttribute("data-page"), out value))
                                                 {
                                                     button.SetAttribute("data-page", value.Split('_')[1]);
                                                 }
@@ -719,7 +720,8 @@ namespace Amos.Controllers
                                             {
                                                 // change the id from the old one to the matching new one
                                                 //button.SetAttribute("id", oldToNewPageNumbers[button.Attributes["id"].Value]);
-                                                if (oldToNewPageNumbers.TryGetValue(button.Attributes["id"].Value, out string value))
+                                                string value;
+                                                if (oldToNewPageNumbers.TryGetValue(button.Attributes["id"].Value, out value))
                                                 {
                                                     button.SetAttribute("id", value);
                                                 }
@@ -738,7 +740,8 @@ namespace Amos.Controllers
                                             {
                                                 // change the id from the old one to the matching new one
                                                 //a.SetAttribute("data-id", oldToNewPageNumbers[a.Attributes["data-id"].Value]);
-                                                if (oldToNewPageNumbers.TryGetValue(a.GetAttribute("data-id"), out string value))
+                                                string value;
+                                                if (oldToNewPageNumbers.TryGetValue(a.GetAttribute("data-id"), out value))
                                                 {
                                                     a.SetAttribute("data-id", value);
                                                 }
@@ -747,7 +750,8 @@ namespace Amos.Controllers
                                             {
                                                 // change the id from the old one to the matching new one
                                                 //a.SetAttribute("data-page", oldToNewPageNumbers[a.Attributes["data-page"].Value]);
-                                                if (oldToNewPageNumbers.TryGetValue("p_" + a.GetAttribute("data-page"), out string value))
+                                                string value;
+                                                if (oldToNewPageNumbers.TryGetValue("p_" + a.GetAttribute("data-page"), out value))
                                                 {
                                                     a.SetAttribute("data-page", value.Split('_')[1]);
                                                 }
