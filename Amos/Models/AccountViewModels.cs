@@ -49,7 +49,7 @@ namespace Amos.Models
     public class LoginViewModel
     {
         [Required]
-        [Display(Name = "Email")]
+        [Display(Name = "Login")]
         [EmailAddress]
         public string Email { get; set; }
 

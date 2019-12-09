@@ -7,6 +7,6 @@ namespace Amos
 {
     public class Version
     {
-        public static string VersionNumber = "v1.0_20190816";
+        public static string VersionNumber = "v1.1_20190927";
     }
 }
